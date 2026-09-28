@@ -1,0 +1,128 @@
+/* Paleta de colores extraída de la imagen */
+:root {
+    --fondo-principal: #0a0a0a; /* Negro profundo para el fondo */
+    --fondo-tarjetas: #1a1a1a;  /* Gris oscuro para buscadores y tarjetas */
+    --naranja-marca: #ff6600;   /* Naranja vibrante para botones y logo */
+    --texto-principal: #ffffff; /* Blanco puro para legibilidad */
+    --texto-secundario: #a0a0a0;/* Gris claro para descripciones */
+    --borde-sutil: #333333;     /* Gris medio para líneas divisorias */
+}
+
+/* Estilos generales (Dark Theme) */
+body {
+    background-color: var(--fondo-principal);
+    color: var(--texto-principal);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px 50px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--borde-sutil);
+    margin: 30px 0;
+}
+
+h2, h3 {
+    margin-top: 0;
+}
+
+p {
+    color: var(--texto-secundario);
+    font-size: 14px;
+}
+
+/* 1. BARRA DE NAVEGACIÓN SUPERIOR */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+header strong {
+    color: var(--naranja-marca);
+    font-size: 24px;
+    font-style: italic;
+}
+
+header input {
+    background-color: var(--fondo-tarjetas);
+    color: var(--texto-principal);
+    border: 1px solid var(--borde-sutil);
+    padding: 10px 20px;
+    border-radius: 20px; /* Bordes redondeados */
+    width: 300px;
+}
+
+header button {
+    background-color: var(--naranja-marca);
+    color: var(--texto-principal);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+/* 3, 4 y 5. LISTAS Y FILTROS */
+ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+ul li {
+    background-color: var(--fondo-tarjetas);
+    padding: 15px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: 0.3s;
+}
+
+ul li:hover {
+    border-color: var(--naranja-marca);
+}
+
+ul li button {
+    background: none;
+    border: none;
+    color: var(--texto-principal);
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* 6. NEGOCIOS DISPONIBLES (Tarjetas) */
+.grid-restaurantes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+article {
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 15px;
+    padding: 20px;
+    width: 250px;
+}
+
+article h3 {
+    margin-bottom: 5px;
+}
+
+/* Simulación de etiquetas (ej. Abierto, Envíos) */
+.etiqueta-tiempo {
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.etiqueta-abierto {
+    color: #4caf50; /* Verde para indicar abierto */
+    font-weight: bold;
+    font-size: 12px;
+}

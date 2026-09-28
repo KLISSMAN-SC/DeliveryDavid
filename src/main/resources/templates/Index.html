@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>RIDE MEAL - Delivery</title>
+    
+    <!-- Conexión al archivo CSS externo usando Thymeleaf -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+ <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header>
+        <div>
+            <strong>RIDE MEAL</strong>
+        </div>
+        <div>
+            <input type="text" placeholder="Busca restaurantes, platos o categorías...">
+        </div>
+        <div>
+            <span style="color: var(--texto-secundario);">📍 Enviar a: <strong style="color: var(--texto-principal);">Mi ubicación ⌵</strong></span>
+        </div>
+        <div>
+            <span>🛒 0</span>
+            <button>Iniciar sesión</button>
+        </div>
+    </header>
+
+    <hr>
+
+    <!-- 2. SECCIÓN DE BANNER -->
+    <section style="background-color: var(--fondo-tarjetas); height: 200px; border-radius: 15px; display: flex; align-items: center; padding: 0 40px;">
+        <div>
+            <h1 style="font-size: 40px; margin: 0; font-style: italic;">TU ANTOJO,<br><span style="color: var(--naranja-marca);">NUESTRA RUTA.</span></h1>
+            <p style="color: var(--texto-principal);">Comida deliciosa, rápida y directo a tu puerta.</p>
+            <button style="background-color: var(--naranja-marca); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">Pedir ahora →</button>
+        </div>
+    </section>
+
+    <hr>
+
+    <!-- 3. TIPOS DE NEGOCIO (Categoría General) -->
+    <section>
+        <ul>
+            <li>Restaurantes</li>
+            <li>Súper</li>
+            <li>Farmacias</li>
+            <li>Tiendas</li>
+            <li>Bebidas</li>
+            <li>Mascotas</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <!-- 4. LUGARES (Zonas o Centros Comerciales) -->
+    <section>
+        <h2>Lugares</h2>
+        <ul>
+            <li><button>SAPORI</button></li>
+            <li><button>SELVA PLAZA</button></li>
+            <li><button>REAL PLAZA</button></li>
+            <li><button>CENTRO</button></li>
+            <li><button>CALLERIA</button></li>
+            <li><button>YARINA</button></li>
+            <li><button>MANANTAY</button></li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <!-- 5. EXPLORA POR CATEGORÍA (Filtros de comida) -->
+    <section>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Explora por categoría</h2>
+            <span style="color: var(--texto-secundario); cursor: pointer;">Ver todas →</span>
+        </div>
+        <ul>
+            <li>Hamburguesas</li>
+            <li>Pizza</li>
+            <li>Pollería</li>
+            <li>Sushi</li>
+            <li>Comida peruana</li>
+            <li>Salchipapas</li>
+            <li>Saludable</li>
+            <li>Postres</li>
+            <li>Bebidas</li>
+            <li>Más</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <!-- 6. NEGOCIOS DISPONIBLES (Restaurantes cerca de ti) -->
+    <section>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Restaurantes cerca de ti</h2>
+            <div style="display: flex; gap: 10px;">
+                <button style="background-color: var(--naranja-marca); color: white; border: none; padding: 5px 15px; border-radius: 15px;">Todas</button>
+                <button style="background-color: var(--fondo-tarjetas); color: white; border: 1px solid var(--borde-sutil); padding: 5px 15px; border-radius: 15px;">Más cercanos</button>
+            </div>
+        </div>
+        
+        <div class="grid-restaurantes">
+            <!-- Tarjeta de Negocio 1 -->
+            <article>
+                <h3>RIDE Burger</h3>
+                <p>Hamburguesas - Fast Food</p>
+                <span class="etiqueta-tiempo">⏱ 20 - 30 min | 🛵 Envío S/ 0.00 | <span class="etiqueta-abierto">Abierto</span></span>
+            </article>
+
+            <!-- Tarjeta de Negocio 2 -->
+            <article>
+                <h3>Pizzería Roma</h3>
+                <p>Pizza - Italiana</p>
+                <span class="etiqueta-tiempo">⏱ 25 - 40 min | 🛵 Envío S/ 4.90 | <span class="etiqueta-abierto">Abierto</span></span>
+            </article>
+
+            <!-- Tarjeta de Negocio 3 -->
+            <article>
+                <h3>La Brasa de la Casa</h3>
+                <p>Pollería - Criolla</p>
+                <span class="etiqueta-tiempo">⏱ 30 - 40 min | 🛵 Envío S/ 3.90 | <span class="etiqueta-abierto">Abierto</span></span>
+            </article>
+
+            <!-- Tarjeta de Negocio 4 -->
+            <article>
+                <h3>Sushi Go</h3>
+                <p>Sushi - Japonesa</p>
+                <span class="etiqueta-tiempo">⏱ 30 - 45 min | 🛵 Envío S/ 5.90 | <span class="etiqueta-abierto">Abierto</span></span>
+            </article>
+
+            <!-- Tarjeta de Negocio 5 -->
+            <article>
+                <h3>Pasta & Pasta</h3>
+                <p>Pastas - Italiana</p>
+                <span class="etiqueta-tiempo">⏱ 25 - 35 min | 🛵 Envío S/ 4.90 | <span class="etiqueta-abierto">Abierto</span></span>
+            </article>
+        </div>
+    </section>
+
+</body>
+</html>
