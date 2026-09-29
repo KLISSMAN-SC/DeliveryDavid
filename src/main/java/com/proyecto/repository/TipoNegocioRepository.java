@@ -1,5 +1,10 @@
 package com.proyecto.repository;
 
-public interface TipoNegocioRepository {
+import com.proyecto.model.TipoNegocio;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface TipoNegocioRepository extends JpaRepository<TipoNegocio, Integer> {
+    // JpaRepository ya trae métodos como findAll() por defecto
 }

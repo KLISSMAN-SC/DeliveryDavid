@@ -1,5 +1,9 @@
 package com.proyecto.repository;
 
-public interface CategoriaProductoRepository {
+import com.proyecto.model.CategoriaProducto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface CategoriaProductoRepository extends JpaRepository<CategoriaProducto, Integer> {
 }

@@ -39,52 +39,41 @@
     <hr>
 
     <!-- 3. TIPOS DE NEGOCIO (Categoría General) -->
+    <!-- 3. TIPOS DE NEGOCIO (Categoría General desde BD) -->
     <section>
         <ul>
-            <li>Restaurantes</li>
-            <li>Súper</li>
-            <li>Farmacias</li>
-            <li>Tiendas</li>
-            <li>Bebidas</li>
-            <li>Mascotas</li>
+            <!-- th:each funciona como un bucle FOR. Recorre 'listaTipos' -->
+            <!-- th:text reemplaza el texto por el nombre real de la BD -->
+            <li th:each="tipo : ${listaTipos}" th:text="${tipo.nombre}">
+                Categoría (se reemplazará)
+            </li>
         </ul>
     </section>
 
     <hr>
 
-    <!-- 4. LUGARES (Zonas o Centros Comerciales) -->
+    <!-- 4. LUGARES (Zonas desde BD) -->
     <section>
         <h2>Lugares</h2>
         <ul>
-            <li><button>SAPORI</button></li>
-            <li><button>SELVA PLAZA</button></li>
-            <li><button>REAL PLAZA</button></li>
-            <li><button>CENTRO</button></li>
-            <li><button>CALLERIA</button></li>
-            <li><button>YARINA</button></li>
-            <li><button>MANANTAY</button></li>
+            <li th:each="zona : ${listaZonas}">
+                <button th:text="${zona.nombre}">Lugar</button>
+            </li>
         </ul>
     </section>
 
     <hr>
 
-    <!-- 5. EXPLORA POR CATEGORÍA (Filtros de comida) -->
+    <!-- 5. EXPLORA POR CATEGORÍA (Categorías desde BD) -->
     <section>
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Explora por categoría</h2>
             <span style="color: var(--texto-secundario); cursor: pointer;">Ver todas →</span>
         </div>
         <ul>
-            <li>Hamburguesas</li>
-            <li>Pizza</li>
-            <li>Pollería</li>
-            <li>Sushi</li>
-            <li>Comida peruana</li>
-            <li>Salchipapas</li>
-            <li>Saludable</li>
-            <li>Postres</li>
-            <li>Bebidas</li>
-            <li>Más</li>
+            <li th:each="categoria : ${listaCategorias}" th:text="${categoria.nombre}">
+                Categoría
+            </li>
         </ul>
     </section>
 
