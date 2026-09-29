@@ -15,4 +15,15 @@ public class TipoNegocioService {
     public List<TipoNegocio> obtenerTodos() {
         return tipoNegocioRepository.findAll();
     }
+    
+    public TipoNegocio obtenerPorId(Integer id) {
+        return tipoNegocioRepository.findById(id)
+                .orElse(null);
+    }
+    
+    public TipoNegocio obtenerPorNombre(String nombre) {
+
+        return tipoNegocioRepository.findByNombreIgnoreCase(nombre);
+
+    }
 }

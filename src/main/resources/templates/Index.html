@@ -4,18 +4,29 @@
     <meta charset="UTF-8">
     <title>RIDE MEAL - Delivery</title>
     
-    <!-- Conexión al archivo CSS externo usando Thymeleaf -->
+    <!-- Conexión al archivo CSS externo -->
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    
+    <!-- Librería FontAwesome para los íconos de redes sociales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
- <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
+<!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
     <header>
         <div>
             <strong>RIDE MEAL</strong>
         </div>
-        <div>
-            <input type="text" placeholder="Busca restaurantes, platos o categorías...">
+        
+        <!-- Buscador mejorado con Autocomplete -->
+        <div class="search-wrapper">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca lo que necesitas..." autocomplete="off">
+            </div>
+            <!-- Contenedor desplegable dinámico -->
+            <div id="dropdownResultados" class="search-dropdown"></div>
         </div>
+
         <div>
             <span style="color: var(--texto-secundario);">📍 Enviar a: <strong style="color: var(--texto-principal);">Mi ubicación ⌵</strong></span>
         </div>
@@ -28,18 +39,17 @@
     <hr>
 
     <!-- 2. SECCIÓN DE BANNER -->
-    <section style="background-color: var(--fondo-tarjetas); height: 200px; border-radius: 15px; display: flex; align-items: center; padding: 0 40px;">
-        <div>
-            <h1 style="font-size: 40px; margin: 0; font-style: italic;">TU ANTOJO,<br><span style="color: var(--naranja-marca);">NUESTRA RUTA.</span></h1>
-            <p style="color: var(--texto-principal);">Comida deliciosa, rápida y directo a tu puerta.</p>
-            <button style="background-color: var(--naranja-marca); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">Pedir ahora →</button>
+    <section class="banner-principal">
+        <div class="banner-contenido">
+            <h1>TODO LO QUE NECESITAS,<br><span style="color: var(--naranja-marca);">DIRECTO A TU PUERTA.</span></h1>
+            <p>Desde tu plato favorito hasta las compras del súper, farmacia y artículos para tu mascota. Lo llevamos donde estés, en minutos.</p>
+            <button class="btn-banner">Explorar ahora →</button>
         </div>
     </section>
 
     <hr>
 
     <!-- 3. TIPOS DE NEGOCIO (Categoría General) -->
-    <!-- 3. TIPOS DE NEGOCIO (Categoría General desde BD) -->
     <section>
         <ul>
             <!-- th:each funciona como un bucle FOR. Recorre 'listaTipos' -->
@@ -64,22 +74,51 @@
 
     <hr>
 
-    <!-- 5. EXPLORA POR CATEGORÍA (Categorías desde BD) -->
+   <!-- 5. EXPLORA POR CATEGORÍA -->
     <section>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Explora por categoría</h2>
-            <span style="color: var(--texto-secundario); cursor: pointer;">Ver todas →</span>
-        </div>
+        <!-- Título limpio, sin el botón de "Ver todas" -->
+        <h2>Explora por categoría</h2>
+        
         <ul>
-            <li th:each="categoria : ${listaCategorias}" th:text="${categoria.nombre}">
+            <!-- th:each ahora incluye 'iterStat'. El th:if limita a mostrar solo del 0 al 6 (7 elementos) -->
+            <li th:each="nombreCategoria, iterStat : ${listaCategorias}" 
+                th:if="${iterStat.index < 7}" 
+                th:text="${nombreCategoria}">
                 Categoría
+            </li>
+            
+            <!-- Botón de "Más" fijo que abre el modal con el resto de opciones -->
+            <li id="btnAbrirFiltrosCaja" style="text-align: center;">
+                📦<br>Más
             </li>
         </ul>
     </section>
 
+    <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
+    <div id="modalFiltros" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="btnCancelarModal" class="btn-text">Cancelar</span>
+                <h3>Todos los filtros</h3>
+                <span id="btnLimpiarModal" class="btn-text">Limpiar</span>
+            </div>
+            
+            <div class="modal-body">
+			    <!-- También usamos solo "nombreCategoria" y lo convertimos a mayúsculas -->
+			    <button class="filtro-pill" th:each="nombreCategoria : ${listaCategorias}" th:text="${#strings.toUpperCase(nombreCategoria)}">
+			        FILTRO
+			    </button>
+			</div>
+            
+            <div class="modal-footer">
+                <button id="btnAceptarModal" class="btn-aceptar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <hr>
 
-    <!-- 6. NEGOCIOS DISPONIBLES (Restaurantes cerca de ti) -->
+   <!-- 6. NEGOCIOS DISPONIBLES (Restaurantes desde BD) -->
     <section>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Restaurantes cerca de ti</h2>
@@ -90,42 +129,68 @@
         </div>
         
         <div class="grid-restaurantes">
-            <!-- Tarjeta de Negocio 1 -->
-            <article>
-                <h3>RIDE Burger</h3>
-                <p>Hamburguesas - Fast Food</p>
-                <span class="etiqueta-tiempo">⏱ 20 - 30 min | 🛵 Envío S/ 0.00 | <span class="etiqueta-abierto">Abierto</span></span>
+            
+            <!-- Tarjeta generada automáticamente por cada negocio -->
+            <article th:each="negocio : ${listaNegocios}">
+                <!-- Nombre del negocio -->
+                <h3 th:text="${negocio.nombre}">Nombre Negocio</h3>
+                
+                <!-- Mostramos el Tipo de Negocio y su dirección -->
+                <p th:text="${negocio.tipoNegocio.nombre + ' - ' + negocio.direccion}">Categoría</p>
+                
+                <!-- Datos adicionales (Envío y Estado) -->
+                <span class="etiqueta-tiempo">
+                    ⏱ 20 - 30 min | 
+                    🛵 Envío S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span> | 
+                    
+                    <!-- Color dinámico para ABIERTO o CERRADO -->
+                    <span th:text="${negocio.estado}" 
+                          th:style="${negocio.estado == 'ABIERTO'} ? 'color: #4caf50; font-weight: bold;' : 'color: #ff3333; font-weight: bold;'">
+                        Estado
+                    </span>
+                </span>
             </article>
 
-            <!-- Tarjeta de Negocio 2 -->
-            <article>
-                <h3>Pizzería Roma</h3>
-                <p>Pizza - Italiana</p>
-                <span class="etiqueta-tiempo">⏱ 25 - 40 min | 🛵 Envío S/ 4.90 | <span class="etiqueta-abierto">Abierto</span></span>
-            </article>
-
-            <!-- Tarjeta de Negocio 3 -->
-            <article>
-                <h3>La Brasa de la Casa</h3>
-                <p>Pollería - Criolla</p>
-                <span class="etiqueta-tiempo">⏱ 30 - 40 min | 🛵 Envío S/ 3.90 | <span class="etiqueta-abierto">Abierto</span></span>
-            </article>
-
-            <!-- Tarjeta de Negocio 4 -->
-            <article>
-                <h3>Sushi Go</h3>
-                <p>Sushi - Japonesa</p>
-                <span class="etiqueta-tiempo">⏱ 30 - 45 min | 🛵 Envío S/ 5.90 | <span class="etiqueta-abierto">Abierto</span></span>
-            </article>
-
-            <!-- Tarjeta de Negocio 5 -->
-            <article>
-                <h3>Pasta & Pasta</h3>
-                <p>Pastas - Italiana</p>
-                <span class="etiqueta-tiempo">⏱ 25 - 35 min | 🛵 Envío S/ 4.90 | <span class="etiqueta-abierto">Abierto</span></span>
-            </article>
         </div>
     </section>
+    <!-- ... Fin de la sección de Negocios ... -->
+    </section>
 
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-izq">
+            <div>
+                <strong>RIDE MEAL</strong>
+            </div>
+            <p>Comida que encaja con tu día.</p>
+            
+            <!-- Íconos de Redes Sociales -->
+            <div class="redes-sociales">
+                <a href="#" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+            
+            <p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> RIDE MEAL</p>
+        </div>
+        
+        <div class="footer-der">
+            <div class="footer-enlaces">
+                <a href="#">Restaurantes</a>
+                <a href="#">Ayuda</a>
+                <a href="#">Afilia tu restaurante</a>
+            </div>
+            
+            <div class="footer-legal">
+                <a href="#">Términos y condiciones</a> · 
+                <a href="#">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
+    <div id="modalFiltros" class="modal-overlay">
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TipoNegocioRepository extends JpaRepository<TipoNegocio, Integer> {
-    // JpaRepository ya trae métodos como findAll() por defecto
+	TipoNegocio findByNombreIgnoreCase(String nombre);
 }
