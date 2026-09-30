@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NegocioRepository extends JpaRepository<Negocio, Integer> {
-	List<Negocio> findByNombreContainingIgnoreCase(String nombre);
-	List<Negocio> findByTipoNegocio(TipoNegocio tipoNegocio);
+
+
+    List<Negocio> findByNombreContainingIgnoreCase(String nombre);
+
+
+    List<Negocio> findByTipoNegocioIdTipoNegocio(Integer idTipoNegocio);
+
+
 }

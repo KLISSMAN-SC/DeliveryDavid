@@ -9,25 +9,32 @@ import java.util.List;
 
 @Service
 public class NegocioService {
-    
+
+
     @Autowired
     private NegocioRepository negocioRepository;
 
-    public List<Negocio> obtenerTodos() {
+
+
+    public List<Negocio> obtenerTodos(){
+
         return negocioRepository.findAll();
+
     }
-    
-    public List<Negocio> buscarPorNombre(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) {
+
+    public List<Negocio> buscarPorNombre(String nombre){
+
+        if(nombre == null || nombre.trim().isEmpty()){
+
             return List.of();
         }
+        
         return negocioRepository.findByNombreContainingIgnoreCase(nombre.trim());
     }
-    
-    public List<Negocio> obtenerPorTipo(TipoNegocio tipoNegocio){
 
-        return negocioRepository.findByTipoNegocio(tipoNegocio);
+    public List<Negocio> listarPorTipo(Integer idTipoNegocio){
 
+        return negocioRepository.findByTipoNegocioIdTipoNegocio(idTipoNegocio);
     }
-    
+
 }
