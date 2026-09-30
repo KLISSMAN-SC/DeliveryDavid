@@ -122,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         const div = document.createElement("div");
                         div.className = "search-item";
                         
-                        
-						const imagenHTML = (negocio.imagenLogo && negocio.imagenLogo.trim() !== "") 
-						? `<img src="/imagenes/${negocio.imagenLogo}+.jpg" class="search-item-img" alt="Logo">`
-						: `<div class="search-item-placeholder">
-						      <i class="fa-solid fa-image"></i>
-						   </div>`;
-
+						// Ruta corregida usando JavaScript puro en lugar de sintaxis Thymeleaf
+						 const imagenHTML = (negocio.imagenLogo && negocio.imagenLogo.trim() !== "") 
+						  ? `<img src="/api/imagenes/${negocio.imagenLogo.trim()}" class="search-item-img" alt="Logo">`
+						  : `<div class="search-item-placeholder">
+						   <i class="fa-solid fa-image"></i>
+						    </div>`;
+						                      
                         div.innerHTML = `
                             ${imagenHTML}
                             <div class="search-item-info">
