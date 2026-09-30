@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						                      
                         div.innerHTML = `
                             ${imagenHTML}
-                            <div class="search-item-info">
+                            <div class="search-item-info" onclick="abrirRestaurante(${negocio.id})">
                                 <span class="search-item-title">${negocio.nombre}</span>
                                 <span class="search-item-sub">${negocio.tipo} - ${negocio.direccion}</span>
                             </div>
@@ -182,3 +182,50 @@ function volverInicio(){
     location.reload();
 
 }
+// ==========================================
+// 4. CARRUSEL DE PROMOCIONES (Auto y Manual)
+// ==========================================
+let promoIndex = 0;
+let intervaloPromo;
+
+const mostrarPromo = (index) => {
+    const slides = document.querySelectorAll('.promo-slide');
+    const dots = document.querySelectorAll('.promo-dots .dot');
+
+    if (!slides.length) return; // Si no hay carrusel en la página, no hace nada
+
+    // Ocultar todos
+    slides.forEach(slide => slide.classList.remove('activo'));
+    dots.forEach(dot => dot.classList.remove('activo'));
+
+    // Calcular índice cíclico
+    if (index >= slides.length) promoIndex = 0;
+    if (index < 0) promoIndex = slides.length - 1;
+
+    // Mostrar el correspondiente
+    slides[promoIndex].classList.add('activo');
+    dots[promoIndex].classList.add('activo');
+};
+
+const avanzarPromo = () => {
+    promoIndex++;
+    mostrarPromo(promoIndex);
+};
+
+// Se vincula globalmente para que el HTML la pueda llamar con onclick=""
+window.cambiarSlide = (index) => {
+    promoIndex = index;
+    mostrarPromo(promoIndex);
+    
+    // Reiniciar el temporizador automático si el usuario hizo clic manual
+    clearInterval(intervaloPromo);
+    intervaloPromo = setInterval(avanzarPromo, 5000);
+};
+
+// Arrancar el carrusel cuando cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelectorAll('.promo-slide').length > 0) {
+        mostrarPromo(promoIndex);
+        intervaloPromo = setInterval(avanzarPromo, 5000); // 5000 ms = 5 segundos
+    }
+});

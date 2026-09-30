@@ -297,28 +297,92 @@ p {
     font-size: 13px;
 }
 
-/* --- SECCIÓN DE BANNER PRINCIPAL --- */
-.banner-principal {
-    background: linear-gradient(135deg, var(--fondo-tarjetas) 40%, #2a1100 100%);
-    height: 250px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    padding: 0 50px;
-    margin: 20px 0;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--borde-sutil);
+
+/* Espaciado adicional debajo del párrafo principal para separar de los íconos */
+.banner-contenido p {
+    color: var(--texto-secundario);
+    font-size: 15px;
+    margin: 0 0 25px 0; 
+    line-height: 1.5;
 }
 
+/* --- INDICADORES DE CONFIANZA EN EL BANNER --- */
+.banner-features {
+    display: flex;
+    gap: 25px; /* Separación entre cada bloque de ícono+texto */
+    flex-wrap: wrap; /* Permite que se adapten si la pantalla es más pequeña */
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Separación entre el círculo naranja y el texto */
+}
+
+.feature-icon {
+    width: 38px;
+    height: 38px;
+    background-color: var(--naranja-marca);
+    color: var(--fondo-principal); /* Ícono en color negro/oscuro */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.feature-text strong {
+    color: var(--texto-principal);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.feature-text span {
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+/* --- SECCIÓN DE BANNER PRINCIPAL (Fondo fundido y 2 Columnas) --- */
+.banner-principal {
+    /* 
+       Capa 1: Degradado que empieza en color sólido oscuro a la izquierda (para leer el texto),
+               se vuelve transparente al centro (para ver la mochila), y se oscurece un poco a la derecha.
+       Capa 2: La imagen de la mochila centrada como fondo.
+    */
+    background: 
+        linear-gradient(to right, var(--fondo-principal) 25%, transparent 55%, rgba(10,10,10,0.6) 100%),
+        url('/api/banner/mochila.png') center / cover no-repeat;
+    
+    min-height: 240px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px;
+    margin: 40px 0;
+    position: relative;
+    border: none; /* Marco eliminado según tu solicitud */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    gap: 20px;
+    overflow: hidden;
+}
+
+/* Columna Izquierda: Texto e Íconos */
 .banner-contenido {
     position: relative;
     z-index: 2;
-    max-width: 600px;
+    max-width: 50%; /* Se asegura de que el texto no tape la mochila central */
 }
 
 .banner-contenido h1 {
-    font-size: 42px;
+    font-size: 32px;
     margin: 0 0 10px 0;
     font-style: italic;
     line-height: 1.1;
@@ -327,25 +391,152 @@ p {
 
 .banner-contenido p {
     color: var(--texto-secundario);
-    font-size: 16px;
-    margin-bottom: 25px;
+    font-size: 13px;
+    margin: 0 0 20px 0; 
+    max-width: 400px;
+    line-height: 1.4;
 }
 
-.btn-banner {
+/* --- INDICADORES DE CONFIANZA EN EL BANNER --- */
+.banner-features {
+    display: flex;
+    gap: 20px; 
+    flex-wrap: nowrap;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
+
+.feature-icon {
+    width: 32px;
+    height: 32px;
     background-color: var(--naranja-marca);
+    color: var(--fondo-principal);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px; 
+    flex-shrink: 0;
+}
+
+.feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.feature-text strong {
     color: var(--texto-principal);
-    border: none;
-    padding: 12px 25px;
-    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap; 
+}
+
+.feature-text span {
+    color: var(--texto-secundario);
+    font-size: 11px;
+    white-space: nowrap; 
+}
+
+/* Columna Derecha: Tarjeta de Promociones */
+.banner-promociones {
+    background-color: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    border-radius: 15px;
+    width: 250px;
+    box-sizing: border-box; 
+    padding: 20px;
+    position: relative;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6); /* Sombra más pronunciada para resaltar sobre el fondo */
+    overflow: hidden;
+    flex-shrink: 0; 
+}
+
+/* Nota: Los estilos de .promo-slide, animaciones y dots se mantienen exactamente igual que antes */
+
+.promo-slide {
+    display: none;
+    animation: fadePromo 0.5s ease-in-out;
+}
+
+.promo-slide.activo {
+    display: block;
+}
+
+@keyframes fadePromo {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.promo-tag {
+    background-color: var(--naranja-marca);
+    color: white;
+    font-size: 10px;
     font-weight: bold;
-    font-size: 16px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.promo-slide h3 {
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 900;
+    margin: 0 0 5px 0;
+    color: var(--texto-principal);
+    line-height: 1.1;
+}
+
+.promo-slide p {
+    font-size: 12px;
+    color: var(--texto-secundario);
+    margin: 0 0 15px 0 !important;
+}
+
+.promo-link {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.promo-link:hover {
+    color: var(--texto-principal);
+}
+
+.promo-dots {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.promo-dots .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #444;
+    border-radius: 50%;
     cursor: pointer;
     transition: 0.3s ease;
 }
 
-.btn-banner:hover {
-    transform: scale(1.05);
-    background-color: #e65c00;
+.promo-dots .dot.activo {
+    background-color: var(--naranja-marca);
+    width: 20px;
+    border-radius: 4px;
 }
 
 /* --- LISTAS GENÉRICAS --- */

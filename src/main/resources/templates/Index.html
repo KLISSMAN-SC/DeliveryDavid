@@ -43,11 +43,7 @@
                 </div>
             </div>
             
-            <!-- Carrito de compras con notificación -->
-            <div class="cart-wrapper">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-badge">0</span>
-            </div>
+            
             
             <!-- Botón Login -->
             <button class="btn-login">Iniciar sesión</button>
@@ -59,12 +55,71 @@
 	
     <hr>
 
-    <!-- 2. SECCIÓN DE BANNER -->
+   <!-- 2. SECCIÓN DE BANNER -->
     <section class="banner-principal">
+        <!-- Izquierda: Textos e Íconos -->
         <div class="banner-contenido">
             <h1>TODO LO QUE NECESITAS,<br><span style="color: var(--naranja-marca);">DIRECTO A TU PUERTA.</span></h1>
             <p>Desde tu plato favorito hasta las compras del súper, farmacia y artículos para tu mascota. Lo llevamos donde estés, en minutos.</p>
-            <button class="btn-banner">Explorar ahora →</button>
+            
+            <div class="banner-features">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="feature-text">
+                        <strong>Envíos rápidos</strong>
+                        <span>20 - 40 min</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-shield"></i></div>
+                    <div class="feature-text">
+                        <strong>Pagos seguros</strong>
+                        <span>100% confiable</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="feature-text">
+                        <strong>Seguimiento en vivo</strong>
+                        <span>Tu pedido en tiempo real</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derecha: Carrusel de Promociones -->
+        <div class="banner-promociones">
+            
+            <!-- Slide 1 -->
+            <div class="promo-slide activo">
+                <span class="promo-tag">PROMO DEL DÍA</span>
+                <h3>COMBOS HASTA 40% OFF</h3>
+                <p>Tus favoritos, a un mejor precio.</p>
+                <a href="#" class="promo-link">Ver promociones <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="promo-slide">
+                <span class="promo-tag">ENVÍO GRATIS</span>
+                <h3>PIZZAS FAMILIARES</h3>
+                <p>Pide 2 y el envío va por nuestra cuenta.</p>
+                <a href="#" class="promo-link">Ver menú <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="promo-slide">
+                <span class="promo-tag">NUEVO LOCAL</span>
+                <h3>SUSHI 2X1</h3>
+                <p>Celebra la apertura con esta gran oferta.</p>
+                <a href="#" class="promo-link">Aprovechar <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Controles del carrusel (Puntitos) -->
+            <div class="promo-dots">
+                <span class="dot activo" onclick="cambiarSlide(0)"></span>
+                <span class="dot" onclick="cambiarSlide(1)"></span>
+                <span class="dot" onclick="cambiarSlide(2)"></span>
+            </div>
         </div>
     </section>
 
