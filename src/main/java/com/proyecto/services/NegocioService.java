@@ -21,6 +21,9 @@ public class NegocioService {
         return negocioRepository.findAll();
 
     }
+    public Negocio obtenerporId(Integer idNegocio){
+    	return negocioRepository.findByIdNegocio(idNegocio);
+    }
 
     public List<Negocio> buscarPorNombre(String nombre){
 

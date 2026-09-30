@@ -189,3 +189,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('cargado');
     });
 });
+function abrirRestaurante(idNegocio){
+
+    fetch("/api/restaurante/" + idNegocio)
+
+    .then(response => response.text())
+
+    .then(html => {
+
+        document.getElementById("contenido-principal")
+        .innerHTML = html;
+
+        window.scrollTo(0,0);
+
+    });
+
+}
+function volverInicio(){
+
+    location.reload();
+
+}

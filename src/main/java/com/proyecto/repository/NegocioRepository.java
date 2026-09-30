@@ -16,7 +16,8 @@ public interface NegocioRepository extends JpaRepository<Negocio, Integer> {
 
     List<Negocio> findByNombreContainingIgnoreCase(String nombre);
 
-
+    Negocio findByIdNegocio(Integer idNegocio);
+    
     List<Negocio> findByTipoNegocioIdTipoNegocio(Integer idTipoNegocio);
     
     List<Negocio>findByTipoNegocio(TipoNegocio tipoNegocio);

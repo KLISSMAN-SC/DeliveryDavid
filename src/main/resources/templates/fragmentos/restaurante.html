@@ -1,0 +1,53 @@
+<div th:fragment="vista">
+
+
+<button onclick="volverInicio()">
+← Volver
+</button>
+
+
+<h1 th:text="${negocio.nombre}">
+Restaurante
+</h1>
+
+
+<p th:text="${negocio.direccion}">
+Dirección
+</p>
+
+
+<h2>Productos</h2>
+
+
+<div class="grid-productos">
+
+<article th:each="producto:${productos}">
+
+
+<img th:src="${producto.imagen}">
+
+
+<h3 th:text="${producto.nombre}">
+Producto
+</h3>
+
+
+<p>
+S/
+<span th:text="${producto.precio}">
+0
+</span>
+</p>
+
+
+<button>
+Agregar
+</button>
+
+
+</article>
+
+</div>
+
+
+</div>
