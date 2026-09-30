@@ -19,6 +19,9 @@ public class CategoriaProducto {
 	
 	@Column(length=45)
 	private String nombre;
+	
+	@Column(length=45)
+	private String logo	;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="idNegocio", nullable=false)

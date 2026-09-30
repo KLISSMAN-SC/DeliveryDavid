@@ -102,20 +102,33 @@
         </ul>
     </section>
 	<br>
-    <!-- 5. EXPLORA POR CATEGORÍA -->
+   <!-- 5. EXPLORA POR CATEGORÍA -->
     <th:block th:if="${esRestaurante}">
         <section>
             <h2>Explora por categoría</h2>
-            <ul style="display: flex; gap: 15px; list-style: none; padding: 0; overflow-x: auto;">
+            <!-- Añadido padding-bottom para que la sombra del hover no se corte -->
+            <ul style="display: flex; gap: 15px; list-style: none; padding: 0 0 10px 0; margin: 0; overflow-x: auto;">
+                
                 <li th:each="nombreCategoria, iterStat : ${listaCategorias}" th:if="${iterStat.index < 7}">
-                    <!-- Lógica para desmarcar -->
+                    <!-- Nueva clase 'categoria-card' y lógica de desmarcado intacta -->
                     <a th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada}, categoria=${categoriaSeleccionada == nombreCategoria ? null : nombreCategoria})}"
-                       th:class="${categoriaSeleccionada == nombreCategoria} ? 'categoria-inline seleccionado' : 'categoria-inline'" 
-                       th:text="${nombreCategoria}"></a>
+                       th:class="${categoriaSeleccionada == nombreCategoria} ? 'categoria-card seleccionado' : 'categoria-card'">
+                        
+                        <!-- Llama a la imagen dinámicamente -->
+                        <img th:src="@{'/categorias_comidas/' + ${nombreCategoria} + '.png'}" 
+                             alt="Icono" 
+                             class="img-categoria">
+                        
+                        <span th:text="${nombreCategoria}"></span>
+                    </a>
                 </li>
-                <li id="btnAbrirFiltrosCaja" class="categoria-inline" style="cursor: pointer; text-align: center;">
-                    📦<br>Ver más
+                
+                <!-- Botón de Ver más adaptado al nuevo diseño -->
+                <li id="btnAbrirFiltrosCaja" class="categoria-card" style="cursor: pointer;">
+                    <div class="icono-mas">📦</div>
+                    <span>Ver más</span>
                 </li>
+                
             </ul>
         </section>
         <hr>
@@ -161,27 +174,34 @@
         <div class="grid-restaurantes">
             
             <!-- Tarjeta generada automáticamente por cada negocio -->
-            <article th:each="negocio : ${listaNegocios}"
-         	class="tarjeta-restaurante"
-         	th:data-id="${negocio.idNegocio}"
-         	onclick="abrirRestaurante(this.dataset.id)">
-                <!-- Nombre del negocio -->
-                <h3 th:text="${negocio.nombre}">Nombre Negocio</h3>
-                
-                <!-- Mostramos el Tipo de Negocio y su dirección -->
-                <p th:text="${negocio.tipoNegocio.nombre + ' - ' + negocio.direccion}">Categoría</p>
-                
-                <!-- Datos adicionales (Envío y Estado) -->
-                <span class="etiqueta-tiempo">
-                    ⏱ 20 - 30 min | 
-                    🛵 Envío S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span> | 
+            <article th:each="negocio : ${listaNegocios}" class="tarjeta-restaurante" th:data-id="${negocio.idNegocio}" onclick="abrirRestaurante(this.dataset.id)">	
+         	
+                <!-- Contenedor de Imagen -->
+                <div class="tarjeta-img-contenedor">
+                    <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
+                         th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
+                         alt="Logo del negocio">
                     
-                    <!-- Color dinámico para ABIERTO o CERRADO -->
-                    <span th:text="${negocio.estado}" 
-                          th:style="${negocio.estado == 'ABIERTO'} ? 'color: #4caf50; font-weight: bold;' : 'color: #ff3333; font-weight: bold;'">
-                        Estado
-                    </span>
-                </span>
+                    <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" class="tarjeta-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                </div>
+
+                <!-- Contenedor de Información -->
+                <div class="tarjeta-info">
+                    <h3 class="tarjeta-titulo" th:text="${negocio.nombre}">Nombre Negocio</h3>
+                    
+                    <!-- Subtítulo con separador de punto medio (•) -->
+                    <p class="tarjeta-subtitulo" th:text="${negocio.tipoNegocio.nombre + ' • ' + negocio.direccion}">Categoría • Dirección</p>
+                    
+                    <!-- Pie de tarjeta con tiempo y precio alineados a los extremos -->
+                    <div class="tarjeta-footer">
+                        <span class="tarjeta-tiempo">
+                            <i class="fa-regular fa-clock"></i> 25 - 40 min
+                        </span>
+                        <span class="tarjeta-precio">S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span></span>
+                    </div>
+                </div>
             </article>
 
         </div>

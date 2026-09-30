@@ -45,7 +45,7 @@ p {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 25px;
-    gap: 30px; /* Separación entre Logo, Buscador y Botones */
+    gap: 30px; 
 }
 
 /* --- Logo --- */
@@ -71,7 +71,7 @@ p {
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 35px; /* Separación entre ubicación, carrito y botón */
+    gap: 35px; 
 }
 
 /* --- Ubicación --- */
@@ -121,7 +121,7 @@ p {
     position: absolute;
     top: -5px;
     right: -8px;
-    background-color: #ff3333; /* Rojo alerta */
+    background-color: #ff3333; 
     color: white;
     font-size: 11px;
     font-weight: bold;
@@ -139,7 +139,7 @@ p {
     color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: 8px; /* Cuadrado con bordes curvos como en la imagen */
+    border-radius: 8px; 
     font-weight: bold;
     font-size: 14px;
     cursor: pointer;
@@ -153,7 +153,7 @@ p {
 /* --- BARRA DE BÚSQUEDA Y AUTOCOMPLETE --- */
 .search-wrapper {
     position: relative;
-    flex: 1;             /* Novedad: Permite que el buscador se expanda */
+    flex: 1;             
     max-width: 650px;
 }
 
@@ -206,11 +206,29 @@ p {
     display: none; 
 }
 
+/* --- ESTILO PERSONALIZADO PARA EL SCROLLBAR DEL BUSCADOR --- */
+.search-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+.search-dropdown::-webkit-scrollbar-track {
+    background: var(--fondo-tarjetas);
+    border-radius: 0 15px 15px 0; /* Redondea solo el lado derecho */
+}
+.search-dropdown::-webkit-scrollbar-thumb {
+    background-color: #444444; /* Gris oscuro para combinar con el tema */
+    border-radius: 10px;
+}
+.search-dropdown::-webkit-scrollbar-thumb:hover {
+    background-color: var(--naranja-marca); /* Resalta en naranja al pasar el mouse */
+}
+
+/* --- NUEVO DISEÑO DE LOS RESULTADOS CON IMAGEN --- */
 .search-item {
     padding: 12px 18px;
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    flex-direction: row; /* Alinea imagen y texto de izquierda a derecha */
+    align-items: center; 
+    gap: 15px; /* Separación entre la imagen y los textos */
     cursor: pointer;
     border-bottom: 1px solid var(--borde-sutil);
     transition: 0.2s;
@@ -221,18 +239,55 @@ p {
 }
 
 .search-item:hover {
-    background-color: rgba(255, 102, 0, 0.12);
+    background-color: rgba(255, 102, 0, 0.12); /* Efecto de luz naranja de fondo */
+}
+
+/* Contenedor exclusivo para los textos */
+.search-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow: hidden;
 }
 
 .search-item-title {
     color: var(--texto-principal);
     font-weight: bold;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .search-item-sub {
     color: var(--texto-secundario);
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilos de la imagen miniatura */
+.search-item-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    object-fit: cover;
+    background-color: var(--fondo-principal);
+    flex-shrink: 0; /* Evita que la imagen se aplaste si el texto es muy largo */
+}
+
+/* Estilo del cuadro vacío por si un negocio aún no tiene logo */
+.search-item-placeholder {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    background-color: var(--fondo-principal);
+    color: var(--texto-secundario);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .search-no-results {
@@ -293,7 +348,7 @@ p {
     background-color: #e65c00;
 }
 
-/* --- LISTAS GENÉRICAS (Limpias para evitar la doble caja) --- */
+/* --- LISTAS GENÉRICAS --- */
 ul {
     list-style: none;
     padding: 0;
@@ -304,16 +359,16 @@ ul {
 }
 
 ul li {
-    padding: 0; /* Corrección: Se elimina el padding y fondo del <li> para que el <a> haga todo el trabajo */
+    padding: 0; 
     margin: 0;
 }
 
 /* --- DISEÑO BASE DE TODOS LOS BOTONES DE FILTRO --- */
-.btn-tipo, .btn-zona, .categoria-inline, .filtro-pill {
+.btn-tipo, .btn-zona, .filtro-pill {
     display: inline-block;
     background-color: var(--fondo-tarjetas);
     color: var(--texto-principal);
-    border: 1px solid var(--borde-sutil); /* Borde sutil por defecto */
+    border: 1px solid var(--borde-sutil);
     padding: 12px 24px;
     border-radius: 12px;
     text-decoration: none;
@@ -323,45 +378,163 @@ ul li {
     white-space: nowrap;
 }
 
-/* --- EFECTO HOVER Y SELECCIONADO (Borde naranja brillante, fondo gris) --- */
+/* --- EFECTO HOVER Y SELECCIONADO PARA BOTONES --- */
 .btn-tipo.seleccionado, .btn-tipo:hover,
 .btn-zona.seleccionado, .btn-zona:hover,
-.categoria-inline.seleccionado, .categoria-inline:hover,
 .filtro-pill.seleccionado, .filtro-pill:hover {
-    background-color: var(--fondo-tarjetas) !important; /* Mantiene su fondo original */
-    border-color: var(--naranja-marca) !important;      /* El contorno brilla */
-    color: var(--texto-principal) !important;           /* El texto sigue blanco */
-    box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);         /* Leve resplandor exterior */
+    background-color: var(--fondo-tarjetas) !important;
+    border-color: var(--naranja-marca) !important;      
+    color: var(--texto-principal) !important;           
+    box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);         
 }
 
-/* 6. NEGOCIOS DISPONIBLES (Tarjetas) */
+
+/* --- TARJETAS DE EXPLORA POR CATEGORÍA --- */
+.categoria-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    width: 105px;    
+    height: 95px;    
+    text-decoration: none;
+    color: var(--texto-principal);
+    transition: 0.3s ease;
+    padding: 10px;
+    box-sizing: border-box;
+    gap: 8px; 
+}
+
+/* Efecto al seleccionar o pasar el cursor (Borde Naranja) */
+.categoria-card.seleccionado, .categoria-card:hover {
+    background-color: transparent !important;
+    border-color: var(--naranja-marca) !important;
+    color: var(--texto-principal) !important;
+    box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
+}
+
+/* Configuración de las imágenes 3D de categorías */
+.img-categoria {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Estilo del texto inferior (Ej. "Hamburguesas") */
+.categoria-card span {
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    width: 100%;
+}
+
+/* Estilo exclusivo para el icono del botón "Ver más" */
+.icono-mas {
+    font-size: 28px;
+    height: 45px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* 6. NEGOCIOS DISPONIBLES (Tarjetas de Restaurantes) */
 .grid-restaurantes {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
 }
 
-article {
+.tarjeta-restaurante {
     background-color: var(--fondo-tarjetas);
     border: 1px solid var(--borde-sutil);
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 12px;
     width: 250px;
+    overflow: hidden; 
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-article h3 {
-    margin-bottom: 5px;
+.tarjeta-restaurante:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-.etiqueta-tiempo {
+.tarjeta-img-contenedor {
+    width: 100%;
+    height: 150px;
+    background-color: var(--fondo-principal);
+}
+
+.tarjeta-img-contenedor img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tarjeta-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: var(--texto-secundario);
-    font-size: 12px;
+    font-size: 32px;
 }
 
-.etiqueta-abierto {
-    color: #4caf50; 
+.tarjeta-info {
+    padding: 16px;
+}
+
+.tarjeta-titulo {
+    color: var(--texto-principal);
+    font-size: 17px;
     font-weight: bold;
-    font-size: 12px;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.tarjeta-subtitulo {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    margin: 0 0 16px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tarjeta-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tarjeta-tiempo {
+    color: var(--texto-principal);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-tiempo i {
+    font-size: 14px;
+}
+
+.tarjeta-precio {
+    color: #ff5555; 
+    font-size: 14px;
+    font-weight: bold;
 }
 
 /* --- ESTILOS DEL MODAL DE FILTROS --- */
