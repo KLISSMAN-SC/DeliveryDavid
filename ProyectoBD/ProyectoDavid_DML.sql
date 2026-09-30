@@ -40,16 +40,16 @@ INSERT INTO `usuario` (`idUsuario`, `idRol`, `nombres`, `apellidos`, `dni`, `tel
 (2, 3, 'Miguel', 'Gómez', '45678912', '999888777', 'miguel@delivery.com', 'hash_pass_456', NOW()),
 (3, 1, 'Admin', 'Sistema', '00000000', '900000000', 'admin@sistema.com', 'admin_pass', NOW());
 
-INSERT INTO `categorias_producto` (`idCategoriaProducto`, `nombre`, `idNegocio`) VALUES 
-(1, 'Alitas', 38),
-(2, 'Desayunos', 38),
-(3, 'Hamburguesas', 39),
-(4, 'POLLERIA', 40),
-(5, 'Licores', 44),
-(6, 'Dulces', 39),
-(7, 'Pizza', 41),
-(8, 'Marino', 28),
-(9, 'Makis', 28);
+INSERT INTO categorias_producto (idCategoriaProducto, nombre,logo, idNegocio) VALUES 
+(1, 'Alitas','alitas.jpg' ,38),
+(2, 'Desayunos','desayunos.jpg' ,38),
+(3, 'Hamburguesas', 'hamburguesas.jpg',39),
+(4, 'Polleria', 'polleria.jpg',40),
+(5, 'Licores','licores.jpg', 44),
+(6, 'Dulces', 'dulces.jpg',39),
+(7, 'Pizza', 'pizza.jpg',41),
+(8, 'Marino', 'marino.jpg',28),
+(9, 'Makis', 'makis.jpg',28);
 
 INSERT INTO `producto` (`idProducto`, `nombre`, `descripcion`, `precio`, `imagen`, `disponible`, `idNegocio`, `idCategoriaProducto`) VALUES 
 (1, 'Alitas BBQ (6 und)', 'Bañadas en salsa BBQ dulce con porción de papas', 16.00, 'alitas_bbq.jpg', 1, 38, 1),
@@ -59,9 +59,9 @@ INSERT INTO `producto` (`idProducto`, `nombre`, `descripcion`, `precio`, `imagen
 (5, 'Porción Torta de Chocolate', 'Bizcocho húmedo relleno de fudge', 10.00, 'torta_choco.jpg', 1, 39, 4);
 
 
-INSERT INTO `pedido` (`idPedido`, `estado_pedido`, `metodo_pago`, `costo_envio`, `propina`, `total`, `direccionEnvio`, `referencia`, `latitud_envio`, `longitud_envio`, `fecha_hora`, `idUsuario`, `idNegocio`, `idRepartidor`) VALUES 
-(1, 'Confirmado', 'Efectivo', 3.00, 0.00, 17.50, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 39, 2),
-(2, 'Pendiente de WhatsApp', 'Yape', 3.00, 0.00, 46.00, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 38, NULL);
+INSERT INTO `pedido` (`idPedido`, `estadoPedido`, `metodoPago`, `costoEnvio`, `propina`, `total`, `direccionEnvio`, `referencia`, `latitudEnvio`, `longitudEnvio`, `fechaHora`, `idUsuario`, `idNegocio`, `idRepartidor`) VALUES 
+(1, 'CONFIRMADO', 'Efectivo', 3.00, 0.00, 17.50, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 39, 2),
+(2, 'PENDIENTE_DE_WHATSAPP', 'Yape', 3.00, 0.00, 46.00, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 38, NULL);
 
 INSERT INTO `detalle_pedido` (`idDetallePedido`, `cantidad`, `precioUnitario`, `subtotal`, `notaEspecial`, `idPedido`, `idProducto`) VALUES 
 (1, 1, 14.50, 14.50, 'Con extra crema batida por favor', 1, 4),

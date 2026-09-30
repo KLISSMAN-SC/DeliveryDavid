@@ -15,12 +15,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Pedido {
 	
+	public enum EstadoPedido {PENDIENTE_DE_WHATSAPP,CONFIRMADO,EN_CAMINO,ENTREGADO,CANCELADO}
+	
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Integer idPedido;
 	
-	@Column(name="estadoPedido", length=45)
-	private String estadoPedido;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "estadoPedido", length = 10)
+	private EstadoPedido estadoPedido;
 	
 	@Column(name="metodoPago", length=45)
 	private String metodoPago;

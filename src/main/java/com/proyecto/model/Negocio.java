@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Negocio {
 	
+	public enum EstadoNegocio {ABIERTO,CERRADO}
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Integer idNegocio;
@@ -33,8 +34,9 @@ public class Negocio {
 	@Column(length=15)
 	private String telefono;
 	
-	@Column(length=10) // "ABIERTO" o "CERRADO"
-	private String estado;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "estado", length = 10)
+	private EstadoNegocio estado;
 	
 	@Column(name="imagenLogo", length=200)
 	private String imagenLogo;
