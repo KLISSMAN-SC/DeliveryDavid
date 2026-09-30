@@ -4,6 +4,10 @@ import com.proyecto.services.TipoNegocioService;
 import com.proyecto.services.ZonaService;
 import com.proyecto.services.CategoriaProductoService;
 import com.proyecto.services.NegocioService; // <-- Importar
+import com.proyecto.model.*;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,15 +30,48 @@ public class IndexController {
     private NegocioService negocioService; // <-- Inyectar
 
     @GetMapping("/")
-    public String paginaPrincipal(@RequestParam(required = false) Long tipoId, Model model) {
+    public String paginaPrincipal(
+            @RequestParam(required = false) Integer tipoId,
+            @RequestParam(required = false) Integer zonaId,
+            @RequestParam(required = false) String categoria,
+            Model model) {
         
-        // Enviamos las 4 listas a la plantilla HTML
+        // Listas base para los botones
         model.addAttribute("listaTipos", tipoNegocioService.obtenerTodos());
         model.addAttribute("listaZonas", zonaService.obtenerTodas());
-     // Cambia la línea de listaCategorias a esto:
-        model.addAttribute("listaCategorias", categoriaProductoService.obtenerCategoriasUnicas());
-        model.addAttribute("listaNegocios", negocioService.obtenerTodos()); // <-- Nueva lista
+
+        // Ejecutar consulta maestra con los filtros (si son nulos, la BD los ignora)
+        List<Negocio> negociosMostrar = negocioService.buscarConFiltrosCombinados(tipoId, zonaId, categoria);
         
+        boolean esRestaurante = true; // Por defecto asumimos restaurante
+        String tituloSeccion = "Restaurantes cerca de ti";
+
+        if (tipoId != null) {
+            TipoNegocio tipoSel = tipoNegocioService.obtenerPorId(tipoId);
+            if (tipoSel != null) {
+                tituloSeccion = tipoSel.getNombre() + " cerca de ti";
+                // Si NO contiene la palabra restaurante/comida, ocultamos la sección de categorías
+                if (!tipoSel.getNombre().toLowerCase().contains("restaurante")) {
+                    esRestaurante = false;
+                }
+            }
+        }
+
+        // Enviamos las listas y los identificadores seleccionados a la vista
+        model.addAttribute("listaNegocios", negociosMostrar);
+        model.addAttribute("esRestaurante", esRestaurante);
+        model.addAttribute("tituloSeccion", tituloSeccion);
+        
+        // Mantenemos el estado actual de los filtros
+        model.addAttribute("tipoSeleccionado", tipoId);
+        model.addAttribute("zonaSeleccionada", zonaId);
+        model.addAttribute("categoriaSeleccionada", categoria);
+
+        // Si es restaurante, enviamos las categorías únicas
+        if (esRestaurante) {
+            model.addAttribute("listaCategorias", categoriaProductoService.obtenerCategoriasUnicas());
+        }
+
         return "Index"; 
     }
 }

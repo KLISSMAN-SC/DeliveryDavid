@@ -12,27 +12,45 @@
 </head>
 <body>
 <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
-    <header>
-        <div>
-            <strong>RIDE MEAL</strong>
+    <header class="header-principal">
+        
+        <!-- Logo estructurado -->
+        <div class="logo-container">
+            <!-- Si tienes la imagen del logo usa la etiqueta <img>, por ahora recreo el diseño visualmente -->
+            <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
         </div>
         
-        <!-- Buscador mejorado con Autocomplete -->
+        <!-- Buscador mejorado (Más ancho y centrado) -->
         <div class="search-wrapper">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca lo que necesitas..." autocomplete="off">
+                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca restaurantes, platos o categorías..." autocomplete="off">
             </div>
             <!-- Contenedor desplegable dinámico -->
             <div id="dropdownResultados" class="search-dropdown"></div>
         </div>
 
-        <div>
-            <span style="color: var(--texto-secundario);">📍 Enviar a: <strong style="color: var(--texto-principal);">Mi ubicación ⌵</strong></span>
-        </div>
-        <div>
-            <span>🛒 0</span>
-            <button>Iniciar sesión</button>
+        <!-- Acciones de Usuario (Ubicación, Carrito, Login) -->
+        <div class="user-actions">
+            
+            <!-- Bloque de Ubicación -->
+            <div class="location-block">
+                <i class="fa-solid fa-location-dot"></i>
+                <div class="location-text">
+                    <span class="enviar-a">Enviar a</span>
+                    <span class="mi-ubicacion">Mi ubicación <i class="fa-solid fa-chevron-down chevron-icon"></i></span>
+                </div>
+            </div>
+            
+            <!-- Carrito de compras con notificación -->
+            <div class="cart-wrapper">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge">0</span>
+            </div>
+            
+            <!-- Botón Login -->
+            <button class="btn-login">Iniciar sesión</button>
+            
         </div>
     </header>
 
@@ -48,51 +66,57 @@
     </section>
 
     <hr>
-
-    <!-- 3. TIPOS DE NEGOCIO (Categoría General) -->
+	<br>
+   <!-- 3. TIPOS DE NEGOCIO -->
     <section>
-        <ul>
-            <!-- th:each funciona como un bucle FOR. Recorre 'listaTipos' -->
-            <!-- th:text reemplaza el texto por el nombre real de la BD -->
-            <li th:each="tipo : ${listaTipos}" th:text="${tipo.nombre}">
-                Categoría (se reemplazará)
+        <ul class="lista-tipos">
+            <li>
+                <a th:href="@{/(zonaId=${zonaSeleccionada})}" th:class="${tipoSeleccionado == null} ? 'btn-tipo seleccionado' : 'btn-tipo'">Todos</a>
+            </li>
+            <li th:each="tipo : ${listaTipos}">
+                <!-- Lógica para desmarcar: si ya es el seleccionado, pasa un null -->
+                <a th:href="@{/(tipoId=${tipoSeleccionado == tipo.idTipoNegocio ? null : tipo.idTipoNegocio}, zonaId=${zonaSeleccionada})}" 
+                   th:class="${tipoSeleccionado == tipo.idTipoNegocio} ? 'btn-tipo seleccionado' : 'btn-tipo'" 
+                   th:text="${tipo.nombre}"></a>
             </li>
         </ul>
     </section>
-
-    <hr>
-
-    <!-- 4. LUGARES (Zonas desde BD) -->
+	<br>
+    <!-- 4. LUGARES (ZONAS) -->
     <section>
         <h2>Lugares</h2>
-        <ul>
+        <ul class="lista-zonas">
+            <li>
+                <a th:href="@{/(tipoId=${tipoSeleccionado}, categoria=${categoriaSeleccionada})}" 
+                   th:class="${zonaSeleccionada == null} ? 'btn-zona seleccionado' : 'btn-zona'">Todas</a>
+            </li>
             <li th:each="zona : ${listaZonas}">
-                <button th:text="${zona.nombre}">Lugar</button>
+                <!-- Lógica para desmarcar -->
+                <a th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada == zona.idZona ? null : zona.idZona}, categoria=${categoriaSeleccionada})}" 
+                   th:class="${zonaSeleccionada == zona.idZona} ? 'btn-zona seleccionado' : 'btn-zona'" 
+                   th:text="${zona.nombre}"></a>
             </li>
         </ul>
     </section>
-
-    <hr>
-
-   <!-- 5. EXPLORA POR CATEGORÍA -->
-    <section>
-        <!-- Título limpio, sin el botón de "Ver todas" -->
-        <h2>Explora por categoría</h2>
-        
-        <ul>
-            <!-- th:each ahora incluye 'iterStat'. El th:if limita a mostrar solo del 0 al 6 (7 elementos) -->
-            <li th:each="nombreCategoria, iterStat : ${listaCategorias}" 
-                th:if="${iterStat.index < 7}" 
-                th:text="${nombreCategoria}">
-                Categoría
-            </li>
-            
-            <!-- Botón de "Más" fijo que abre el modal con el resto de opciones -->
-            <li id="btnAbrirFiltrosCaja" style="text-align: center;">
-                📦<br>Más
-            </li>
-        </ul>
-    </section>
+	<br>
+    <!-- 5. EXPLORA POR CATEGORÍA -->
+    <th:block th:if="${esRestaurante}">
+        <section>
+            <h2>Explora por categoría</h2>
+            <ul style="display: flex; gap: 15px; list-style: none; padding: 0; overflow-x: auto;">
+                <li th:each="nombreCategoria, iterStat : ${listaCategorias}" th:if="${iterStat.index < 7}">
+                    <!-- Lógica para desmarcar -->
+                    <a th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada}, categoria=${categoriaSeleccionada == nombreCategoria ? null : nombreCategoria})}"
+                       th:class="${categoriaSeleccionada == nombreCategoria} ? 'categoria-inline seleccionado' : 'categoria-inline'" 
+                       th:text="${nombreCategoria}"></a>
+                </li>
+                <li id="btnAbrirFiltrosCaja" class="categoria-inline" style="cursor: pointer; text-align: center;">
+                    📦<br>Más
+                </li>
+            </ul>
+        </section>
+        <hr>
+    </th:block>
 
     <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
     <div id="modalFiltros" class="modal-overlay">
@@ -104,11 +128,14 @@
             </div>
             
             <div class="modal-body">
-			    <!-- También usamos solo "nombreCategoria" y lo convertimos a mayúsculas -->
-			    <button class="filtro-pill" th:each="nombreCategoria : ${listaCategorias}" th:text="${#strings.toUpperCase(nombreCategoria)}">
-			        FILTRO
-			    </button>
-			</div>
+                <button class="filtro-pill" 
+                        th:each="nombreCategoria : ${listaCategorias}" 
+                        th:data-categoria="${nombreCategoria}"
+                        th:classappend="${categoriaSeleccionada == nombreCategoria} ? ' seleccionado' : ''"
+                        th:text="${#strings.toUpperCase(nombreCategoria)}">
+                    FILTRO
+                </button>
+            </div>
             
             <div class="modal-footer">
                 <button id="btnAceptarModal" class="btn-aceptar">Aceptar</button>

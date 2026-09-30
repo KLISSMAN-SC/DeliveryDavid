@@ -1,11 +1,11 @@
 /* Paleta de colores extraída de la imagen */
 :root {
-    --fondo-principal: #0a0a0a; /* Negro profundo para el fondo */
-    --fondo-tarjetas: #1a1a1a;  /* Gris oscuro para buscadores y tarjetas */
-    --naranja-marca: #ff6600;   /* Naranja vibrante para botones y logo */
-    --texto-principal: #ffffff; /* Blanco puro para legibilidad */
-    --texto-secundario: #a0a0a0;/* Gris claro para descripciones */
-    --borde-sutil: #333333;     /* Gris medio para líneas divisorias */
+    --fondo-principal: #0a0a0a; 
+    --fondo-tarjetas: #1a1a1a;  
+    --naranja-marca: #ff6600;   
+    --texto-principal: #ffffff; 
+    --texto-secundario: #a0a0a0;
+    --borde-sutil: #333333;     
 }
 
 /* Estilos generales (Dark Theme) */
@@ -15,6 +15,13 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 20px 50px;
+    
+    opacity: 0; 
+    transition: opacity 0.2s ease;
+}
+
+body.cargado {
+    opacity: 1; 
 }
 
 hr {
@@ -33,277 +40,208 @@ p {
 }
 
 /* 1. BARRA DE NAVEGACIÓN SUPERIOR */
-header {
+.header-principal {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
+    gap: 30px; /* Separación entre Logo, Buscador y Botones */
 }
 
-header strong {
-    color: var(--naranja-marca);
-    font-size: 24px;
+/* --- Logo --- */
+.logo-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.logo-container strong {
+    font-size: 26px;
+    font-weight: 900;
     font-style: italic;
+    letter-spacing: 1px;
+}
+.logo-italic {
+    color: var(--texto-principal);
+}
+.logo-orange {
+    color: var(--naranja-marca);
 }
 
-header input {
-    background-color: var(--fondo-tarjetas);
-    color: var(--texto-principal);
-    border: 1px solid var(--borde-sutil);
-    padding: 10px 20px;
-    border-radius: 20px; /* Bordes redondeados */
-    width: 300px;
+/* --- Acciones del usuario (Lado derecho) --- */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 35px; /* Separación entre ubicación, carrito y botón */
 }
 
-header button {
-    background-color: var(--naranja-marca);
+/* --- Ubicación --- */
+.location-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+.location-block i.fa-location-dot {
     color: var(--texto-principal);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
+    font-size: 22px;
+}
+.location-text {
+    display: flex;
+    flex-direction: column;
+}
+.enviar-a {
+    color: var(--texto-secundario);
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+.mi-ubicacion {
+    color: var(--texto-principal);
+    font-size: 14px;
     font-weight: bold;
-    cursor: pointer;
-    margin-left: 15px;
-}
-
-/* 3, 4 y 5. LISTAS Y FILTROS */
-ul {
-    list-style: none;
-    padding: 0;
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+.chevron-icon {
+    font-size: 10px;
+    color: var(--texto-secundario);
 }
 
-ul li {
-    background-color: var(--fondo-tarjetas);
-    padding: 15px 25px;
-    border-radius: 10px;
+/* --- Carrito --- */
+.cart-wrapper {
+    position: relative;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: 0.3s;
+    padding: 5px;
+}
+.cart-wrapper i {
+    color: var(--texto-principal);
+    font-size: 22px;
+}
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: #ff3333; /* Rojo alerta */
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-ul li:hover {
+/* --- Botón de Inicio de Sesión --- */
+.btn-login {
+    background-color: var(--naranja-marca);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px; /* Cuadrado con bordes curvos como en la imagen */
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.btn-login:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* --- BARRA DE BÚSQUEDA Y AUTOCOMPLETE --- */
+.search-wrapper {
+    position: relative;
+    flex: 1;             /* Novedad: Permite que el buscador se expanda */
+    max-width: 650px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    padding: 10px 20px;
+    gap: 12px;
+    transition: 0.3s ease;
+}
+
+.search-container:focus-within {
     border-color: var(--naranja-marca);
+    box-shadow: 0 0 10px rgba(255, 102, 0, 0.25);
 }
 
-ul li button {
-    background: none;
+.search-container i {
+    color: var(--texto-secundario);
+    font-size: 15px;
+}
+
+.search-input {
+    background: transparent;
     border: none;
     color: var(--texto-principal);
-    cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
 }
 
-/* 6. NEGOCIOS DISPONIBLES (Tarjetas) */
-.grid-restaurantes {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+.search-input::placeholder {
+    color: var(--texto-secundario);
 }
 
-article {
+.search-dropdown {
+    position: absolute;
+    top: 115%;
+    left: 0;
+    width: 100%;
     background-color: var(--fondo-tarjetas);
     border: 1px solid var(--borde-sutil);
     border-radius: 15px;
-    padding: 20px;
-    width: 250px;
-}
-
-article h3 {
-    margin-bottom: 5px;
-}
-
-/* Simulación de etiquetas (ej. Abierto, Envíos) */
-.etiqueta-tiempo {
-    color: var(--texto-secundario);
-    font-size: 12px;
-}
-
-.etiqueta-abierto {
-    color: #4caf50; /* Verde para indicar abierto */
-    font-weight: bold;
-    font-size: 12px;
-}
-/* --- ESTILOS DEL MODAL DE FILTROS --- */
-.modal-overlay {
-    display: none; /* Oculto por defecto */
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: var(--fondo-tarjetas); /* Fondo gris oscuro */
-    width: 550px;
-    max-width: 90%;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--borde-sutil);
-}
-
-.btn-text {
-    cursor: pointer;
-    color: var(--texto-secundario);
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.modal-body {
-    padding: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    max-height: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    max-height: 280px;
     overflow-y: auto;
+    z-index: 1000;
+    display: none; 
 }
 
-.filtro-pill {
-    background-color: transparent;
-    color: var(--texto-principal);
-    border: 1px solid var(--borde-sutil);
-    padding: 10px 18px;
-    border-radius: 20px;
+.search-item {
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
+    border-bottom: 1px solid var(--borde-sutil);
     transition: 0.2s;
 }
 
-/* Efecto visual al hacer clic en un filtro (Ahora se pinta de naranja) */
-.filtro-pill.seleccionado {
-    background-color: var(--naranja-marca);
+.search-item:last-child {
+    border-bottom: none;
+}
+
+.search-item:hover {
+    background-color: rgba(255, 102, 0, 0.12);
+}
+
+.search-item-title {
     color: var(--texto-principal);
-    border-color: var(--naranja-marca);
-}
-
-/* Botón inferior del Modal (Ahora es naranja) */
-.btn-aceptar {
-    background-color: var(--naranja-marca);
-    color: var(--texto-principal);
-    border: none;
-    width: 100%;
-    padding: 15px;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-aceptar:hover {
-    opacity: 0.9;
-}
-/* --- FOOTER (Pie de página) --- */
-footer {
-    background-color: var(--fondo-tarjetas);
-    border-top: 1px solid var(--borde-sutil);
-    padding: 40px;
-    margin-top: 60px;
-    border-radius: 20px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 30px;
-}
-
-.footer-izq {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.footer-izq strong {
-    color: var(--naranja-marca);
-    font-size: 22px;
-    font-style: italic;
-}
-
-.footer-izq p {
-    margin: 0;
-    color: var(--texto-secundario);
-}
-
-/* Contenedor de redes sociales */
-.redes-sociales {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.redes-sociales a {
-    color: var(--texto-principal);
-    background-color: var(--fondo-principal);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    text-decoration: none;
-    font-size: 18px;
-    transition: 0.3s;
-}
-
-/* Efecto hover naranja para los íconos */
-.redes-sociales a:hover {
-    background-color: var(--naranja-marca);
-    color: white;
-    transform: translateY(-3px);
-}
-
-.footer-der {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.footer-enlaces {
-    display: flex;
-    gap: 25px;
-}
-
-.footer-enlaces a {
-    color: var(--texto-principal);
-    text-decoration: none;
     font-weight: bold;
     font-size: 14px;
-    transition: 0.2s;
 }
 
-.footer-enlaces a:hover {
-    color: var(--naranja-marca);
-}
-
-.footer-legal {
+.search-item-sub {
     color: var(--texto-secundario);
     font-size: 12px;
-    margin-top: 20px;
 }
 
-.footer-legal a {
+.search-no-results {
+    padding: 15px;
+    text-align: center;
     color: var(--texto-secundario);
-    text-decoration: none;
-    margin: 0 5px;
+    font-size: 13px;
 }
 
-.footer-legal a:hover {
-    color: var(--texto-principal);
-}
 /* --- SECCIÓN DE BANNER PRINCIPAL --- */
 .banner-principal {
     background: linear-gradient(135deg, var(--fondo-tarjetas) 40%, #2a1100 100%);
@@ -354,94 +292,232 @@ footer {
     transform: scale(1.05);
     background-color: #e65c00;
 }
-/* --- BARRA DE BÚSQUEDA Y AUTOCOMPLETE --- */
-.search-wrapper {
-    position: relative;
-    width: 350px;
-}
 
-.search-container {
+/* --- LISTAS GENÉRICAS (Limpias para evitar la doble caja) --- */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
-    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+ul li {
+    padding: 0; /* Corrección: Se elimina el padding y fondo del <li> para que el <a> haga todo el trabajo */
+    margin: 0;
+}
+
+/* --- DISEÑO BASE DE TODOS LOS BOTONES DE FILTRO --- */
+.btn-tipo, .btn-zona, .categoria-inline, .filtro-pill {
+    display: inline-block;
     background-color: var(--fondo-tarjetas);
-    border: 1px solid var(--borde-sutil);
-    border-radius: 30px;
-    padding: 10px 20px;
-    gap: 12px;
-    transition: 0.3s ease;
-}
-
-.search-container:focus-within {
-    border-color: var(--naranja-marca);
-    box-shadow: 0 0 10px rgba(255, 102, 0, 0.25);
-}
-
-.search-container i {
-    color: var(--texto-secundario);
-    font-size: 15px;
-}
-
-.search-input {
-    background: transparent;
-    border: none;
     color: var(--texto-principal);
+    border: 1px solid var(--borde-sutil); /* Borde sutil por defecto */
+    padding: 12px 24px;
+    border-radius: 12px;
+    text-decoration: none;
     font-size: 14px;
-    width: 100%;
-    outline: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    white-space: nowrap;
 }
 
-.search-input::placeholder {
-    color: var(--texto-secundario);
+/* --- EFECTO HOVER Y SELECCIONADO (Borde naranja brillante, fondo gris) --- */
+.btn-tipo.seleccionado, .btn-tipo:hover,
+.btn-zona.seleccionado, .btn-zona:hover,
+.categoria-inline.seleccionado, .categoria-inline:hover,
+.filtro-pill.seleccionado, .filtro-pill:hover {
+    background-color: var(--fondo-tarjetas) !important; /* Mantiene su fondo original */
+    border-color: var(--naranja-marca) !important;      /* El contorno brilla */
+    color: var(--texto-principal) !important;           /* El texto sigue blanco */
+    box-shadow: 0 0 5px rgba(255, 102, 0, 0.3);         /* Leve resplandor exterior */
 }
 
-/* Menú desplegable de coincidencias */
-.search-dropdown {
-    position: absolute;
-    top: 115%;
-    left: 0;
-    width: 100%;
+/* 6. NEGOCIOS DISPONIBLES (Tarjetas) */
+.grid-restaurantes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+article {
     background-color: var(--fondo-tarjetas);
     border: 1px solid var(--borde-sutil);
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    max-height: 280px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none; /* Oculto por defecto */
+    padding: 20px;
+    width: 250px;
 }
 
-.search-item {
-    padding: 12px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--borde-sutil);
-    transition: 0.2s;
+article h3 {
+    margin-bottom: 5px;
 }
 
-.search-item:last-child {
-    border-bottom: none;
-}
-
-.search-item:hover {
-    background-color: rgba(255, 102, 0, 0.12);
-}
-
-.search-item-title {
-    color: var(--texto-principal);
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.search-item-sub {
+.etiqueta-tiempo {
     color: var(--texto-secundario);
     font-size: 12px;
 }
 
-.search-no-results {
-    padding: 15px;
-    text-align: center;
+.etiqueta-abierto {
+    color: #4caf50; 
+    font-weight: bold;
+    font-size: 12px;
+}
+
+/* --- ESTILOS DEL MODAL DE FILTROS --- */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--fondo-tarjetas); 
+    width: 550px;
+    max-width: 90%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--borde-sutil);
+}
+
+.btn-text {
+    cursor: pointer;
     color: var(--texto-secundario);
-    font-size: 13px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.modal-body {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.btn-aceptar {
+    background-color: var(--naranja-marca);
+    color: var(--texto-principal);
+    border: none;
+    width: 100%;
+    padding: 15px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-aceptar:hover {
+    opacity: 0.9;
+}
+
+/* --- FOOTER (Pie de página) --- */
+footer {
+    background-color: var(--fondo-tarjetas);
+    border-top: 1px solid var(--borde-sutil);
+    padding: 40px;
+    margin-top: 60px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-izq {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.footer-izq strong {
+    color: var(--naranja-marca);
+    font-size: 22px;
+    font-style: italic;
+}
+
+.footer-izq p {
+    margin: 0;
+    color: var(--texto-secundario);
+}
+
+.redes-sociales {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.redes-sociales a {
+    color: var(--texto-principal);
+    background-color: var(--fondo-principal);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.redes-sociales a:hover {
+    background-color: var(--naranja-marca);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.footer-der {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.footer-enlaces {
+    display: flex;
+    gap: 25px;
+}
+
+.footer-enlaces a {
+    color: var(--texto-principal);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.footer-enlaces a:hover {
+    color: var(--naranja-marca);
+}
+
+.footer-legal {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+.footer-legal a {
+    color: var(--texto-secundario);
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-legal a:hover {
+    color: var(--texto-principal);
 }

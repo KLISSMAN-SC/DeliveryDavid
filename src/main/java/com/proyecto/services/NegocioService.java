@@ -36,5 +36,19 @@ public class NegocioService {
 
         return negocioRepository.findByTipoNegocioIdTipoNegocio(idTipoNegocio);
     }
+    
+ // Agrégalo debajo de los demás métodos en NegocioService.java
+    public List<Negocio> obtenerPorTipo(TipoNegocio tipoNegocio) {
+        return negocioRepository.findByTipoNegocio(tipoNegocio);
+    }
+    public List<Negocio> buscarConFiltrosCombinados(Integer tipoId, Integer zonaId, String categoria) {
+        // Reemplazamos los nulos por valores que no existen (-1 o vacío) para evitar el error de MySQL
+        Integer filtroTipo = (tipoId == null) ? -1 : tipoId;
+        Integer filtroZona = (zonaId == null) ? -1 : zonaId;
+        String filtroCat = (categoria == null) ? "" : categoria;
+        
+        return negocioRepository.findByFiltrosCombinados(filtroTipo, filtroZona, filtroCat);
+    }
+    
 
 }
