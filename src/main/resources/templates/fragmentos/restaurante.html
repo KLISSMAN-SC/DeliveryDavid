@@ -1,53 +1,103 @@
-<div th:fragment="vista">
+<div th:fragment="vista" class="vista-restaurante fade-in">
 
+    <!-- Botón Volver -->
+    <button class="btn-volver" onclick="volverInicio()">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+    </button>
 
-<button onclick="volverInicio()">
-← Volver
-</button>
+    <!-- CABECERA DEL RESTAURANTE (Logo y Nombre Centrados) -->
+    <div class="restaurante-header-centrado">
+        <div class="restaurante-logo-caja">
+            <!-- Valida si hay logo guardado, sino pone un icono por defecto -->
+            <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
+                 th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
+                 alt="Logo Restaurante">
+            <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" class="logo-placeholder">
+                <i class="fa-solid fa-store"></i>
+            </div>
+        </div>
+        <div class="restaurante-info-texto">
+            <h1 th:text="${negocio.nombre}">Nombre del Restaurante</h1>
+            
+            <div class="restaurante-tags">
+                <span class="tag-estrellas"><i class="fa-solid fa-star"></i> 4.8 (120 opiniones)</span>
+                <span class="tag-estado" th:text="${negocio.estado}">ABIERTO</span>
+            </div>
+            
+            <p class="restaurante-direccion">
+                <i class="fa-solid fa-location-dot"></i> <span th:text="${negocio.direccion}">Dirección</span>
+            </p>
+        </div>
+    </div>
 
+    <hr class="separador-sutil">
 
-<h1 th:text="${negocio.nombre}">
-Restaurante
-</h1>
+    <!-- BARRA DE BÚSQUEDA Y CATEGORÍAS INTERNAS -->
+    <div class="restaurante-navegacion">
+        <div class="search-container-interno">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar productos..." class="search-input-interno">
+        </div>
+        
+        <!-- Botones de categorías tipo píldora -->
+        <ul class="restaurante-categorias-pills">
+            <li class="pill activo">Recomendados</li>
+            <li class="pill">Platos principales</li>
+            <li class="pill">Bebidas</li>
+            <li class="pill">Complementos</li>
+        </ul>
+    </div>
 
+    <!-- LAYOUT PRINCIPAL (2 Columnas) -->
+    <div class="restaurante-layout">
+        
+        <!-- Columna Izquierda: Lista de Productos -->
+        <div class="restaurante-productos-seccion">
+            <div class="titulo-seccion-productos">
+                <h2>Platos recomendados</h2>
+                <span class="tag-fotos"><i class="fa-regular fa-circle-check"></i> Fotos referenciales</span>
+            </div>
 
-<p th:text="${negocio.direccion}">
-Dirección
-</p>
+            <div class="grid-productos-interno">
+                <!-- Tarjeta de Producto -->
+                <article class="tarjeta-producto" th:each="producto : ${productos}">
+                    <div class="producto-img-caja">
+                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" 
+                             th:src="@{'/productos/' + ${producto.imagen}}" 
+                             alt="Producto">
+                        <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" class="producto-placeholder">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="producto-info">
+                        <h3 th:text="${producto.nombre}">Nombre Producto</h3>
+                        <!-- Si tu base de datos tiene descripción, se mostrará aquí -->
+                        <p class="producto-desc" th:text="${producto.descripcion}">Deliciosa descripción del plato con todos sus ingredientes detallados.</p>
+                        
+                        <div class="producto-footer">
+                            <span class="producto-precio">S/ <span th:text="${producto.precio}">0.00</span></span>
+                            <button class="btn-add-carrito"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
 
+        <!-- Columna Derecha: Carrito Flotante -->
+        <div class="restaurante-carrito-sidebar">
+            <div class="carrito-box">
+                <h3>Mi pedido</h3>
+                
+                <!-- Estado vacío del carrito -->
+                <div class="carrito-vacio">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <p>Tu pedido está vacío</p>
+                </div>
+                
+                <!-- Aquí se inyectarán los items del carrito mediante JavaScript después -->
+            </div>
+        </div>
 
-<h2>Productos</h2>
-
-
-<div class="grid-productos">
-
-<article th:each="producto:${productos}">
-
-
-<img th:src="${producto.imagen}">
-
-
-<h3 th:text="${producto.nombre}">
-Producto
-</h3>
-
-
-<p>
-S/
-<span th:text="${producto.precio}">
-0
-</span>
-</p>
-
-
-<button>
-Agregar
-</button>
-
-
-</article>
-
-</div>
-
-
+    </div>
 </div>

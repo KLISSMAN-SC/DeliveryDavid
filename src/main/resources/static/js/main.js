@@ -160,6 +160,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+	// ==========================================
+	    // 5. CARGAR MÁS RESTAURANTES (De 8 en 8)
+	    // ==========================================
+	    const tarjetas = document.querySelectorAll('.tarjeta-restaurante');
+	    const btnVerMas = document.getElementById('btnVerMasRestaurantes');
+	    const contenedorVerMas = document.getElementById('contenedorVerMas');
+	    const cantidadPorPagina = 8; // Cuántos restaurantes mostrar cada vez
+
+	    // 1. Fase de inicio: Ocultar los que sobran
+	    if (tarjetas.length > cantidadPorPagina) {
+	        contenedorVerMas.style.display = 'flex'; // Mostrar el botón
+	        
+	        tarjetas.forEach((tarjeta, index) => {
+	            if (index >= cantidadPorPagina) {
+	                tarjeta.classList.add('oculto');
+	            }
+	        });
+	    }
+
+	    // 2. Evento del botón: Mostrar los siguientes 8
+	    if (btnVerMas) {
+	        btnVerMas.addEventListener('click', () => {
+	            // Seleccionar solo las tarjetas que están ocultas en este momento
+	            const tarjetasOcultas = document.querySelectorAll('.tarjeta-restaurante.oculto');
+	            
+	            // Quitar la clase 'oculto' a las siguientes 8
+	            for (let i = 0; i < cantidadPorPagina && i < tarjetasOcultas.length; i++) {
+	                tarjetasOcultas[i].classList.remove('oculto');
+	            }
+
+	            // Comprobar si ya no queda ninguna oculta
+	            if (document.querySelectorAll('.tarjeta-restaurante.oculto').length === 0) {
+	                // Animación suave de desaparición para el botón
+	                contenedorVerMas.style.opacity = '0';
+	                setTimeout(() => { contenedorVerMas.style.display = 'none'; }, 300);
+	            }
+	        });
+	    }
+	
 });
 function abrirRestaurante(idNegocio){
 

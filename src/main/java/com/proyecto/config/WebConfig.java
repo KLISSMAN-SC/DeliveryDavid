@@ -20,5 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/banner/**")
         .addResourceLocations("file:///C:/RIDE_MEAL/banner/");
         
+        registry.addResourceHandler("/productos/**")
+        .addResourceLocations("file:///C:/RIDE_MEAL/productos/");
+        
     }
 }

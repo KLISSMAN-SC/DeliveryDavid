@@ -643,11 +643,14 @@ ul li {
 }
 
 
+
 /* 6. NEGOCIOS DISPONIBLES (Tarjetas de Restaurantes) */
 .grid-restaurantes {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    display: grid;
+    /* Crea tantas columnas de 250px (el ancho de tu tarjeta) como quepan en la pantalla */
+    grid-template-columns: repeat(auto-fill, 250px); 
+    gap: 25px; /* Aumentamos ligeramente el espacio para que respiren mejor */
+    justify-content: center; /* Centra el bloque entero de tarjetas en la pantalla */
 }
 
 .tarjeta-restaurante {
@@ -735,66 +738,125 @@ ul li {
     font-weight: bold;
 }
 
-/* --- ESTILOS DEL MODAL DE FILTROS --- */
+/* =========================================================
+   ESTILOS DEL MODAL DE FILTROS
+   ========================================================= */
 .modal-overlay {
-    display: none; 
+    display: none; /* Cambiará a 'flex' mediante JS */
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(3px); /* Añade un ligero desenfoque al fondo de la página */
+    z-index: 2000;
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background-color: var(--fondo-tarjetas); 
-    width: 550px;
+    background-color: #1a1a1a; /* Tono oscuro profundo */
+    width: 520px;
     max-width: 90%;
+    border: 1px solid #333;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    animation: fadeModal 0.3s ease-out;
 }
 
+@keyframes fadeModal {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Cabecera del Modal --- */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--borde-sutil);
+    padding: 20px 25px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.modal-titulo {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--texto-principal);
+    text-align: center;
+    flex: 1; /* Permite que el título se centre perfectamente entre los dos botones laterales */
 }
 
 .btn-text {
     cursor: pointer;
     color: var(--texto-secundario);
     font-weight: bold;
-    font-size: 14px;
+    font-size: 13px;
+    transition: 0.2s;
+    width: 60px; /* Ancho fijo para equilibrar ambos lados */
 }
 
+#btnCancelarModal { text-align: left; }
+#btnLimpiarModal { text-align: right; }
+
+.btn-text:hover {
+    color: var(--texto-principal);
+}
+
+/* --- Cuerpo del Modal (Botones de Filtro) --- */
 .modal-body {
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     max-height: 400px;
     overflow-y: auto;
 }
 
+/* Rediseño de las píldoras específico para el Modal */
+.filtro-pill {
+    background-color: transparent;
+    color: var(--texto-principal);
+    border: 1px solid #3a3a3a;
+    padding: 10px 18px;
+    border-radius: 8px; /* Bordes ligeramente curvados en lugar de redondos al 100% */
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    letter-spacing: 0.5px;
+}
+
+.filtro-pill.seleccionado, .filtro-pill:hover {
+    background-color: rgba(255, 102, 0, 0.1) !important;
+    border-color: var(--naranja-marca) !important;
+    color: var(--texto-principal) !important;
+    box-shadow: none; /* Eliminamos el resplandor para un diseño más limpio */
+}
+
+/* --- Pie del Modal (Botón Aceptar) --- */
+.modal-footer {
+    padding: 0 25px 25px 25px;
+    display: flex;
+}
+
 .btn-aceptar {
     background-color: var(--naranja-marca);
-    color: var(--texto-principal);
+    color: white;
     border: none;
     width: 100%;
-    padding: 15px;
-    border-radius: 30px;
-    font-size: 16px;
+    padding: 14px;
+    border-radius: 12px; /* Combina con el diseño de la imagen */
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .btn-aceptar:hover {
-    opacity: 0.9;
+    background-color: #e65c00;
+    transform: translateY(-2px);
 }
 
 /* --- FOOTER (Pie de página) --- */
@@ -891,4 +953,380 @@ footer {
 
 .footer-legal a:hover {
     color: var(--texto-principal);
+}
+/* =========================================================
+   VISTA INTERNA DEL RESTAURANTE
+   ========================================================= */
+.vista-restaurante {
+    animation: fadePromo 0.3s ease-in-out;
+}
+
+.btn-volver {
+    background: transparent;
+    border: none;
+    color: var(--texto-secundario);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.btn-volver:hover {
+    color: var(--naranja-marca);
+}
+
+/* --- Cabecera Centrada --- */
+.restaurante-header-centrado {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.restaurante-logo-caja {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--fondo-tarjetas);
+    border: 2px solid var(--borde-sutil);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
+
+.restaurante-logo-caja img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: var(--texto-secundario);
+}
+
+.restaurante-info-texto h1 {
+    font-size: 32px;
+    margin: 0 0 8px 0;
+    color: var(--texto-principal);
+}
+
+.restaurante-tags {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.tag-estrellas {
+    color: #ffc107; /* Amarillo para las estrellas */
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.tag-estado {
+    background-color: var(--naranja-marca);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.restaurante-direccion {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.separador-sutil {
+    border-color: #222;
+    margin: 20px 0;
+}
+
+/* --- Navegación Interna (Buscador y Categorías) --- */
+.restaurante-navegacion {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.search-container-interno {
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 20px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 250px;
+}
+
+.search-input-interno {
+    background: transparent;
+    border: none;
+    color: var(--texto-principal);
+    outline: none;
+    width: 100%;
+    font-size: 13px;
+}
+
+.restaurante-categorias-pills {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+}
+
+.pill {
+    background-color: var(--fondo-tarjetas);
+    color: var(--texto-principal);
+    border: 1px solid var(--borde-sutil);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.pill.activo, .pill:hover {
+    background-color: var(--texto-principal);
+    color: var(--fondo-principal);
+    border-color: var(--texto-principal);
+}
+
+/* --- Layout Principal de 2 Columnas --- */
+.restaurante-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Columna Izquierda (Productos) */
+.restaurante-productos-seccion {
+    flex: 1;
+}
+
+.titulo-seccion-productos {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.titulo-seccion-productos h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.tag-fotos {
+    background-color: #2a2a2a;
+    color: var(--texto-secundario);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Grid de Productos Internos */
+.grid-productos-interno {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.tarjeta-producto {
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: 0.2s;
+}
+
+.tarjeta-producto:hover {
+    border-color: var(--naranja-marca);
+    box-shadow: 0 5px 15px rgba(255, 102, 0, 0.15);
+}
+
+.producto-img-caja {
+    width: 100%;
+    height: 140px;
+    background-color: var(--fondo-principal);
+}
+
+.producto-img-caja img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.producto-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: var(--texto-secundario);
+}
+
+.producto-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.producto-info h3 {
+    font-size: 15px;
+    margin: 0 0 5px 0;
+    color: var(--texto-principal);
+}
+
+.producto-desc {
+    font-size: 12px;
+    color: var(--texto-secundario);
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.producto-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.producto-precio {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--texto-principal);
+}
+
+.btn-add-carrito {
+    background-color: var(--fondo-principal);
+    color: var(--texto-principal);
+    border: 1px solid var(--borde-sutil);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-add-carrito:hover {
+    background-color: var(--naranja-marca);
+    border-color: var(--naranja-marca);
+    color: white;
+}
+
+/* Columna Derecha (Carrito Flotante) */
+.restaurante-carrito-sidebar {
+    width: 300px;
+    position: sticky;
+    top: 20px; /* Hace que el carrito se quede pegado al bajar el scroll */
+}
+
+.carrito-box {
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.carrito-box h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    border-bottom: 1px solid var(--borde-sutil);
+    padding-bottom: 15px;
+}
+
+.carrito-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--texto-secundario);
+    gap: 15px;
+}
+
+.carrito-vacio i {
+    font-size: 40px;
+    opacity: 0.5;
+}
+
+.carrito-vacio p {
+    margin: 0;
+    font-weight: bold;
+}
+/* =========================================================
+   BOTÓN VER MÁS (Paginación de Restaurantes)
+   ========================================================= */
+.contenedor-ver-mas {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.btn-ver-mas {
+    background-color: var(--fondo-tarjetas);
+    color: var(--texto-principal);
+    border: 1px solid var(--borde-sutil);
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-ver-mas:hover {
+    background-color: var(--naranja-marca);
+    border-color: var(--naranja-marca);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 102, 0, 0.2);
+}
+
+/* Clase dinámica para ocultar las tarjetas sobrantes */
+.tarjeta-restaurante.oculto {
+    display: none !important;
 }

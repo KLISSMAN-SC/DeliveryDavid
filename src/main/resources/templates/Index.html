@@ -25,7 +25,7 @@
         <div class="search-wrapper">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca restaurantes, platos o categorías..." autocomplete="off">
+                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca negocios de restaurantes, farmacias, licoreria..." autocomplete="off">
             </div>
             <!-- Contenedor desplegable dinámico -->
             <div id="dropdownResultados" class="search-dropdown"></div>
@@ -34,16 +34,10 @@
         <!-- Acciones de Usuario (Ubicación, Carrito, Login) -->
         <div class="user-actions">
             
-            <!-- Bloque de Ubicación -->
-            <div class="location-block">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="location-text">
-                    <span class="enviar-a">Enviar a</span>
-                    <span class="mi-ubicacion">Mi ubicación <i class="fa-solid fa-chevron-down chevron-icon"></i></span>
-                </div>
+            <div class="redes-sociales">
+                
+                <a href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
-            
-            
             
             <!-- Botón Login -->
             <button class="btn-login">Iniciar sesión</button>
@@ -189,12 +183,12 @@
         <hr>
     </th:block>
 
-    <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
+   <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
     <div id="modalFiltros" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <span id="btnCancelarModal" class="btn-text">Cancelar</span>
-                <h3>Todos los filtros</h3>
+                <h3 class="modal-titulo">Todos los filtros</h3>
                 <span id="btnLimpiarModal" class="btn-text">Limpiar</span>
             </div>
             
@@ -220,10 +214,7 @@
     <section>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Restaurantes cerca de ti</h2>
-            <div style="display: flex; gap: 10px;">
-                <button style="background-color: var(--naranja-marca); color: white; border: none; padding: 5px 15px; border-radius: 15px;">Todas</button>
-                <button style="background-color: var(--fondo-tarjetas); color: white; border: 1px solid var(--borde-sutil); padding: 5px 15px; border-radius: 15px;">Más cercanos</button>
-            </div>
+            
         </div>
         
         <div class="grid-restaurantes">
@@ -259,6 +250,12 @@
                 </div>
             </article>
 
+        </div>
+        <!-- NUEVO: Contenedor del botón "Ver más" -->
+        <div class="contenedor-ver-mas" id="contenedorVerMas" style="display: none;">
+            <button id="btnVerMasRestaurantes" class="btn-ver-mas">
+                Ver más restaurantes <i class="fa-solid fa-chevron-down"></i>
+            </button>
         </div>
     </section>
     <!-- ... Fin de la sección de Negocios ... -->
