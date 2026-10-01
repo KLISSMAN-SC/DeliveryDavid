@@ -253,3 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
         intervaloPromo = setInterval(avanzarPromo, 5000); // 5000 ms = 5 segundos
     }
 });
+function manejarMenuUsuario(opcion) {
+
+    if (opcion === "perfil") {
+
+        window.location.href = "/api/perfil";
+
+    }
+
+    if (opcion === "logout") {
+
+        document.getElementById("formLogout").submit();
+
+    }
+}

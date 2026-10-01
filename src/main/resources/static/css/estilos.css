@@ -1650,6 +1650,8 @@ footer {
     margin: 0;
     padding: 20px;
     background: linear-gradient(135deg, #050505 0%, #1a0a00 100%); /* Fondo súper oscuro con un tinte cálido */
+    opacity: 1;
+    transition: none;
 }
 
 .login-wrapper {
@@ -1764,4 +1766,69 @@ footer {
 
 .volver-inicio:hover {
     color: var(--texto-principal) !important;
+}
+/* =========================================================
+   USUARIO AUTENTICADO - MENÚ SUPERIOR
+   ========================================================= */
+
+.usuario-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+
+    padding: 8px 12px;
+    border-radius: 12px;
+
+    transition: 0.3s ease;
+}
+
+.usuario-menu:hover {
+    border-color: var(--naranja-marca);
+}
+
+
+/* Icono de usuario */
+.usuario-icono {
+    color: var(--naranja-marca);
+    font-size: 22px;
+}
+
+
+/* Nombre */
+.usuario-nombre {
+    color: var(--texto-principal);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* Combobox */
+.usuario-combobox {
+    background-color: #111;
+    color: var(--texto-principal);
+
+    border: 1px solid var(--borde-sutil);
+    border-radius: 8px;
+
+    padding: 6px 8px;
+
+    cursor: pointer;
+    outline: none;
+}
+
+
+/* Cuando se selecciona */
+.usuario-combobox:focus {
+    border-color: var(--naranja-marca);
+}
+
+
+/* Opciones */
+.usuario-combobox option {
+    background-color: var(--fondo-tarjetas);
+    color: var(--texto-principal);
 }

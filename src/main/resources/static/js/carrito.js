@@ -1,21 +1,37 @@
-
-function abrirRestaurante(idNegocio){
+function abrirRestaurante(idNegocio) {
 
     fetch("/api/restaurante/" + idNegocio)
+        .then(response => {
 
-    .then(response => response.text())
+            // Spring Security redirigió la petición al login
+            if (response.redirected && response.url.includes("/login")) {
+                window.location.href = response.url;
+                return null;
+            }
 
-    .then(html => {
+            // Si ocurrió otro error
+            if (!response.ok) {
+                throw new Error("No se pudo abrir el restaurante");
+            }
 
-        document.getElementById("contenido-principal")
-        .innerHTML = html;
+            return response.text();
+        })
+        .then(html => {
 
-        window.scrollTo(0,0);
-		
-		cargarCarrito(idNegocio)
+            // Si fuimos enviados al login, no continuar
+            if (html === null) {
+                return;
+            }
 
-    });
+            document.getElementById("contenido-principal").innerHTML = html;
 
+            window.scrollTo(0, 0);
+
+            cargarCarrito(idNegocio);
+        })
+        .catch(error => {
+            console.error("Error abriendo restaurante:", error);
+        });
 }
 function agregarAlCarrito(boton) {
 

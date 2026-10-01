@@ -39,10 +39,54 @@
                 <a href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
             
-            <!-- Botón Login (Ahora es un enlace) -->
-            <a th:href="@{/login}" class="btn-login" style="text-decoration: none; display: inline-block; text-align: center;">
-                Iniciar sesión
-            </a>
+            <!-- ==========================================
+     USUARIO NO AUTENTICADO
+     ========================================== -->
+<a th:if="${usuarioAutenticado == null}"
+   th:href="@{/login}"
+   class="btn-login"
+   style="text-decoration: none; display: inline-block; text-align: center;">
+    Iniciar sesión
+</a>
+
+
+<!-- ==========================================
+     USUARIO AUTENTICADO
+     ========================================== -->
+<div th:if="${usuarioAutenticado != null}"
+     class="usuario-menu">
+
+    <i class="fa-solid fa-circle-user usuario-icono"></i>
+
+    <span class="usuario-nombre"
+          th:text="${usuarioAutenticado.nombres + ' ' + usuarioAutenticado.apellidos}">
+        Usuario
+    </span>
+
+    <select class="usuario-combobox"
+            onchange="manejarMenuUsuario(this.value); this.selectedIndex = 0;">
+
+        <option value="" selected disabled>▼</option>
+
+        <option value="perfil">
+            Perfil
+        </option>
+
+        <option value="logout">
+            Cerrar sesión
+        </option>
+
+    </select>
+
+</div>
+
+
+<!-- Formulario oculto para cerrar sesión -->
+<form id="formLogout"
+      th:action="@{/logout}"
+      method="post"
+      style="display: none;">
+</form>
             
         </div>
     </header>
