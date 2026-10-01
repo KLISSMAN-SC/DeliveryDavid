@@ -1,3 +1,10 @@
+﻿/* Paleta de colores extraída de la imagen */
+:root {
+    --fondo-principal: #0a0a0a; 
+    --fondo-tarjetas: #1a1a1a;  
+    --naranja-marca: #ff6600;   
+    --texto-principal: #ffffff; 
+}
 /* Paleta de colores extraída de la imagen */
 :root {
     --fondo-principal: #0a0a0a; 

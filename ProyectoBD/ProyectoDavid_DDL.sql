@@ -235,6 +235,80 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`DETALLE_PEDIDO` (
 ENGINE = InnoDB;
 
 
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`CARRITO` (
+  `idCarrito` INT NOT NULL AUTO_INCREMENT,
+  `fecha_actualizacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `idUsuario` INT NOT NULL,
+  `idNegocio` INT NOT NULL,
+  PRIMARY KEY (`idCarrito`),
+  UNIQUE INDEX `idUsuario_UNIQUE` (`idUsuario` ASC) VISIBLE,
+  INDEX `fk_CARRITO_USUARIO1_idx` (`idUsuario` ASC) VISIBLE,
+  INDEX `fk_CARRITO_NEGOCIO1_idx` (`idNegocio` ASC) VISIBLE,
+  CONSTRAINT `fk_CARRITO_USUARIO1`
+    FOREIGN KEY (`idUsuario`)
+    REFERENCES `proyecto_david`.`USUARIO` (`idUsuario`)
+    ON DELETE CASCADE -- Si borras al usuario, se borra su carrito
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_CARRITO_NEGOCIO1`
+    FOREIGN KEY (`idNegocio`)
+    REFERENCES `proyecto_david`.`NEGOCIO` (`idNegocio`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `proyecto_david`.`DETALLE_CARRITO`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`DETALLE_CARRITO` (
+  `idDetalleCarrito` INT NOT NULL AUTO_INCREMENT,
+  `cantidad` INT NOT NULL,
+  `notaEspecial` VARCHAR(100) NULL,
+  `idCarrito` INT NOT NULL,
+  `idProducto` INT NOT NULL,
+  PRIMARY KEY (`idDetalleCarrito`),
+  INDEX `fk_DETALLE_CARRITO_CARRITO1_idx` (`idCarrito` ASC) VISIBLE,
+  INDEX `fk_DETALLE_CARRITO_PRODUCTO1_idx` (`idProducto` ASC) VISIBLE,
+  CONSTRAINT `fk_DETALLE_CARRITO_CARRITO1`
+    FOREIGN KEY (`idCarrito`)
+    REFERENCES `proyecto_david`.`CARRITO` (`idCarrito`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_DETALLE_CARRITO_PRODUCTO1`
+    FOREIGN KEY (`idProducto`)
+    REFERENCES `proyecto_david`.`PRODUCTO` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `proyecto_david`.`PROMOCION`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`PROMOCION` (
+  `idPromocion` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(100) NOT NULL,
+  `descripcion` VARCHAR(255) NULL,
+  `imagenBanner` VARCHAR(255) NOT NULL,
+  `fecha_inicio` DATETIME NOT NULL,
+  `fecha_fin` DATETIME NOT NULL,
+  `estado` TINYINT(1) NULL DEFAULT 1,
+  `idNegocio` INT NOT NULL,
+  `idProducto` INT NULL,
+  PRIMARY KEY (`idPromocion`),
+  INDEX `fk_PROMOCION_NEGOCIO1_idx` (`idNegocio` ASC) VISIBLE,
+  INDEX `fk_PROMOCION_PRODUCTO1_idx` (`idProducto` ASC) VISIBLE,
+  CONSTRAINT `fk_PROMOCION_NEGOCIO1`
+    FOREIGN KEY (`idNegocio`)
+    REFERENCES `proyecto_david`.`NEGOCIO` (`idNegocio`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_PROMOCION_PRODUCTO1`
+    FOREIGN KEY (`idProducto`)
+    REFERENCES `proyecto_david`.`PRODUCTO` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

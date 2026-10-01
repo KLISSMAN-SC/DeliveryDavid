@@ -58,7 +58,6 @@ INSERT INTO `producto` (`idProducto`, `nombre`, `descripcion`, `precio`, `imagen
 (4, 'Frappé de Chocolate', 'Bebida dulce helada con crema batida y fudge', 14.50, 'frappe_choco.jpg', 1, 39, 3),
 (5, 'Porción Torta de Chocolate', 'Bizcocho húmedo relleno de fudge', 10.00, 'torta_choco.jpg', 1, 39, 4);
 
-
 INSERT INTO `pedido` (`idPedido`, `estadoPedido`, `metodoPago`, `costoEnvio`, `propina`, `total`, `direccionEnvio`, `referencia`, `latitudEnvio`, `longitudEnvio`, `fechaHora`, `idUsuario`, `idNegocio`, `idRepartidor`) VALUES 
 (1, 'CONFIRMADO', 'Efectivo', 3.00, 0.00, 17.50, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 39, 2),
 (2, 'PENDIENTE_DE_WHATSAPP', 'Yape', 3.00, 0.00, 46.00, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 38, NULL);
@@ -67,3 +66,16 @@ INSERT INTO `detalle_pedido` (`idDetallePedido`, `cantidad`, `precioUnitario`, `
 (1, 1, 14.50, 14.50, 'Con extra crema batida por favor', 1, 4),
 (2, 2, 18.00, 36.00, 'Las papas bien fritas', 2, 2),
 (3, 1, 7.00, 7.00, 'Helada', 2, 3);
+
+INSERT INTO `carrito` (`idCarrito`, `fecha_actualizacion`, `idUsuario`, `idNegocio`) VALUES 
+(1, NOW(), 1, 39);
+
+INSERT INTO `detalle_carrito` (`idDetalleCarrito`, `cantidad`, `notaEspecial`, `idCarrito`, `idProducto`) VALUES 
+(1, 2, 'Uno de ellos sin crema batida por favor', 1, 4),
+(2, 1, NULL, 1, 5);
+
+INSERT INTO `promocion` (`idPromocion`, `titulo`, `descripcion`, `imagenBanner`, `fecha_inicio`, `fecha_fin`, `estado`, `idNegocio`, `idProducto`) VALUES 
+(1, '¡Locura de Alitas BBQ!', 'Disfruta nuestras Alitas BBQ con porción doble de papas fritas solo por este fin de semana.', 'banner_promo_alitas.jpg', '2026-09-01 08:00:00', '2026-10-31 23:59:59', 1, 38, 1),
+(2, 'Tardes de Frappé en el Real Plaza', 'Alivia el calor de Pucallpa con nuestro increíble Frappé de Chocolate.', 'banner_promo_frappe.jpg', '2026-09-15 08:00:00', '2026-10-15 23:59:59', 1, 39, 4),
+(3, '¡Nuevos Postres en Manu Cafe!', 'Ven a probar nuestra nueva carta de dulces y tortas. ¡Te esperamos!', 'banner_nuevos_postres.jpg', '2026-09-20 08:00:00', '2026-11-30 23:59:59', 1, 39, NULL);
+
