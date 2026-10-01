@@ -21,4 +21,25 @@ public class ProductoService {
         return productoRepository.findByNegocioIdNegocioAndDisponibleTrue(idNegocio);
 
     }
+    
+    public List<Producto> buscarProductosPorNegocio(
+            Integer idNegocio,
+            String texto) {
+
+        // Si el buscador está vacío, mostrar todos
+        if (texto == null || texto.trim().isEmpty()) {
+
+            return productoRepository
+                    .findByNegocioIdNegocioAndDisponibleTrue(
+                            idNegocio
+                    );
+        }
+
+
+        return productoRepository
+                .buscarProductosPorNegocio(
+                        idNegocio,
+                        texto.trim()
+                );
+    }
 }

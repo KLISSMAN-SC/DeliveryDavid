@@ -41,7 +41,7 @@ public class Usuario {
 	@Column(length=200)
 	private String password;
 	
-	@Column(name="fecha_creacion", insertable=false, updatable=false)
+	@Column(name="fechaCreacion", insertable=false, updatable=false)
 	private LocalDateTime fechaCreacion;
 
 }

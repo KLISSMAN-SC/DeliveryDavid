@@ -35,7 +35,7 @@ INSERT INTO `rol` (`idRol`, `nombre`) VALUES
 (2, 'Cliente'),
 (3, 'Repartidor');
 
-INSERT INTO `usuario` (`idUsuario`, `idRol`, `nombres`, `apellidos`, `dni`, `telefono`, `correoElectronico`, `password`, `fecha_creacion`) VALUES 
+INSERT INTO `usuario` (`idUsuario`, `idRol`, `nombres`, `apellidos`, `dni`, `telefono`, `correoElectronico`, `password`, `fechaCreacion`) VALUES 
 (1, 2, 'Carlos Andre', 'Ramirez Cachique', '71234567', '987654321', 'carlos@cliente.com', 'hash_pass_123', NOW()),
 (2, 3, 'Miguel', 'Gómez', '45678912', '999888777', 'miguel@delivery.com', 'hash_pass_456', NOW()),
 (3, 1, 'Admin', 'Sistema', '00000000', '900000000', 'admin@sistema.com', 'admin_pass', NOW());
@@ -51,12 +51,20 @@ INSERT INTO categorias_producto (idCategoriaProducto, nombre,logo, idNegocio) VA
 (8, 'Marino', 'marino.jpg',28),
 (9, 'Makis', 'makis.jpg',28);
 
-INSERT INTO `producto` (`idProducto`, `nombre`, `descripcion`, `precio`, `imagen`, `disponible`, `idNegocio`, `idCategoriaProducto`) VALUES 
-(1, 'Alitas BBQ (6 und)', 'Bañadas en salsa BBQ dulce con porción de papas', 16.00, 'alitas_bbq.jpg', 1, 38, 1),
-(2, 'Alitas Acevichadas (6 und)', 'Con salsa acevichada y toques de limón', 18.00, 'alitas_acevichadas.jpg', 1, 38, 1),
-(3, 'Chicha Morada 1L', 'Refrescante chicha helada', 7.00, 'chicha_1l.jpg', 1, 38, 2),
-(4, 'Frappé de Chocolate', 'Bebida dulce helada con crema batida y fudge', 14.50, 'frappe_choco.jpg', 1, 39, 3),
-(5, 'Porción Torta de Chocolate', 'Bizcocho húmedo relleno de fudge', 10.00, 'torta_choco.jpg', 1, 39, 4);
+INSERT INTO PRODUCTO(nombre,descripcion,precio,imagen,disponible,idNegocio,idCategoriaProducto) VALUES 
+('Alitas BBQ (6 und)', 'Bañadas en salsa BBQ dulce con porción de papas', 16.00, 'alitas_bbq.jpg', 1, 38, 1),
+('Alitas Acevichadas (6 und)', 'Con salsa acevichada y toques de limón', 18.00, 'alitas_acevichadas.jpg', 1, 38, 1),
+('Chicha Morada 1L', 'Refrescante chicha helada', 7.00, 'chicha_1l.jpg', 1, 38, 2),
+('Frappé de Chocolate', 'Bebida dulce helada con crema batida y fudge', 14.50, 'frappe_choco.jpg', 1, 39, 3),
+('Porción Torta de Chocolate', 'Bizcocho húmedo relleno de fudge', 10.00, 'torta_choco.jpg', 1, 39, 4),
+('Alitas Buffalo (6 und)', 'Clásicas alitas picantes estilo New York, acompañadas de bastones de apio y salsa blue cheese.', 18.00, 'alitas_buffalo.jpg', 1, 38, 1),
+('Alitas a la Maracuyá (6 und)', 'Crujientes alitas bañadas en nuestra salsa agridulce especial de maracuyá.', 17.00, 'alitas_maracuya.jpg', 1, 38, 1),
+('Alitas Teriyaki (6 und)', 'Glaseadas en salsa oriental teriyaki espolvoreadas con semillas de sésamo blanco tostado.', 17.50, 'alitas_teriyaki.jpg', 1, 38, 1),
+('Alitas Garlic Parmesan (6 und)', 'Bañadas en una rica mantequilla de ajo artesanal y abundante queso parmesano rallado.', 18.50, 'alitas_garlic_parmesan.jpg', 1, 38, 1),
+('Alitas Honey Mustard (6 und)', 'El balance perfecto entre el dulzor de la miel y el toque especial de mostaza.', 16.50, 'alitas_honey_mustard.jpg', 1, 38, 1),
+('Alitas BBQ Picante (6 und)', 'Nuestra tradicional salsa BBQ dulce pero con un toque ahumado y nivel de picante medio.', 17.00, 'alitas_bbq_picante.jpg', 1, 38, 1),
+('Combo Mega Wings (24 und)', '24 alitas a elección (hasta 4 sabores), porción familiar de papas rústicas y cremas.', 60.00, 'combo_mega_wings.jpg', 1, 38, 1),
+('Combo Duo Wings (12 und)', '12 alitas (hasta 2 sabores), 2 porciones de papas fritas personales y 2 gaseosas de 500ml.', 38.00, 'combo_duo_wings.jpg', 1, 38, 1);
 
 INSERT INTO `pedido` (`idPedido`, `estadoPedido`, `metodoPago`, `costoEnvio`, `propina`, `total`, `direccionEnvio`, `referencia`, `latitudEnvio`, `longitudEnvio`, `fechaHora`, `idUsuario`, `idNegocio`, `idRepartidor`) VALUES 
 (1, 'CONFIRMADO', 'Efectivo', 3.00, 0.00, 17.50, 'Av. Miraflores Mz B', 'Casa con portón blanco', -8.38400000, -74.55100000, NOW(), 1, 39, 2),
@@ -67,8 +75,8 @@ INSERT INTO `detalle_pedido` (`idDetallePedido`, `cantidad`, `precioUnitario`, `
 (2, 2, 18.00, 36.00, 'Las papas bien fritas', 2, 2),
 (3, 1, 7.00, 7.00, 'Helada', 2, 3);
 
-INSERT INTO `carrito` (`idCarrito`, `fecha_actualizacion`, `idUsuario`, `idNegocio`) VALUES 
-(1, NOW(), 1, 39);
+INSERT INTO `carrito` (`idCarrito`,`fechaCreacion`,`fechaActualizacion`,`estado`, `idUsuario`, `idNegocio`) VALUES 
+(1,NOW(), NOW(),'ACTIVO', 1, 39);
 
 INSERT INTO `detalle_carrito` (`idDetalleCarrito`, `cantidad`, `notaEspecial`, `idCarrito`, `idProducto`) VALUES 
 (1, 2, 'Uno de ellos sin crema batida por favor', 1, 4),

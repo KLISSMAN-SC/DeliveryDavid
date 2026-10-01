@@ -35,9 +35,17 @@
     <!-- BARRA DE BÚSQUEDA Y CATEGORÍAS INTERNAS -->
     <div class="restaurante-navegacion">
         <div class="search-container-interno">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Buscar productos..." class="search-input-interno">
-        </div>
+
+    		<i class="fa-solid fa-magnifying-glass"></i>
+    		<input
+        	type="text"
+       		id="buscarProductos"
+        	placeholder="Buscar productos..."
+        	class="search-input-interno"
+        	th:data-negocio="${negocio.idNegocio}"
+        	autocomplete="off">
+
+		</div>
         
         <!-- Botones de categorías tipo píldora -->
         <ul class="restaurante-categorias-pills">
@@ -57,31 +65,89 @@
                 <h2>Platos recomendados</h2>
                 <span class="tag-fotos"><i class="fa-regular fa-circle-check"></i> Fotos referenciales</span>
             </div>
+			<div class="grid-productos-interno"
+     		id="listaProductos"
+     		th:fragment="listaProductos">
 
-            <div class="grid-productos-interno">
-                <!-- Tarjeta de Producto -->
-                <article class="tarjeta-producto" th:each="producto : ${productos}">
-                    <div class="producto-img-caja">
-                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" 
-                             th:src="@{'/productos/' + ${producto.imagen}}" 
-                             alt="Producto">
-                        <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" class="producto-placeholder">
-                            <i class="fa-solid fa-utensils"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="producto-info">
-                        <h3 th:text="${producto.nombre}">Nombre Producto</h3>
-                        <!-- Si tu base de datos tiene descripción, se mostrará aquí -->
-                        <p class="producto-desc" th:text="${producto.descripcion}">Deliciosa descripción del plato con todos sus ingredientes detallados.</p>
-                        
-                        <div class="producto-footer">
-                            <span class="producto-precio">S/ <span th:text="${producto.precio}">0.00</span></span>
-                            <button class="btn-add-carrito"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-                </article>
-            </div>
+    		<article class="tarjeta-producto"
+             th:each="producto : ${productos}">
+
+
+        		<div class="producto-img-caja">
+
+            		<img
+                		th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
+                		th:src="@{'/productos/' + ${producto.imagen}}"
+                		alt="Producto">
+
+
+            	<div
+                		th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}"
+                		class="producto-placeholder">
+
+                		<i class="fa-solid fa-utensils"></i>
+
+            	</div>
+
+        </div>
+
+
+        <div class="producto-info">
+
+            <h3 th:text="${producto.nombre}">
+                Nombre Producto
+            </h3>
+
+
+            <p class="producto-desc"
+               th:text="${producto.descripcion}">
+                Descripción
+            </p>
+
+
+            <div class="producto-footer">
+
+                <span class="producto-precio">
+
+                    S/
+
+                    <span th:text="${producto.precio}">
+                        0.00
+                    </span>
+
+                </span>
+
+
+               		 <button
+                    type="button"
+                    class="btn-add-carrito"
+                    th:data-producto="${producto.idProducto}"
+                    th:data-negocio="${negocio.idNegocio}"
+                    onclick="agregarAlCarrito(this)">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                	</button>
+
+            	</div>
+
+        	</div>
+
+    	</article>
+
+
+    <!-- Si la búsqueda no encontró nada -->
+    			<div class="productos-no-encontrados"
+         		th:if="${#lists.isEmpty(productos)}">
+
+        		<i class="fa-solid fa-magnifying-glass"></i>
+
+        	<p>No encontramos productos con ese nombre.</p>
+
+    		</div>
+
+		</div>
+           
         </div>
 
         <!-- Columna Derecha: Carrito Flotante -->
@@ -90,10 +156,17 @@
                 <h3>Mi pedido</h3>
                 
                 <!-- Estado vacío del carrito -->
-                <div class="carrito-vacio">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <p>Tu pedido está vacío</p>
-                </div>
+               <div id="contenido-carrito">
+
+        		<div class="carrito-vacio">
+
+            		<i class="fa-solid fa-bag-shopping"></i>
+
+            		<p>Tu pedido está vacío</p>
+
+        		</div>
+
+    		   </div>
                 
                 <!-- Aquí se inyectarán los items del carrito mediante JavaScript después -->
             </div>

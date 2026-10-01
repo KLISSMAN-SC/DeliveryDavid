@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`USUARIO` (
   `telefono` VARCHAR(15) NULL,
   `correoElectronico` VARCHAR(45) NULL,
   `password` VARCHAR(200) NULL,
-  `fecha_creacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `fechaCreacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idUsuario`),
   INDEX `fk_USUARIO_ROL1_idx` (`idRol` ASC) VISIBLE,
   CONSTRAINT `fk_USUARIO_ROL1`
@@ -237,11 +237,12 @@ ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `proyecto_david`.`CARRITO` (
   `idCarrito` INT NOT NULL AUTO_INCREMENT,
-  `fecha_actualizacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `fechaCreacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `fechaActualizacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `estado`varchar(20) NULL,
   `idUsuario` INT NOT NULL,
   `idNegocio` INT NOT NULL,
   PRIMARY KEY (`idCarrito`),
-  UNIQUE INDEX `idUsuario_UNIQUE` (`idUsuario` ASC) VISIBLE,
   INDEX `fk_CARRITO_USUARIO1_idx` (`idUsuario` ASC) VISIBLE,
   INDEX `fk_CARRITO_NEGOCIO1_idx` (`idNegocio` ASC) VISIBLE,
   CONSTRAINT `fk_CARRITO_USUARIO1`
@@ -262,6 +263,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `proyecto_david`.`DETALLE_CARRITO` (
   `idDetalleCarrito` INT NOT NULL AUTO_INCREMENT,
   `cantidad` INT NOT NULL,
+  `precioUnitario` DECIMAL(10,2) NULL,
   `notaEspecial` VARCHAR(100) NULL,
   `idCarrito` INT NOT NULL,
   `idProducto` INT NOT NULL,

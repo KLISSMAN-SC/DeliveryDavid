@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "CARRITO")
@@ -15,20 +17,31 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Carrito {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCarrito;
 
-    @Column(name = "fecha_actualizacion", insertable = false, updatable = false)
+    @Column(name="fechaCreacion", insertable=false, updatable=false)
+    private LocalDateTime fechaCreacion;
+    
+    @Column(name="fechaActualizacion", insertable=false, updatable=false)
     private LocalDateTime fechaActualizacion;
 
-    // Relación 1 a 1: Un usuario solo puede tener un carrito activo a la vez
-    @OneToOne
-    @JoinColumn(name = "idUsuario", nullable = false, unique = true)
+    @Column(length = 20)
+    private String estado; // ACTIVO / FINALIZADO / ABANDONADO
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idNegocio", nullable = false)
     private Negocio negocio;
-
+    
+    @OneToMany(
+    	    mappedBy = "carrito",
+    	    cascade = CascadeType.ALL,
+    	    orphanRemoval = true
+    	)
+    	private List<DetalleCarrito> detalles = new ArrayList<>();
 }
