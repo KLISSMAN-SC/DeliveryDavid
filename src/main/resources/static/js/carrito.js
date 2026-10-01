@@ -137,226 +137,91 @@ function cargarCarrito(idNegocio) {
 }
 
 function mostrarCarrito(carrito) {
-
-    const contenedor =
-        document.getElementById(
-            "contenido-carrito"
-        );
-
-
+    const contenedor = document.getElementById("contenido-carrito");
+    
     if (!contenedor) {
         return;
     }
 
-
     // Carrito sin productos
-    if (
-        !carrito.detalles ||
-        carrito.detalles.length === 0
-    ) {
-
+    if (!carrito.detalles || carrito.detalles.length === 0) {
         contenedor.innerHTML = `
-
             <div class="carrito-vacio">
-
                 <i class="fa-solid fa-bag-shopping"></i>
-
-                <p>
-                    Tu pedido está vacío
-                </p>
-
+                <p>Tu pedido está vacío</p>
             </div>
-
         `;
-
         return;
     }
 
+    let html = '<div class="carrito-items-lista">';
 
-    let html = "";
+    // Generar la lista de productos
+    carrito.detalles.forEach(detalle => {
+        const producto = detalle.producto;
+        const subtotal = Number(detalle.precioUnitario) * detalle.cantidad;
 
-
-    carrito.detalles.forEach(
-        detalle => {
-
-            const producto =
-                detalle.producto;
-
-
-            const subtotal =
-                Number(
-                    detalle.precioUnitario
-                ) *
-                detalle.cantidad;
-
-
-            html += `
-
-                <div class="item-carrito">
-
-                    <div class="item-carrito-info">
-
-                        <h4>
-                            ${producto.nombre}
-                        </h4>
-
-                        <span>
-                            S/
-                            ${Number(
-                                detalle.precioUnitario
-                            ).toFixed(2)}
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        class="item-carrito-cantidad">
-
-                        <button
-                            onclick="disminuirProducto(
-                                ${producto.idProducto},
-                                ${carrito.negocio.idNegocio}
-                            )">
-
-                            −
-
+        html += `
+            <div class="carrito-item">
+                <h4 class="carrito-item-titulo">${producto.nombre}</h4>
+                
+                <div class="carrito-item-body">
+                    <!-- Controles de Cantidad (Formato Píldora) -->
+                    <div class="carrito-controles">
+                        <button class="btn-cantidad" onclick="disminuirProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})">
+                            <i class="fa-solid fa-minus"></i>
                         </button>
-
-
-                        <span>
-                            ${detalle.cantidad}
-                        </span>
-
-
-                        <button
-                            onclick="aumentarProducto(
-                                ${producto.idProducto},
-                                ${carrito.negocio.idNegocio}
-                            )">
-
-                            +
-
+                        <span class="cantidad-numero">${detalle.cantidad}</span>
+                        <button class="btn-cantidad" onclick="aumentarProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})">
+                            <i class="fa-solid fa-plus"></i>
                         </button>
-						
-						<button
-							class="btn-eliminar-carrito"
-							onclick="eliminarProducto(
-							${producto.idProducto},
-							${carrito.negocio.idNegocio}
-							)"
-							title="Eliminar producto">
-							<i class="fa-solid fa-trash"></i>
-
-						</button>
-
                     </div>
-
-
-                    <strong>
-
-                        S/
-                        ${subtotal.toFixed(2)}
-
-                    </strong>
-
+                    
+                    <!-- Precio y Botón Eliminar -->
+                    <div class="carrito-item-precio">
+                        <span class="precio-subtotal">S/ ${subtotal.toFixed(2)}</span>
+                        <button class="btn-eliminar" onclick="eliminarProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})" title="Eliminar producto">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
                 </div>
+            </div>
+        `;
+    });
 
-            `;
-        }
-    );
+    html += '</div>';
 
-
-    // Calcular subtotal
+    // Calcular montos totales
     let subtotal = 0;
+    carrito.detalles.forEach(detalle => {
+        subtotal += Number(detalle.precioUnitario) * detalle.cantidad;
+    });
 
+    const envio = carrito.negocio && carrito.negocio.zona ? Number(carrito.negocio.zona.costoEnvioBase) : 0;
+    const total = subtotal + envio;
 
-    carrito.detalles.forEach(
-        detalle => {
-
-            subtotal +=
-                Number(
-                    detalle.precioUnitario
-                ) *
-                detalle.cantidad;
-
-        }
-    );
-
-
-	const envio =
-	    carrito.negocio &&
-	    carrito.negocio.zona
-	        ? Number(
-	            carrito.negocio.zona.costoEnvioBase
-	          )
-	        : 0;
-
-
-    const total =
-        subtotal + envio;
-
-
+    // Generar la zona de resumen
     html += `
-
-        <div class="resumen-carrito">
-
-            <div>
-
-                <span>
-                    Subtotal
-                </span>
-
-                <strong>
-                    S/
-                    ${subtotal.toFixed(2)}
-                </strong>
-
+        <div class="carrito-resumen">
+            <div class="resumen-fila">
+                <span>Subtotal</span>
+                <span>S/ ${subtotal.toFixed(2)}</span>
             </div>
-
-
-            <div>
-
-                <span>
-                    Envío
-                </span>
-
-                <strong>
-                    S/
-                    ${envio.toFixed(2)}
-                </strong>
-
+            <div class="resumen-fila">
+                <span>Envío</span>
+                <span>S/ ${envio.toFixed(2)}</span>
             </div>
-
-
-            <hr>
-
-
-            <div class="total-carrito">
-
-                <span>
-                    Total
-                </span>
-
-                <strong>
-                    S/
-                    ${total.toFixed(2)}
-                </strong>
-
+            
+            <hr class="separador-sutil">
+            
+            <div class="resumen-fila total">
+                <span>Total</span>
+                <span>S/ ${total.toFixed(2)}</span>
             </div>
-
-
-            <button
-                class="btn-confirmar-pedido">
-
-                Continuar pedido
-
-            </button>
-
+            
+            <button class="btn-continuar-pedido">Continuar pedido</button>
         </div>
-
     `;
-
 
     contenedor.innerHTML = html;
 }

@@ -114,31 +114,7 @@ p {
     color: var(--texto-secundario);
 }
 
-/* --- Carrito --- */
-.cart-wrapper {
-    position: relative;
-    cursor: pointer;
-    padding: 5px;
-}
-.cart-wrapper i {
-    color: var(--texto-principal);
-    font-size: 22px;
-}
-.cart-badge {
-    position: absolute;
-    top: -5px;
-    right: -8px;
-    background-color: #ff3333; 
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
 
 /* --- Botón de Inicio de Sesión --- */
 .btn-login {
@@ -367,7 +343,7 @@ p {
         linear-gradient(to right, var(--fondo-principal) 25%, transparent 55%, rgba(10,10,10,0.6) 100%),
         url('/api/banner/mochila.png') center / cover no-repeat;
     
-    min-height: 240px;
+    min-height: 350px;
     border-radius: 20px;
     display: flex;
     justify-content: space-between;
@@ -454,7 +430,8 @@ p {
     background-color: #0a0a0a;
     border: 1px solid #2a2a2a;
     border-radius: 15px;
-    width: 250px;
+    width: 300px;
+    height: 210px;
     box-sizing: border-box; 
     padding: 20px;
     position: relative;
@@ -1329,4 +1306,462 @@ footer {
 /* Clase dinámica para ocultar las tarjetas sobrantes */
 .tarjeta-restaurante.oculto {
     display: none !important;
+}
+/* =========================================================
+   ESTILOS DEL CARRITO FLOTANTE (Mi Pedido)
+   ========================================================= */
+
+/* Lista de productos con scroll interno si hay muchos */
+.carrito-items-lista {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar sutil para el carrito */
+.carrito-items-lista::-webkit-scrollbar { width: 5px; }
+.carrito-items-lista::-webkit-scrollbar-track { background: transparent; }
+.carrito-items-lista::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+.carrito-item {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--borde-sutil);
+}
+
+.carrito-item-titulo {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: var(--texto-principal);
+    line-height: 1.3;
+}
+
+.carrito-item-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Botones de + y - en formato píldora */
+.carrito-controles {
+    display: flex;
+    align-items: center;
+    background-color: var(--fondo-principal);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 20px;
+    padding: 2px 4px;
+    gap: 8px;
+}
+
+.btn-cantidad {
+    background: transparent;
+    border: none;
+    color: var(--texto-principal);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: 0.2s;
+}
+
+.btn-cantidad:hover {
+    background-color: #333;
+}
+
+.cantidad-numero {
+    font-size: 13px;
+    font-weight: bold;
+    min-width: 14px;
+    text-align: center;
+}
+
+/* Precio y Eliminar */
+.carrito-item-precio {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.precio-subtotal {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--texto-principal);
+}
+
+.btn-eliminar {
+    background: transparent;
+    border: none;
+    color: #ff5555;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+    transition: 0.2s;
+}
+
+.btn-eliminar:hover {
+    color: #ff2222;
+    transform: scale(1.1);
+}
+
+/* --- Resumen y Total --- */
+.carrito-resumen {
+    padding-top: 15px;
+}
+
+.resumen-fila {
+    display: flex;
+    justify-content: space-between;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.resumen-fila.total {
+    color: var(--texto-principal);
+    font-size: 18px;
+    font-weight: 900;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+/* Botón final */
+.btn-continuar-pedido {
+    width: 100%;
+    background-color: var(--naranja-marca);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-continuar-pedido:hover {
+    background-color: #e65c00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
+}
+/* =========================================================
+   MODAL DE AUTENTICACIÓN OTP (SMS)
+   ========================================================= */
+.otp-card {
+    background-color: var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 20px;
+    padding: 30px;
+    width: 380px;
+    max-width: 90%;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+}
+
+.btn-cerrar-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: var(--texto-secundario);
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cerrar-modal:hover {
+    color: var(--texto-principal);
+    transform: scale(1.1);
+}
+
+.otp-header .otp-icono-app {
+    font-size: 35px;
+    color: #25D366; 
+    margin-bottom: 10px;
+}
+
+.otp-header h2 { font-size: 22px; margin: 0 0 5px 0; color: var(--texto-principal); }
+.otp-header p { margin: 0 0 20px 0; color: var(--texto-secundario); font-size: 14px;}
+
+.otp-numero-box {
+    background-color: rgba(37, 211, 102, 0.1); 
+    border: 1px solid #25D366;
+    color: var(--texto-principal);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-cambiar-numero, .btn-necesitas-ayuda {
+    background: transparent;
+    border: 1px solid var(--borde-sutil);
+    color: var(--texto-secundario);
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+    margin-bottom: 20px;
+}
+
+.btn-cambiar-numero:hover, .btn-necesitas-ayuda:hover {
+    color: var(--texto-principal);
+    border-color: #555;
+}
+
+.btn-solicitar-ayuda {
+    background-color: #25D366;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    position: relative;
+    transition: 0.2s;
+}
+
+.btn-solicitar-ayuda:hover { background-color: #20b858; }
+.btn-solicitar-ayuda .arrow-right { position: absolute; right: 15px; }
+
+.otp-input-section p {
+    font-size: 13px;
+    color: var(--texto-principal);
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+
+
+/* Nuevo Input Unificado */
+.codigo-unificado {
+    width: 100%;
+    height: 70px;
+    background-color: var(--fondo-principal);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 15px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--texto-principal);
+    letter-spacing: 25px; /* Separa los números visualmente */
+    padding-left: 25px; /* Compensa el letter-spacing para que quede centrado */
+    outline: none;
+    transition: 0.3s;
+    margin-bottom: 15px;
+}
+
+.codigo-unificado:focus {
+    border-color: var(--naranja-marca);
+    box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);
+}
+
+.input-telefono-caja {
+    display: flex;
+    align-items: center;
+    background-color: var(--fondo-principal);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.input-telefono-caja span {
+    color: var(--texto-secundario);
+    font-weight: bold;
+    margin-right: 10px;
+    border-right: 1px solid #444;
+    padding-right: 10px;
+}
+
+.input-telefono-caja input {
+    background: transparent;
+    border: none;
+    color: var(--texto-principal);
+    font-size: 18px;
+    font-weight: bold;
+    width: 100%;
+    outline: none;
+}
+
+.mensaje-error {
+    color: #ff4444;
+    font-size: 13px;
+    margin-top: -5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.codigo-caja:focus {
+    border-color: #25D366;
+    box-shadow: 0 0 10px rgba(37, 211, 102, 0.2);
+}
+
+.otp-reenviar { color: var(--texto-secundario) !important; text-align: center !important; }
+.otp-reenviar strong { color: #25D366; }
+
+.btn-verificar {
+    background-color: #333;
+    color: #888;
+    border: none;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+
+/* Cambia a naranja cuando tiene los 4 dígitos */
+.btn-verificar.activo {
+    background-color: var(--naranja-marca);
+    color: white;
+    cursor: pointer;
+}
+.btn-verificar.activo:hover {
+    background-color: #e65c00;
+}
+/* =========================================================
+   PÁGINA DE LOGIN
+   ========================================================= */
+.body-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #050505 0%, #1a0a00 100%); /* Fondo súper oscuro con un tinte cálido */
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 420px; /* Ancho máximo de la tarjeta */
+    animation: fadeModal 0.4s ease-out; /* Reutiliza la animación del modal */
+}
+
+.login-card {
+    background-color: var(--fondo-tarjetas);
+    padding: 40px 35px;
+    border-radius: 20px;
+    border: 1px solid var(--borde-sutil);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+.login-card h2 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    color: var(--texto-principal);
+}
+
+.login-subtitulo {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    margin-bottom: 30px;
+}
+
+/* Campos de texto del login */
+.input-group-login {
+    position: relative;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    background-color: var(--fondo-principal);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    padding: 14px 15px;
+    transition: 0.3s ease;
+}
+
+.input-group-login:focus-within {
+    border-color: var(--naranja-marca);
+    box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
+}
+
+.input-group-login i {
+    color: var(--texto-secundario);
+    font-size: 16px;
+    margin-right: 12px;
+    width: 16px; /* Asegura que los iconos estén alineados */
+    text-align: center;
+}
+
+.input-group-login input {
+    background: transparent;
+    border: none;
+    color: var(--texto-principal);
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+}
+
+.input-group-login input::placeholder {
+    color: var(--texto-secundario);
+}
+
+/* Opciones debajo de los inputs */
+.login-opciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 25px;
+    color: var(--texto-secundario);
+}
+
+.login-opciones a, .login-footer a {
+    color: var(--naranja-marca);
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.login-opciones a:hover, .login-footer a:hover {
+    color: #ff8533;
+}
+
+/* Pie de la tarjeta */
+.login-footer {
+    margin-top: 25px;
+    font-size: 13px;
+    color: var(--texto-secundario);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.login-footer p {
+    margin: 0;
+}
+
+.volver-inicio {
+    color: var(--texto-secundario) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.volver-inicio:hover {
+    color: var(--texto-principal) !important;
 }
