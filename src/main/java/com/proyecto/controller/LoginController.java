@@ -6,6 +6,7 @@ import com.proyecto.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,15 @@ public class LoginController {
     // ==========================================
     @GetMapping("/login")
     public String mostrarLogin() {
-        return "Login";
+        // Obtenemos los datos de la sesión actual
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        // Si la sesión existe, está autenticada y NO es un visitante anónimo (invitado)
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/"; // Lo expulsamos de vuelta al inicio
+        }
+        
+        return "Login"; 
     }
 
 

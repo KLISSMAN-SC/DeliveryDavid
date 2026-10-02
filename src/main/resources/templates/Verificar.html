@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificar Correo - RIDE MEAL</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="body-login">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <h2 style="margin-bottom: 15px;">Verifica tu correo</h2>
+            <p class="login-subtitulo">Hemos enviado un código de 6 dígitos a tu correo electrónico. Ingrésalo para activar tu cuenta.</p>
+
+            <div th:if="${error}" style="color: #ff5555; font-size: 13px; margin-bottom: 15px;" th:text="${error}"></div>
+
+            <form th:action="@{/verificar/confirmar}" method="POST">
+                <div class="input-group-login" style="justify-content: center;">
+                    <i class="fa-solid fa-hashtag"></i>
+                    <input type="text" name="codigoIngresado" placeholder="Ej: 123456" maxlength="6" style="text-align: center; font-size: 20px; letter-spacing: 5px;" required>
+                </div>
+                
+                <button type="submit" id="btnRegistrar" class="btn-aceptar" style="margin-top: 15px;">
+                    <span id="btnTexto">Confirmar código</span>
+                    <i id="btnIcono" class="fa-solid fa-spinner fa-spin" style="display: none; margin-left: 8px;"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function mostrarCarga() {
+            const btn = document.getElementById('btnRegistrar');
+            const texto = document.getElementById('btnTexto');
+            const icono = document.getElementById('btnIcono');
+            
+            // Cambia el aspecto del botón al hacer clic
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+            texto.innerText = 'Validando código...';
+            icono.style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>

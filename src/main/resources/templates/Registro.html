@@ -1,0 +1,76 @@
+	<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - RIDE MEAL</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="body-login">
+    <div class="login-wrapper">
+        <div class="login-card" style="max-width: 500px;"> <!-- Ligeramente más ancho para 2 columnas -->
+            <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
+                <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
+            </div>
+            
+            <h2>Crea tu cuenta</h2>
+            <p class="login-subtitulo">Únete y pide tu comida favorita en minutos.</p>
+
+            <form th:action="@{/registro/enviar}" method="POST" id="formRegistro" onsubmit="mostrarCarga()">
+                <div style="display: flex; gap: 15px;">
+                    <div class="input-group-login" style="flex: 1;">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" name="nombres" placeholder="Nombres" required>
+                    </div>
+                    <div class="input-group-login" style="flex: 1;">
+                        <input type="text" name="apellidos" placeholder="Apellidos" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="input-group-login" style="flex: 1;">
+                        <i class="fa-solid fa-id-card"></i>
+                        <input type="text" name="dni" placeholder="DNI (8 dígitos)" maxlength="8" required>
+                    </div>
+                    <div class="input-group-login" style="flex: 1;">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" name="telefono" placeholder="Teléfono" required>
+                    </div>
+                </div>
+
+                <div class="input-group-login">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" name="correoElectronico" placeholder="Correo electrónico" required>
+                </div>
+                
+                <div class="input-group-login">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" placeholder="Crea una contraseña" required>
+                </div>
+
+                <button type="submit" id="btnRegistrar" class="btn-aceptar" style="margin-top: 15px;">
+                    <span id="btnTexto">Registrarme</span>
+                    <i id="btnIcono" class="fa-solid fa-spinner fa-spin" style="display: none; margin-left: 8px;"></i>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function mostrarCarga() {
+            const btn = document.getElementById('btnRegistrar');
+            const texto = document.getElementById('btnTexto');
+            const icono = document.getElementById('btnIcono');
+            
+            // Cambia el aspecto del botón al hacer clic
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+            texto.innerText = 'Enviando código...';
+            icono.style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>
