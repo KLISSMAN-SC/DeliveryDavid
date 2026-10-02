@@ -254,16 +254,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 function manejarMenuUsuario(opcion) {
-
+	if(opcion === 'panel') { 
+		window.location.href = '/api/panel'; 
+	}
     if (opcion === "perfil") {
-
         window.location.href = "/api/perfil";
-
     }
-
     if (opcion === "logout") {
-
         document.getElementById("formLogout").submit();
+    }
+}
+// Abrir/Cerrar el menú de usuario
+function toggleDropdown() {
+    document.querySelector('.usuario-menu-custom').classList.toggle('activo');
+}
 
+// Cerrar el menú automáticamente si se hace clic fuera de él
+window.onclick = function(event) {
+    if (!event.target.closest('.usuario-menu-custom')) {
+        let dropdown = document.querySelector('.usuario-menu-custom');
+        if (dropdown && dropdown.classList.contains('activo')) {
+            dropdown.classList.remove('activo');
+        }
     }
 }

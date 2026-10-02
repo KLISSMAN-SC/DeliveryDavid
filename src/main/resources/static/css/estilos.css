@@ -1832,3 +1832,109 @@ footer {
     background-color: var(--fondo-tarjetas);
     color: var(--texto-principal);
 }
+/* =========================================================
+   MENÚ DE USUARIO DESPLEGABLE (CUSTOM DROPDOWN)
+   ========================================================= */
+.usuario-menu-custom {
+    position: relative;
+    display: inline-block;
+}
+
+/* El botón con el nombre */
+.usuario-boton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.05); /* Fondo semitransparente */
+    border: 1px solid var(--borde-sutil);
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    color: var(--texto-principal);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.usuario-boton:hover {
+    border-color: var(--naranja-marca);
+    background-color: rgba(255, 102, 0, 0.05);
+}
+
+.usuario-boton .usuario-icono {
+    font-size: 18px;
+    color: var(--naranja-marca);
+}
+
+.usuario-boton .flecha {
+    font-size: 11px;
+    color: var(--texto-secundario);
+    transition: transform 0.3s;
+    margin-left: 5px;
+}
+
+/* Animación de la flecha al abrir */
+.usuario-menu-custom.activo .flecha {
+    transform: rotate(180deg);
+}
+
+/* La caja del menú flotante */
+.dropdown-contenido {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background-color: var(--fondo-tarjetas);
+    min-width: 220px;
+    border-radius: 12px;
+    border: 1px solid var(--borde-sutil);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    z-index: 1000;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.usuario-menu-custom.activo .dropdown-contenido {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Las opciones del menú */
+.dropdown-contenido a {
+    color: var(--texto-secundario);
+    padding: 14px 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.dropdown-contenido a i {
+    width: 18px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.dropdown-contenido a:hover {
+    background-color: rgba(255, 102, 0, 0.1);
+    color: var(--naranja-marca);
+}
+
+.dropdown-divisor {
+    height: 1px;
+    background-color: var(--borde-sutil);
+    margin: 5px 0;
+}
+
+/* Estilo especial rojo para "Cerrar sesión" */
+.dropdown-contenido a.logout-texto:hover {
+    background-color: rgba(255, 85, 85, 0.1);
+    color: #ff5555;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

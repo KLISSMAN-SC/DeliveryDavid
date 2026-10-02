@@ -17,19 +17,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        
-    
-    	// 1. Buscamos al usuario por su correo en la BD
         Usuario usuario = usuarioRepository.findByCorreoElectronico(correo)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario o contraseña incorrectos"));
-        
-        
-       
-        // 2. Construimos el usuario validado para Spring Security
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        // Extraemos el nombre del rol de la BD (Ej: "ADMINISTRADOR", "REPARTIDOR", "CLIENTE")
+        String nombreRol = usuario.getRol().getNombre().toUpperCase();
+
         return User.builder()
                 .username(usuario.getCorreoElectronico())
-                .password(usuario.getPassword()) // Spring Security comparará automáticamente el BCrypt
-                .roles("USER") // Asignamos un rol genérico por ahora
+                .password(usuario.getPassword())
+                .roles(nombreRol) // Spring Security requiere los roles en mayúsculas
                 .build();
     }
 }

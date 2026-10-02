@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Gestión - RIDE MEAL</title>
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="body-panel">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="panel-sidebar">
+        <div class="panel-logo">
+            <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
+            <span class="badge-rol">Módulo Admin</span>
+        </div>
+        
+        <nav class="panel-menu">
+            <p class="menu-label">MANTENIMIENTO</p>
+            <a href="#" class="menu-item activo"><i class="fa-solid fa-users"></i> Usuarios</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-store"></i> Negocios</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
+            
+            <p class="menu-label">OPERACIONES</p>
+            <a href="#" class="menu-item"><i class="fa-solid fa-motorcycle"></i> Pedidos Activos</a>
+            <a href="#" class="menu-item"><i class="fa-solid fa-map-location-dot"></i> Zonas de Envío</a>
+            
+            <hr class="separador-sutil">
+            
+            <a th:href="@{/}" class="menu-item volver"><i class="fa-solid fa-arrow-left"></i> Salir al Catálogo</a>
+        </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="panel-main">
+        <header class="panel-header">
+            <h2>Gestión de Usuarios</h2>
+            
+            <div class="panel-acciones-top">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Buscar por DNI o nombre...">
+                </div>
+                <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Usuario</button>
+            </div>
+        </header>
+
+        <!-- ESPACIO PARA LA TABLA CRUD -->
+        <section class="panel-contenido-crud">
+            <div class="tabla-contenedor">
+                <table class="tabla-oscura">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombres</th>
+                            <th>DNI</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Fila de ejemplo -->
+                        <tr>
+                            <td>#1</td>
+                            <td>Jorge Josue Lozano</td>
+                            <td>45829161</td>
+                            <td><span class="badge admin">Administrador</span></td>
+                            <td class="acciones-celda">
+                                <button class="btn-icon editar" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <!-- Fila de ejemplo 2 -->
+                        <tr>
+                            <td>#2</td>
+                            <td>Carlos Ramirez</td>
+                            <td>71234567</td>
+                            <td><span class="badge cliente">Cliente</span></td>
+                            <td class="acciones-celda">
+                                <button class="btn-icon editar" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
