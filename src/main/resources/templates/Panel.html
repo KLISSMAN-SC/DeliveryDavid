@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Panel de Gestión - RIDE MEAL</title>
-    <link rel="stylesheet" th:href="@{/css/panel.css}">
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body class="body-panel">
@@ -13,79 +13,323 @@
     <aside class="panel-sidebar">
         <div class="panel-logo">
             <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
-            <span class="badge-rol">Módulo Admin</span>
+            <span class="badge-rol" sec:authorize="hasRole('ADMINISTRADOR')">Módulo Admin</span>
+            <span class="badge-rol" sec:authorize="hasRole('REPARTIDOR')" style="background: rgba(0, 150, 255, 0.2); color: #0096ff;">Módulo Repartidor</span>
         </div>
         
         <nav class="panel-menu">
-            <p class="menu-label">MANTENIMIENTO</p>
-            <a href="#" class="menu-item activo"><i class="fa-solid fa-users"></i> Usuarios</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-store"></i> Negocios</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
             
+            <!-- MANTENIMIENTO: Bloqueado solo para Administradores -->
+            <div sec:authorize="hasRole('ADMINISTRADOR')">
+                <p class="menu-label">MANTENIMIENTO</p>
+                <a th:href="@{/panel?modulo=usuarios}" th:classappend="${modulo == 'usuarios'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-users"></i> Usuarios</a>
+                <a th:href="@{/panel?modulo=tipos_negocio}" th:classappend="${modulo == 'tipos_negocio'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
+                <a th:href="@{/panel?modulo=negocios}" th:classappend="${modulo == 'negocios'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-store"></i> Negocios</a>
+                <a th:href="@{/panel?modulo=categorias}" th:classappend="${modulo == 'categorias'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-list"></i> Categorías de Prod.</a>
+                <a th:href="@{/panel?modulo=productos}" th:classappend="${modulo == 'productos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-box-open"></i> Productos</a>
+                <a th:href="@{/panel?modulo=promociones}" th:classappend="${modulo == 'promociones'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-star"></i> Promociones</a>
+            </div>
+            
+            <!-- OPERACIONES: Visible para Administradores y Repartidores -->
             <p class="menu-label">OPERACIONES</p>
-            <a href="#" class="menu-item"><i class="fa-solid fa-motorcycle"></i> Pedidos Activos</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-map-location-dot"></i> Zonas de Envío</a>
+            <a th:href="@{/panel?modulo=pedidos}" th:classappend="${modulo == 'pedidos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-motorcycle"></i> Pedidos Activos</a>
             
             <hr class="separador-sutil">
-            
             <a th:href="@{/}" class="menu-item volver"><i class="fa-solid fa-arrow-left"></i> Salir al Catálogo</a>
         </nav>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="panel-main">
-        <header class="panel-header">
-            <h2>Gestión de Usuarios</h2>
-            
-            <div class="panel-acciones-top">
-                <div class="search-container">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="search-input" placeholder="Buscar por DNI o nombre...">
+        
+        <!-- ==========================================
+             1. CRUD DE USUARIOS 
+             ========================================== -->
+        <div th:if="${modulo == 'usuarios'}">
+            <header class="panel-header">
+                <h2>Gestión de Usuarios</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" class="search-input" placeholder="Buscar usuario...">
+                    </div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Usuario</button>
                 </div>
-                <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Usuario</button>
-            </div>
-        </header>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>ID</th><th>Nombres</th><th>DNI</th><th>Rol</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+						    <tr th:each="usuario : ${listaUsuarios}">
+						        <td th:text="'#' + ${usuario.idUsuario}"></td>
+						        <td th:text="${usuario.nombres + ' ' + (usuario.apellidos != null ? usuario.apellidos : '')}"></td>
+						        <td th:text="${usuario.dni}"></td>
+						        <td>
+						            <span class="badge" 
+						                  th:classappend="${usuario.rol.idRol == 1 ? 'admin' : (usuario.rol.idRol == 3 ? 'repartidor' : 'cliente')}" 
+						                  th:text="${usuario.rol.nombre}"></span>
+						        </td>
+						        <td class="acciones-celda">
+						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+						        </td>
+						    </tr>
+						</tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
-        <!-- ESPACIO PARA LA TABLA CRUD -->
-        <section class="panel-contenido-crud">
-            <div class="tabla-contenedor">
-                <table class="tabla-oscura">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombres</th>
-                            <th>DNI</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Fila de ejemplo -->
-                        <tr>
-                            <td>#1</td>
-                            <td>Jorge Josue Lozano</td>
-                            <td>45829161</td>
-                            <td><span class="badge admin">Administrador</span></td>
-                            <td class="acciones-celda">
-                                <button class="btn-icon editar" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <!-- Fila de ejemplo 2 -->
-                        <tr>
-                            <td>#2</td>
-                            <td>Carlos Ramirez</td>
-                            <td>71234567</td>
-                            <td><span class="badge cliente">Cliente</span></td>
-                            <td class="acciones-celda">
-                                <button class="btn-icon editar" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <!-- ==========================================
+             2. CRUD DE TIPOS DE NEGOCIO 
+             ========================================== -->
+        <div th:if="${modulo == 'tipos_negocio'}">
+            <header class="panel-header">
+                <h2>Tipos de Negocio</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar tipo..."></div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Tipo</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>ID</th><th>Nombre</th><th>Icono</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+						    <tr th:each="tipo : ${listaTipos}">
+						        <td th:text="'#' + ${tipo.idTipoNegocio}"></td>
+						        <td th:text="${tipo.nombre}"></td>
+						        <td><i th:class="${tipo.icono}"></i> <span th:text="${tipo.icono}" style="font-size: 11px; margin-left: 5px; color: gray;"></span></td>
+						        <td class="acciones-celda">
+						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+						        </td>
+						    </tr>
+						</tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             3. CRUD DE NEGOCIOS 
+             ========================================== -->
+        <div th:if="${modulo == 'negocios'}">
+            <header class="panel-header">
+                <h2>Gestión de Negocios</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar negocio..."></div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Negocio</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+						 <tbody>
+						    <tr th:each="negocio : ${listaNegocios}">
+						        <td th:text="'#' + ${negocio.idNegocio}"></td>
+						        <td th:text="${negocio.nombre}"></td>
+						        <td th:text="${negocio.direccion}"></td>
+						        <td th:text="${negocio.telefono}"></td>
+						        <td>
+						            <!-- Simplificamos la lógica de estilos en línea para evitar errores de parseo -->
+						            <span class="badge" 
+						                  th:style="${negocio.estado != null and negocio.estado.name() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
+						                  th:text="${negocio.estado}"></span>
+						        </td>
+						        <td class="acciones-celda">
+						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+						        </td>
+						    </tr>
+						</tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             4. CRUD DE CATEGORÍAS DE PRODUCTOS 
+             ========================================== -->
+        <div th:if="${modulo == 'categorias'}">
+            <header class="panel-header">
+                <h2>Categorías de Productos</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar categoría..."></div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nueva Categoría</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>ID</th><th>Nombre</th><th>Negocio Asociado</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                            <!-- Iteración sobre listaCategorias -->
+                            <tr th:each="categoria : ${listaCategorias}">
+                                <td th:text="'#' + ${categoria.idCategoriaProducto}"></td>
+                                <td th:text="${categoria.nombre}"></td>
+                                <td th:text="${categoria.logo}"></td>
+                                
+                                <!-- Uso de ?. para evitar errores si el negocio es nulo -->
+                                <td th:text="${categoria.negocio?.nombre}"></td>
+                                
+                                <td class="acciones-celda">
+                                    <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+		<!-- ==========================================
+             7. CRUD DE PRODUCTOS 
+             ========================================== -->
+        <div th:if="${modulo == 'productos'}">
+            <header class="panel-header">
+                <h2>Gestión de Productos</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar producto..."></div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Producto</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Negocio</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Iteración sobre listaProductos -->
+                            <tr th:each="producto : ${listaProductos}">
+                                <td th:text="'#' + ${producto.idProducto}"></td>
+                                
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <!-- Si más adelante subes imágenes, puedes poner un <img> aquí -->
+                                        <span th:text="${producto.nombre}"></span>
+                                    </div>
+                                </td>
+                                
+                                <td th:text="|S/ ${producto.precio != null ? producto.precio : '0.00'}|"></td>
+                                
+                                <!-- Uso de ?. para navegación segura -->
+                                <td th:text="${producto.negocio?.nombre}"></td>
+                                <td th:text="${producto.categoriaProducto?.nombre}"></td>
+                                
+                                <td>
+                                    <span class="badge" 
+                                          th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
+                                          th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
+                                </td>
+                                
+                                <td class="acciones-celda">
+                                    <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- ==========================================
+             5. CRUD DE PROMOCIONES 
+             ========================================== -->
+        <div th:if="${modulo == 'promociones'}">
+            <header class="panel-header">
+                <h2>Gestión de Promociones</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar promoción..."></div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nueva Promoción</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>ID</th><th>Título</th><th>Vigencia</th><th>Negocio</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+                       <tbody>
+						    <tr th:each="promo : ${listaPromociones}">
+						        <td th:text="'#' + ${promo.idPromocion}"></td>
+						        <td th:text="${promo.titulo}"></td>
+						        <td th:text="${#temporals.format(promo.fechaInicio, 'dd/MM/yyyy') + ' - ' + #temporals.format(promo.fechaFin, 'dd/MM/yyyy')}"></td>
+						        <td th:text="${promo.negocio.nombre}"></td>
+						        <td><span class="badge admin" th:text="${promo.estado ? 'Activa' : 'Inactiva'}"></span></td>
+						        <td class="acciones-celda">
+						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+						        </td>
+						    </tr>
+						</tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             6. CRUD DE PEDIDOS (Operaciones) 
+             ========================================== -->
+        <div th:if="${modulo == 'pedidos'}">
+            <header class="panel-header">
+                <h2>Pedidos Activos</h2>
+                <div class="panel-acciones-top">
+                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar N° de Pedido..."></div>
+                    <!-- Los repartidores no crean pedidos manualmente, por lo que este botón puede ir oculto o distinto, pero lo dejamos por consistencia estructural -->
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" sec:authorize="hasRole('ADMINISTRADOR')"><i class="fa-solid fa-plus"></i> Crear Pedido Manual</button>
+                </div>
+            </header>
+            <section class="panel-contenido-crud">
+                <div class="tabla-contenedor">
+                    <table class="tabla-oscura">
+                        <thead>
+                            <tr><th>N° Pedido</th><th>Cliente</th><th>Negocio</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+						    <tr th:each="pedido : ${listaPedidos}">
+						        <td th:text="'#' + ${pedido.idPedido}"></td>
+						        
+						        <!-- El operador ?. evita que la página colapse si el dato es nulo -->
+						        <td th:text="${pedido.usuario?.nombres}"></td>
+						        <td th:text="${pedido.negocio?.nombre}"></td>
+						        
+						        <!-- Uso de barras | | para concatenar texto y números de forma nativa -->
+						        <td th:text="|S/ ${pedido.total != null ? pedido.total : '0.00'}|"></td>
+						        
+						        <td>
+						            <span class="badge" style="background: rgba(255, 170, 0, 0.2); color: #ffaa00;" th:text="${pedido.estadoPedido}"></span>
+						        </td>
+						        <td class="acciones-celda">
+						            <button class="btn-icon editar" title="Modificar Estado"><i class="fa-solid fa-pen-to-square"></i></button>
+						            <button class="btn-icon eliminar" title="Cancelar Pedido"><i class="fa-solid fa-trash"></i></button>
+						        </td>
+						    </tr>
+						</tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
     </main>
 
 </body>

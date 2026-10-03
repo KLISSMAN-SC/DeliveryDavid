@@ -56,7 +56,7 @@ public class Pedido {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="idUsuario", nullable=false)
 	@ToString.Exclude 
-	private Usuario cliente;
+	private Usuario usuario;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="idNegocio", nullable=false)

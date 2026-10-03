@@ -69,6 +69,7 @@ public class RegistroController {
         // Asignar el Rol de Cliente (Asumiendo que el ID 2 en tu tabla ROL es 'Cliente')
         Rol rolCliente = new Rol();
         rolCliente.setIdRol(2);
+        rolCliente.setNombre("CLIENTE");
         usuario.setRol(rolCliente);
 
         // Guardar temporalmente en sesión
