@@ -253,7 +253,8 @@ function mostrarCarrito(carrito) {
             </div>
             
 			<button
-			    class="btn-confirmar-pedido"
+			type="button"
+			    class="btn-continuar-carrito"
 			    onclick="abrirModalPedido(
 			        ${carrito.negocio.idNegocio}
 			    )">

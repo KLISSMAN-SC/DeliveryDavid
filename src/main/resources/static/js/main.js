@@ -278,3 +278,63 @@ window.onclick = function(event) {
         }
     }
 }
+// ==========================================
+// 6. LÓGICA DEL MODAL DE PEDIDO (CHECKOUT)
+// ==========================================
+
+// Función para abrir y cerrar el modal
+function abrirModalPedido() {
+    const modal = document.getElementById('modalPedido');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Evita que la página del fondo se desplace
+    }
+}
+
+function cerrarModalPedido() {
+    const modal = document.getElementById('modalPedido');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restaura el scroll de la página principal
+    }
+}
+
+function seleccionarPropina(monto, botonClickeado) {
+    // 1. Quitar el color naranja a todos los botones
+    const botonesPropina = document.querySelectorAll('.opciones-propina button');
+    botonesPropina.forEach(btn => btn.classList.remove('activo'));
+    
+    // 2. Pintar de naranja el botón que se clickeó (Con respaldo de seguridad)
+    if (botonClickeado) {
+        botonClickeado.classList.add('activo');
+    } else if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('activo'); 
+    }
+    
+    // 3. Actualizar la variable oculta
+    const inputPropina = document.getElementById('propinaPedido');
+    if(inputPropina) inputPropina.value = monto;
+    
+    // 4. Actualizar el texto del resumen ("S/ 3.00")
+    const textoResumen = document.getElementById('propinaResumen');
+    if(textoResumen) textoResumen.innerText = monto.toFixed(2);
+    
+    // 5. Recalcular el "Total a pagar"
+    const textoTotal = document.getElementById('totalPedido');
+    if (textoTotal) {
+        const baseTotal = parseFloat(textoTotal.getAttribute('data-base')) || 0;
+        const nuevoTotal = baseTotal + monto;
+        textoTotal.innerText = nuevoTotal.toFixed(2);
+    }
+}
+
+// Opcional: Cerrar el modal de pedido si se hace clic fuera de la tarjeta blanca
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalPedido');
+    const contenido = document.querySelector('.modal-pedido-contenido');
+    
+    // Si el clic fue exactamente en el fondo oscuro (overlay) y no dentro de la tarjeta
+    if (event.target === modal) {
+        cerrarModalPedido();
+    }
+});

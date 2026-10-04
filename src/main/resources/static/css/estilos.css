@@ -1938,3 +1938,139 @@ footer {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* =========================================================
+   MODAL DE PEDIDO (CHECKOUT)
+   ========================================================= */
+.modal-pedido-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px); /* Efecto de desenfoque al fondo */
+}
+
+.modal-pedido-contenido {
+    background-color: var(--fondo-tarjetas);
+    color: var(--texto-principal);
+    width: 95%;
+    max-width: 550px;
+    max-height: 85vh;
+    border-radius: 16px;
+    overflow-y: auto;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--borde-sutil);
+}
+
+/* Cabecera pegajosa (Sticky) */
+.pedido-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--borde-sutil);
+    position: sticky;
+    top: 0;
+    background-color: var(--fondo-tarjetas);
+    z-index: 10;
+}
+.pedido-modal-header h2 { margin: 0; font-size: 20px; color: var(--texto-principal); }
+.btn-cerrar-pedido { background: none; border: none; color: var(--texto-principal); font-size: 20px; cursor: pointer; transition: 0.2s; padding: 0 5px; }
+.btn-cerrar-pedido:hover { color: var(--naranja-marca); }
+
+/* Secciones Generales */
+.pedido-seccion, .pedido-mapa-seccion {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--borde-sutil);
+}
+.pedido-seccion h3 { font-size: 15px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 1px;}
+.pedido-seccion p { font-size: 13px; color: var(--texto-secundario); margin-bottom: 15px; }
+
+/* Tarjetas de Dirección */
+.lista-direcciones { display: flex; flex-direction: column; gap: 12px; }
+.direccion-opcion { 
+    display: flex; align-items: flex-start; gap: 15px; 
+    background: rgba(255,255,255,0.02); padding: 15px; 
+    border-radius: 12px; border: 1px solid var(--borde-sutil); 
+    cursor: pointer; transition: 0.2s; 
+}
+.direccion-opcion:hover { border-color: var(--naranja-marca); background: rgba(255, 102, 0, 0.03); }
+.direccion-opcion input[type="radio"] { margin-top: 4px; accent-color: var(--naranja-marca); transform: scale(1.2); }
+.direccion-info { display: flex; flex-direction: column; gap: 4px; }
+.direccion-info strong { font-size: 15px; color: var(--naranja-marca); }
+.direccion-info span { font-size: 13px; color: var(--texto-principal); }
+.direccion-info small { font-size: 12px; color: var(--texto-secundario); }
+
+/* Mapa */
+.direccion-seleccionada-texto { display: flex; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--borde-sutil); }
+.direccion-seleccionada-texto i { color: var(--naranja-marca); font-size: 20px; }
+.mapa-pedido-contenedor { border-radius: 12px; overflow: hidden; border: 1px solid var(--borde-sutil); }
+
+/* Método de Pago */
+.select-pago { 
+    width: 100%; padding: 14px; border-radius: 10px; 
+    background: rgba(255,255,255,0.05); color: var(--texto-principal); 
+    border: 1px solid var(--borde-sutil); font-size: 15px; cursor: pointer; 
+}
+.select-pago:focus { outline: none; border-color: var(--naranja-marca); }
+.select-pago option { background: var(--fondo-principal); color: var(--texto-principal); }
+
+/* Botones de Propina */
+.opciones-propina { display: flex; gap: 10px; flex-wrap: wrap; }
+.opciones-propina button { 
+    flex: 1; min-width: 80px; padding: 12px 10px; 
+    background: rgba(255,255,255,0.05); border: 1px solid var(--borde-sutil); 
+    color: var(--texto-principal); border-radius: 10px; 
+    cursor: pointer; transition: 0.2s; font-weight: bold; 
+}
+.opciones-propina button:hover { background: rgba(255,255,255,0.1); border-color: #888; }
+.opciones-propina button.activo { background: var(--naranja-marca); border-color: var(--naranja-marca); color: #fff; }
+
+/* Lista de Productos */
+.pedido-producto { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+.pedido-producto:last-child { border-bottom: none; }
+.pedido-producto div { display: flex; flex-direction: column; gap: 4px; }
+.pedido-producto div strong { font-size: 14px; color: var(--texto-principal); }
+.pedido-producto div span { font-size: 12px; color: var(--texto-secundario); }
+
+/* Resumen Final */
+.pedido-resumen { padding: 25px; background-color: rgba(0,0,0,0.3); }
+.pedido-resumen div { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: var(--texto-secundario); }
+.pedido-resumen .pedido-total { margin-top: 15px; font-size: 18px; color: var(--texto-principal); font-weight: bold; }
+.pedido-resumen hr { border: none; border-top: 1px dashed var(--borde-sutil); margin: 15px 0; }
+
+.btn-hacer-pedido { 
+    width: 100%; background: var(--naranja-marca); color: white; 
+    border: none; padding: 16px; font-size: 16px; font-weight: bold; 
+    border-radius: 12px; cursor: pointer; margin-top: 20px; transition: 0.2s; 
+}
+.btn-hacer-pedido:hover { background: #e65c00; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3); }
+.btn-hacer-pedido:disabled { background: #333; color: #777; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* =========================================================
+   BOTÓN "CONTINUAR PEDIDO" DEL CARRITO LATERAL
+   ========================================================= */
+.btn-continuar-carrito {
+    width: 100%;
+    background-color: var(--naranja-marca);
+    color: #ffffff;
+    border: none;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.btn-continuar-carrito:hover {
+    background-color: #e65c00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
+}
