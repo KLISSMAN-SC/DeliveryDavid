@@ -27,10 +27,10 @@ public class Promocion {
     @Column(name = "imagenBanner", nullable = false, length = 255)
     private String imagenBanner;
 
-    @Column(name = "fecha_inicio", nullable = false)
+    @Column(name = "fechaInicio", nullable = false)
     private LocalDateTime fechaInicio;
 
-    @Column(name = "fecha_fin", nullable = false)
+    @Column(name = "fechaFin", nullable = false)
     private LocalDateTime fechaFin;
 
     @Column(columnDefinition = "TINYINT(1) DEFAULT 1")

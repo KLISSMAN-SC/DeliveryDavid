@@ -290,8 +290,8 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`PROMOCION` (
   `titulo` VARCHAR(100) NOT NULL,
   `descripcion` VARCHAR(255) NULL,
   `imagenBanner` VARCHAR(255) NOT NULL,
-  `fecha_inicio` DATETIME NOT NULL,
-  `fecha_fin` DATETIME NOT NULL,
+  `fechaInicio` DATETIME NOT NULL,
+  `fechaFin` DATETIME NOT NULL,
   `estado` TINYINT(1) NULL DEFAULT 1,
   `idNegocio` INT NOT NULL,
   `idProducto` INT NULL,
@@ -308,6 +308,25 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`PROMOCION` (
     REFERENCES `proyecto_david`.`PRODUCTO` (`idProducto`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`DIRECCION_USUARIO`(
+    `idDireccionUsuario` INT NOT NULL AUTO_INCREMENT,
+    `alias` VARCHAR(30) NOT NULL,
+    `direccion` VARCHAR(150) NOT NULL,
+    `referencia` VARCHAR(150) NULL,
+    `latitud` DECIMAL(10,8) NOT NULL,
+    `longitud` DECIMAL(10,8) NOT NULL,
+    `principal` TINYINT(1) NOT NULL DEFAULT 0,
+    `fechaCreacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `idUsuario` INT NOT NULL,
+    PRIMARY KEY (idDireccionUsuario),
+    INDEX idx_direccion_usuario (idUsuario),
+    CONSTRAINT fk_direccion_usuario
+        FOREIGN KEY (idUsuario)
+        REFERENCES USUARIO(idUsuario)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION) 
 ENGINE = InnoDB;
 
 

@@ -1,3 +1,20 @@
+function obtenerIdUsuario() {
+
+    const idUsuario =
+        Number(window.idUsuarioValidado);
+
+    if (
+        !Number.isInteger(idUsuario) ||
+        idUsuario <= 0
+    ) {
+
+        throw new Error(
+            "No existe un usuario autenticado"
+        );
+    }
+
+    return idUsuario;
+}
 function abrirRestaurante(idNegocio) {
 
     fetch("/api/restaurante/" + idNegocio)
@@ -44,7 +61,7 @@ function agregarAlCarrito(boton) {
 
     // TEMPORAL
     // Después lo reemplazaremos por el usuario de sesión.
-    const idUsuario = 1;
+    const idUsuario = obtenerIdUsuario();
 
 
     fetch(
@@ -92,7 +109,7 @@ function agregarAlCarrito(boton) {
 }
 function cargarCarrito(idNegocio) {
 
-    const idUsuario = 1; // temporal
+    const idUsuario = obtenerIdUsuario(); // temporal
 
     console.log("Consultando carrito del negocio:", idNegocio);
 
@@ -235,7 +252,15 @@ function mostrarCarrito(carrito) {
                 <span>S/ ${total.toFixed(2)}</span>
             </div>
             
-            <button class="btn-continuar-pedido">Continuar pedido</button>
+			<button
+			    class="btn-confirmar-pedido"
+			    onclick="abrirModalPedido(
+			        ${carrito.negocio.idNegocio}
+			    )">
+
+			    Continuar pedido
+
+			</button>
         </div>
     `;
 
@@ -243,7 +268,7 @@ function mostrarCarrito(carrito) {
 }
 function aumentarProducto(idProducto, idNegocio) {
 
-    const idUsuario = 1; // temporal
+    const idUsuario = obtenerIdUsuario(); // temporal
 
     fetch(
         `/api/carrito/agregar` +
@@ -283,7 +308,7 @@ function disminuirProducto(
     idNegocio
 ) {
 
-    const idUsuario = 1; // temporal
+    const idUsuario = obtenerIdUsuario(); // temporal
 
     fetch(
         `/api/carrito/disminuir` +
@@ -320,7 +345,7 @@ function disminuirProducto(
 }
 function eliminarProducto(idProducto, idNegocio) {
 
-    const idUsuario = 1; // temporal
+    const idUsuario = obtenerIdUsuario(); // temporal
 
     fetch(
         `/api/carrito/eliminar` +

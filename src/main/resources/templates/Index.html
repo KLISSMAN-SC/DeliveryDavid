@@ -6,6 +6,7 @@
     
     <!-- Conexión al archivo CSS externo -->
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/mapa.css}">
     
     <!-- Librería FontAwesome para los íconos de redes sociales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -345,11 +346,22 @@
         </div>
         
     </footer>
+    
 
     <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
-    <div id="modalFiltros" class="modal-overlay">
+    <div id="modalFiltros" class="modal-overlay"></div>
+    <div id="contenedor-modal-pedido"></div>
+    <script th:inline="javascript">
+
+    window.idUsuarioValidado =
+        /*[[${usuarioAutenticado != null
+            ? usuarioAutenticado.idUsuario
+            : null}]]*/ null;
+
+	</script>
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/carrito.js}"></script>
 <script th:src="@{/js/productos.js}"></script>
+<script th:src="@{/js/pedido.js}"></script>
 </body>
 </html>

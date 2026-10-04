@@ -82,8 +82,11 @@ INSERT INTO `detalle_carrito` (`idDetalleCarrito`, `cantidad`, `notaEspecial`, `
 (1, 2, 'Uno de ellos sin crema batida por favor', 1, 4),
 (2, 1, NULL, 1, 5);
 
-INSERT INTO `promocion` (`idPromocion`, `titulo`, `descripcion`, `imagenBanner`, `fecha_inicio`, `fecha_fin`, `estado`, `idNegocio`, `idProducto`) VALUES 
+INSERT INTO `promocion` (`idPromocion`, `titulo`, `descripcion`, `imagenBanner`, `fechaInicio`, `fechaFin`, `estado`, `idNegocio`, `idProducto`) VALUES 
 (1, '¡Locura de Alitas BBQ!', 'Disfruta nuestras Alitas BBQ con porción doble de papas fritas solo por este fin de semana.', 'banner_promo_alitas.jpg', '2026-09-01 08:00:00', '2026-10-31 23:59:59', 1, 38, 1),
 (2, 'Tardes de Frappé en el Real Plaza', 'Alivia el calor de Pucallpa con nuestro increíble Frappé de Chocolate.', 'banner_promo_frappe.jpg', '2026-09-15 08:00:00', '2026-10-15 23:59:59', 1, 39, 4),
 (3, '¡Nuevos Postres en Manu Cafe!', 'Ven a probar nuestra nueva carta de dulces y tortas. ¡Te esperamos!', 'banner_nuevos_postres.jpg', '2026-09-20 08:00:00', '2026-11-30 23:59:59', 1, 39, NULL);
 
+INSERT INTO DIRECCION_USUARIO(alias,direccion,referencia,latitud,longitud,principal,idUsuario)VALUES
+('Casa','Av. Centenario 123','Casa de fachada blanca',-8.3791470,-74.5538670,1,1),
+('Trabajo','Jr. Independencia 450','Frente al parque',-8.3830000,-74.5560000,0,1);

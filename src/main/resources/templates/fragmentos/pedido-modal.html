@@ -1,0 +1,548 @@
+<div
+    th:fragment="modalPedido"
+    id="modalPedido"
+    class="modal-pedido-overlay"
+
+    th:data-google-key="${googleMapsKey}">
+
+    <div class="modal-pedido-contenido">
+
+
+        <!-- CABECERA -->
+
+        <div class="pedido-modal-header">
+
+            <button
+                type="button"
+                class="btn-cerrar-pedido"
+                onclick="cerrarModalPedido()">
+
+                <i
+                    class="fa-solid
+                           fa-arrow-left">
+                </i>
+
+            </button>
+
+
+            <h2>
+                Tu pedido
+            </h2>
+
+        </div>
+
+        <!-- =============================== -->
+        <!-- DIRECCIONES -->
+        <!-- =============================== -->
+
+        <section class="pedido-seccion">
+
+
+            <h3>
+                <i class="fa-solid fa-location-dot"></i>
+
+                Dirección de entrega
+            </h3>
+
+
+
+            <!-- SI TIENE DIRECCIONES -->
+
+            <div
+                class="lista-direcciones"
+                th:if="${!#lists.isEmpty(direcciones)}">
+
+
+                <label
+                    class="direccion-opcion"
+                    th:each="direccion : ${direcciones}">
+
+
+                    <input
+                        type="radio"
+
+                        name="direccionPedido"
+
+                        th:value="${direccion.idDireccion}"
+
+                        th:data-direccion="${direccion.direccion}"
+
+                        th:data-referencia="${direccion.referencia}"
+
+                        th:data-latitud="${direccion.latitud}"
+
+                        th:data-longitud="${direccion.longitud}"
+
+                        th:checked="${direccionSeleccionada != null
+                            and direccion.idDireccion ==
+                            direccionSeleccionada.idDireccion}">
+
+
+                    <div class="direccion-info">
+
+
+                        <strong
+                            th:text="${direccion.alias}">
+                            Casa
+                        </strong>
+
+
+                        <span
+                            th:text="${direccion.direccion}">
+                            Dirección
+                        </span>
+
+
+                        <small
+                            th:if="${direccion.referencia != null
+                                and !direccion.referencia.isEmpty()}"
+
+                            th:text="${direccion.referencia}">
+
+                            Referencia
+
+                        </small>
+
+
+                        <span
+                            class="direccion-principal"
+
+                            th:if="${direccion.principal}">
+
+                            Principal
+
+                        </span>
+
+
+                    </div>
+
+                </label>
+
+            </div>
+
+
+
+            <!-- SIN DIRECCIONES -->
+
+            <div
+                class="sin-direcciones"
+                th:if="${#lists.isEmpty(direcciones)}">
+
+                <p>
+                    No tienes una dirección
+                    registrada.
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =============================== -->
+        <!-- MAPA -->
+        <!-- =============================== -->
+
+        <section
+            class="pedido-mapa-seccion"
+
+            th:if="${direccionSeleccionada != null}">
+
+
+            <div class="direccion-seleccionada-texto">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+
+                <div>
+
+                    <strong id="aliasMapa">
+                        Ubicación de entrega
+                    </strong>
+
+
+                    <p
+                        id="direccionMapa"
+
+                        th:text="${direccionSeleccionada.direccion}">
+
+                        Dirección
+
+                    </p>
+
+
+                    <small
+                        id="referenciaMapa"
+
+                        th:text="${direccionSeleccionada.referencia}">
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- GOOGLE MAPS EMBED -->
+
+            <div class="mapa-pedido-contenedor">
+
+
+                <iframe
+                    id="mapaPedido"
+
+                    class="mapa-pedido"
+
+                    width="100%"
+
+                    height="240"
+
+                    style="border:0;"
+
+                    loading="lazy"
+
+                    tabindex="-1"
+
+                    th:src="|https://www.google.com/maps/embed/v1/place?key=${googleMapsKey}&q=${direccionSeleccionada.latitud},${direccionSeleccionada.longitud}|">
+
+                </iframe>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =============================== -->
+        <!-- PAGO -->
+        <!-- =============================== -->
+
+        <section class="pedido-seccion">
+
+
+            <h3>
+                <i class="fa-solid fa-wallet"></i>
+
+                Método de pago
+            </h3>
+
+
+            <select
+                id="metodoPagoPedido"
+                class="select-pago">
+
+
+                <option value="EFECTIVO">
+                    Efectivo
+                </option>
+
+
+                <option value="YAPE">
+                    Yape
+                </option>
+
+
+                <option value="PLIN">
+                    Plin
+                </option>
+
+
+            </select>
+
+
+        </section>
+
+
+
+        <!-- =============================== -->
+        <!-- PROPINA -->
+        <!-- =============================== -->
+
+        <section class="pedido-seccion">
+
+
+            <h3>
+                Propina
+            </h3>
+
+
+            <p>
+                La propina es voluntaria.
+            </p>
+
+
+            <div class="opciones-propina">
+
+
+                <button
+                    type="button"
+                    onclick="seleccionarPropina(0)">
+
+                    Sin propina
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="seleccionarPropina(2)">
+
+                    S/ 2.00
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="seleccionarPropina(3)">
+
+                    S/ 3.00
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="seleccionarPropina(5)">
+
+                    S/ 5.00
+
+                </button>
+
+
+            </div>
+
+
+            <input
+                type="hidden"
+                id="propinaPedido"
+                value="0">
+
+
+        </section>
+
+
+
+        <!-- =============================== -->
+        <!-- PRODUCTOS -->
+        <!-- =============================== -->
+
+        <section class="pedido-seccion">
+
+
+            <h3>
+                Detalle del pedido
+            </h3>
+
+
+            <div
+                class="pedido-producto"
+
+                th:each="detalle : ${carrito.detalles}">
+
+
+                <div>
+
+
+                    <strong
+                        th:text="${detalle.producto.nombre}">
+
+                        Producto
+
+                    </strong>
+
+
+                    <span>
+
+                        x
+
+                        <span
+                            th:text="${detalle.cantidad}">
+                            1
+                        </span>
+
+                    </span>
+
+
+                </div>
+
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            detalle.precioUnitario *
+                            detalle.cantidad,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =============================== -->
+        <!-- TOTALES -->
+        <!-- =============================== -->
+
+        <section class="pedido-resumen">
+
+
+            <h3>
+                Resumen del pedido
+            </h3>
+
+
+            <div>
+
+                <span>
+                    Productos
+                </span>
+
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            subtotal,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+
+            <div>
+
+                <span>
+                    Envío
+                </span>
+
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            envio,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+
+            <div>
+
+                <span>
+                    Propina
+                </span>
+
+
+                <strong>
+
+                    S/
+
+                    <span id="propinaResumen">
+                        0.00
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+
+            <hr>
+
+
+
+            <div class="pedido-total">
+
+                <span>
+                    Total a pagar
+                </span>
+
+
+                <strong>
+
+                    S/
+
+                    <span
+                        id="totalPedido"
+
+                        th:data-base="${total}"
+
+                        th:text="${#numbers.formatDecimal(
+                            total,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+
+            <button
+                type="button"
+
+                class="btn-hacer-pedido"
+
+                th:data-negocio="${carrito.negocio.idNegocio}"
+
+                th:disabled="${#lists.isEmpty(direcciones)}"
+
+                onclick="confirmarPedido(this)">
+
+
+                Hacer pedido
+
+
+            </button>
+
+
+        </section>
+
+
+    </div>
+
+</div>
