@@ -425,13 +425,13 @@ p {
     white-space: nowrap; 
 }
 
-/* Columna Derecha: Tarjeta de Promociones */
+/* Columna Derecha: Tarjeta de Promociones (AUMENTADA) */
 .banner-promociones {
     background-color: #0a0a0a;
     border: 1px solid #2a2a2a;
     border-radius: 15px;
-    width: 300px;
-    height: 210px;
+    width: 360px;  /* Antes 300px */
+    height: 250px; /* Antes 210px */
     box-sizing: border-box; 
     padding: 20px;
     position: relative;
@@ -439,9 +439,29 @@ p {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.6); /* Sombra más pronunciada para resaltar sobre el fondo */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6);
     overflow: hidden;
     flex-shrink: 0; 
+    
+    /* Reglas para el Drag & Drop */
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+}
+
+.banner-promociones:active {
+    cursor: grabbing;
+}
+
+/* MAGIA: Hace que el texto y la imagen ignoren el mouse, transfiriendo el arrastre al contenedor */
+.promo-slide > * {
+    pointer-events: none;
+}
+
+/* Protegemos los puntitos inferiores para que sí se puedan clickear */
+.promo-dots, .promo-dots .dot {
+    pointer-events: auto;
 }
 
 /* Nota: Los estilos de .promo-slide, animaciones y dots se mantienen exactamente igual que antes */
@@ -2073,4 +2093,22 @@ footer {
     background-color: #e65c00;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
+}
+/* ==========================================
+   CARRUSEL DRAG & DROP
+   ========================================== */
+.banner-promociones {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y; /* Permite scroll vertical nativo pero bloquea el horizontal para el swipe */
+}
+
+.banner-promociones:active {
+    cursor: grabbing;
+}
+
+.banner-promociones img {
+    -webkit-user-drag: none; /* Bloquea el arrastre nativo de imágenes */
+    pointer-events: none;    /* Transfiere el clic al contenedor principal */
 }

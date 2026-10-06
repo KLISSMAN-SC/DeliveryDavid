@@ -130,38 +130,26 @@
             </div>
         </div>
 
-        <!-- Derecha: Carrusel de Promociones -->
-        <div class="banner-promociones">
+        <!-- Derecha: Carrusel de Promociones Dinámico -->
+        <div class="banner-promociones" style="padding: 0; background: transparent; border: none;">
             
-            <!-- Slide 1 -->
-            <div class="promo-slide activo">
-                <span class="promo-tag">PROMO DEL DÍA</span>
-                <h3>COMBOS HASTA 40% OFF</h3>
-                <p>Tus favoritos, a un mejor precio.</p>
-                <a href="#" class="promo-link">Ver promociones <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            
-            <!-- Slide 2 -->
-            <div class="promo-slide">
-                <span class="promo-tag">ENVÍO GRATIS</span>
-                <h3>PIZZAS FAMILIARES</h3>
-                <p>Pide 2 y el envío va por nuestra cuenta.</p>
-                <a href="#" class="promo-link">Ver menú <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            
-            <!-- Slide 3 -->
-            <div class="promo-slide">
-                <span class="promo-tag">NUEVO LOCAL</span>
-                <h3>SUSHI 2X1</h3>
-                <p>Celebra la apertura con esta gran oferta.</p>
-                <a href="#" class="promo-link">Aprovechar <i class="fa-solid fa-arrow-right"></i></a>
+            <div th:each="promo, iterStat : ${promocionesCarrusel}" 
+                 th:class="${iterStat.index == 0} ? 'promo-slide activo' : 'promo-slide'"
+                 style="position: relative; width: 100%; height: 100%; cursor: pointer;"
+                 th:data-negocio="${promo.negocio.idNegocio}"> <!-- Enlace limpio de JS -->
+                
+                <img th:src="@{'/promociones/' + ${promo.imagenBanner}}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;">
+                
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px; box-sizing: border-box; border-radius: 0 0 15px 15px;">
+                    <span class="promo-tag" style="margin-bottom: 5px;">DESTACADO</span>
+                    <h3 th:text="${promo.titulo}" style="font-size: 16px; margin: 0; text-shadow: 1px 1px 3px black;">TÍTULO</h3>
+                </div>
             </div>
 
-            <!-- Controles del carrusel (Puntitos) -->
-            <div class="promo-dots">
-                <span class="dot activo" onclick="cambiarSlide(0)"></span>
-                <span class="dot" onclick="cambiarSlide(1)"></span>
-                <span class="dot" onclick="cambiarSlide(2)"></span>
+            <div class="promo-dots" style="z-index: 10;">
+                <span th:each="promo, iterStat : ${promocionesCarrusel}" 
+                      th:class="${iterStat.index == 0} ? 'dot activo' : 'dot'" 
+                      th:onclick="'cambiarSlide(' + ${iterStat.index} + ')'"></span>
             </div>
         </div>
     </section>

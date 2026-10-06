@@ -48,39 +48,104 @@
         <div th:if="${modulo == 'usuarios'}">
             <header class="panel-header">
                 <h2>Gestión de Usuarios</h2>
+                
                 <div class="panel-acciones-top">
+                    <!-- BUSCADOR DINÁMICO (Sin form, manejado por JS visualmente) -->
                     <div class="search-container">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" class="search-input" placeholder="Buscar usuario...">
+                        <input type="text" id="buscadorUsuarios" class="search-input" placeholder="Buscar por DNI o nombre..." autocomplete="off">
                     </div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Usuario</button>
+                    
+                    <button type="button" class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalUsuario()">
+                        <i class="fa-solid fa-plus"></i> Nuevo Usuario
+                    </button>
                 </div>
             </header>
+            
+            <!-- Alertas de Éxito o Error al eliminar -->
+            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;">
+                <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span>
+            </div>
+            
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;">
+                <i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span>
+            </div>
+            
             <section class="panel-contenido-crud">
                 <div class="tabla-contenedor">
                     <table class="tabla-oscura">
                         <thead>
                             <tr><th>ID</th><th>Nombres</th><th>DNI</th><th>Rol</th><th>Acciones</th></tr>
                         </thead>
-                        <tbody>
-						    <tr th:each="usuario : ${listaUsuarios}">
-						        <td th:text="'#' + ${usuario.idUsuario}"></td>
-						        <td th:text="${usuario.nombres + ' ' + (usuario.apellidos != null ? usuario.apellidos : '')}"></td>
-						        <td th:text="${usuario.dni}"></td>
-						        <td>
-						            <span class="badge" 
-						                  th:classappend="${usuario.rol.idRol == 1 ? 'admin' : (usuario.rol.idRol == 3 ? 'repartidor' : 'cliente')}" 
-						                  th:text="${usuario.rol.nombre}"></span>
-						        </td>
-						        <td class="acciones-celda">
-						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
-						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-						        </td>
-						    </tr>
-						</tbody>
+                        <!-- ID AGREGADO AL TBODY -->
+                        <tbody id="tablaUsuariosBody">
+                            <tr th:each="usuario : ${listaUsuarios}">
+                                <!-- ... (El contenido de tus <td> se mantiene exactamente igual) ... -->
+                                <td th:text="'#' + ${usuario.idUsuario}"></td>
+                                <td th:text="${usuario.nombres + ' ' + (usuario.apellidos != null ? usuario.apellidos : '')}"></td>
+                                <td th:text="${usuario.dni}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${usuario.rol.idRol == 1 ? 'admin' : (usuario.rol.idRol == 3 ? 'repartidor' : 'cliente')}" 
+                                          th:text="${usuario.rol.nombre}"></span>
+                                </td>
+                                <td class="acciones-celda">
+                                    <button class="btn-icon editar" title="Modificar" th:onclick="abrirModalUsuario([[${usuario.idUsuario}]], [[${usuario.nombres}]], [[${usuario.apellidos}]], [[${usuario.dni}]], [[${usuario.telefono}]], [[${usuario.correoElectronico}]], [[${usuario.rol.idRol}]])"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <form th:action="@{/panel/usuarios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este usuario?');">
+                                        <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- MODAL HTML (Renderizado pero oculto por CSS) -->
+            <div id="modalUsuario" class="modal-overlay">
+                <div class="modal-content" style="width: 450px;">
+                    <form th:action="@{/panel/usuarios/guardar}" method="POST">
+                        
+                        <div class="modal-header">
+                            <h3 class="modal-titulo" id="tituloModalUsuario">Nuevo Usuario</h3>
+                            <span class="btn-text" onclick="document.getElementById('modalUsuario').style.display='none'" style="text-align: right; cursor: pointer;">
+                                <i class="fa-solid fa-xmark" style="font-size: 20px;"></i>
+                            </span>
+                        </div>
+                        
+                        <div class="modal-body" style="flex-direction: column; gap: 15px;">
+                            <!-- ID Oculto (Si tiene valor, Java lo actualizará; si está vacío, creará uno nuevo) -->
+                            <input type="hidden" id="inputIdUsuario" name="idUsuario">
+
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inputNombres" name="nombres" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombres" required>
+                                <input type="text" id="inputApellidos" name="apellidos" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Apellidos" required>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inputDni" name="dni" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="DNI" required maxlength="8">
+                                <input type="text" id="inputTelefono" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required>
+                            </div>
+
+                            <input type="email" id="inputCorreo" name="correoElectronico" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Correo Electrónico" required>
+                            
+                            <input type="password" id="inputPassword" name="password" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Contraseña (Deja en blanco para no cambiar)">
+                            
+                            <select id="inputRol" name="rol.idRol" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal); cursor: pointer;" required>
+                                <option value="" disabled selected>Selecciona un Rol</option>
+                                <!-- Se llena dinámicamente desde Java -->
+                                <option th:each="r : ${listaRoles}" th:value="${r.idRol}" th:text="${r.nombre}"></option>
+                            </select>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn-aceptar">Guardar Usuario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
         </div>
 
         <!-- ==========================================
@@ -123,37 +188,128 @@
             <header class="panel-header">
                 <h2>Gestión de Negocios</h2>
                 <div class="panel-acciones-top">
-                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar negocio..."></div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Negocio</button>
+                    <!-- Buscador Dinámico JS -->
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="buscadorNegocios" class="search-input" placeholder="Buscar negocio..." autocomplete="off">
+                    </div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalNegocio()">
+                        <i class="fa-solid fa-plus"></i> Nuevo Negocio
+                    </button>
                 </div>
             </header>
+            
+            <!-- Alertas -->
+            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+
             <section class="panel-contenido-crud">
                 <div class="tabla-contenedor">
                     <table class="tabla-oscura">
                         <thead>
                             <tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
                         </thead>
-						 <tbody>
-						    <tr th:each="negocio : ${listaNegocios}">
-						        <td th:text="'#' + ${negocio.idNegocio}"></td>
-						        <td th:text="${negocio.nombre}"></td>
-						        <td th:text="${negocio.direccion}"></td>
-						        <td th:text="${negocio.telefono}"></td>
-						        <td>
-						            <!-- Simplificamos la lógica de estilos en línea para evitar errores de parseo -->
-						            <span class="badge" 
-						                  th:style="${negocio.estado != null and negocio.estado.name() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
-						                  th:text="${negocio.estado}"></span>
-						        </td>
-						        <td class="acciones-celda">
-						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
-						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-						        </td>
-						    </tr>
-						</tbody>
+                        <tbody id="tablaNegociosBody">
+                            <tr th:each="negocio : ${listaNegocios}">
+                                <td th:text="'#' + ${negocio.idNegocio}"></td>
+                                
+                                <!-- Renderizado de Imagen y Nombre -->
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                        <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
+                                            <i class="fa-solid fa-store"></i>
+                                        </div>
+                                        <span th:text="${negocio.nombre}"></span>
+                                    </div>
+                                </td>
+                                
+                                <td th:text="${negocio.direccion}"></td>
+                                <td th:text="${negocio.telefono}"></td>
+                                <td>
+                                    <span class="badge" th:style="${negocio.estado != null and negocio.estado.name() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${negocio.estado}"></span>
+                                </td>
+                                <td class="acciones-celda">
+                                    <button class="btn-icon editar" title="Modificar" 
+                                            th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]])">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <form th:action="@{/panel/negocios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este negocio?');">
+                                        <input type="hidden" name="idNegocio" th:value="${negocio.idNegocio}">
+                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
+            
+            <!-- MODAL HTML NEGOCIOS -->
+            <div id="modalNegocio" class="modal-overlay">
+                <div class="modal-content" style="width: 500px;">
+                    <!-- enctype para permitir subida de archivos -->
+                    <form th:action="@{/panel/negocios/guardar}" method="POST" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h3 class="modal-titulo" id="tituloModalNegocio">Nuevo Negocio</h3>
+                            <span class="btn-text" onclick="document.getElementById('modalNegocio').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+                        </div>
+                        
+                        <div class="modal-body" style="flex-direction: column; gap: 12px; max-height: 60vh;">
+                            <input type="hidden" id="inputIdNegocio" name="idNegocio">
+
+                            <!-- Nombre y Teléfono -->
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inputNombreNegocio" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombre del Negocio" required>
+                                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required>
+                            </div>
+                            
+                            <!-- Dirección -->
+                            <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
+                            
+                            <!-- Coordenadas -->
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" step="any" id="inputLatitud" name="latitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Latitud (Opcional)">
+                                <input type="number" step="any" id="inputLongitud" name="longitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Longitud (Opcional)">
+                            </div>
+                            
+                            <!-- Estado y Tipo de Negocio -->
+                            <div style="display: flex; gap: 10px;">
+                                <select id="inputEstado" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                    <option value="ABIERTO">ABIERTO</option>
+                                    <option value="CERRADO">CERRADO</option>
+                                </select>
+                                <select id="inputTipoNegocio" name="tipoNegocio.idTipoNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                    <option value="" disabled selected>Categoría...</option>
+                                    <option th:each="t : ${listaTipos}" th:value="${t.idTipoNegocio}" th:text="${t.nombre}"></option>
+                                </select>
+                            </div>
+                            
+                            <!-- Llaves foráneas que aceptan NULL -->
+                            <div style="display: flex; gap: 10px;">
+                                <select id="inputZona" name="zona.idZona" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+                                    <option value="">Sin Zona Específica</option>
+                                    <option th:each="z : ${listaZonas}" th:value="${z.idZona}" th:text="${z.nombre}"></option>
+                                </select>
+                                <select id="inputCentro" name="centroComercial.idCentroComercial" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+                                    <option value="">Sin Centro Comercial</option>
+                                    <option th:each="c : ${listaCentros}" th:value="${c.idCentroComercial}" th:text="${c.nombre}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Input de Archivo Físico -->
+                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px; margin-top: 5px;">
+                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Logo del negocio (Opcional si editas)</label>
+                                <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn-aceptar">Guardar Negocio</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- ==========================================
@@ -163,35 +319,90 @@
             <header class="panel-header">
                 <h2>Categorías de Productos</h2>
                 <div class="panel-acciones-top">
-                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar categoría..."></div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nueva Categoría</button>
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="buscadorCategorias" class="search-input" placeholder="Buscar categoría..." autocomplete="off">
+                    </div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalCategoria()">
+                        <i class="fa-solid fa-plus"></i> Nueva Categoría
+                    </button>
                 </div>
             </header>
+            
+            <!-- Alertas -->
+            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+
             <section class="panel-contenido-crud">
                 <div class="tabla-contenedor">
                     <table class="tabla-oscura">
                         <thead>
-                            <tr><th>ID</th><th>Nombre</th><th>Negocio Asociado</th><th>Acciones</th></tr>
+                            <tr><th>ID</th><th>Categoría</th><th>Negocio Asociado</th><th>Acciones</th></tr>
                         </thead>
-                        <tbody>
-                            <!-- Iteración sobre listaCategorias -->
+                        <tbody id="tablaCategoriasBody">
                             <tr th:each="categoria : ${listaCategorias}">
                                 <td th:text="'#' + ${categoria.idCategoriaProducto}"></td>
-                                <td th:text="${categoria.nombre}"></td>
-                                <td th:text="${categoria.logo}"></td>
                                 
-                                <!-- Uso de ?. para evitar errores si el negocio es nulo -->
+                                <!-- Renderizado de Imagen y Nombre -->
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img th:if="${categoria.logo != null and !categoria.logo.isEmpty()}" th:src="@{'/categorias_comidas/' + ${categoria.logo}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                        <div th:unless="${categoria.logo != null and !categoria.logo.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
+                                            <i class="fa-solid fa-layer-group"></i>
+                                        </div>
+                                        <span th:text="${categoria.nombre}"></span>
+                                    </div>
+                                </td>
+                                
                                 <td th:text="${categoria.negocio?.nombre}"></td>
                                 
                                 <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-icon editar" title="Modificar" 
+                                            th:onclick="abrirModalCategoria([[${categoria.idCategoriaProducto}]], [[${categoria.nombre}]], [[${categoria.negocio?.idNegocio}]])">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <form th:action="@{/panel/categorias/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar esta categoría?');">
+                                        <input type="hidden" name="idCategoriaProducto" th:value="${categoria.idCategoriaProducto}">
+                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+            
+            <!-- MODAL HTML CATEGORÍAS -->
+            <div id="modalCategoria" class="modal-overlay">
+                <div class="modal-content" style="width: 450px;">
+                    <form th:action="@{/panel/categorias/guardar}" method="POST" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h3 class="modal-titulo" id="tituloModalCategoria">Nueva Categoría</h3>
+                            <span class="btn-text" onclick="document.getElementById('modalCategoria').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+                        </div>
+                        
+                        <div class="modal-body" style="flex-direction: column; gap: 15px;">
+                            <input type="hidden" id="inputIdCategoria" name="idCategoriaProducto">
+
+                            <input type="text" id="inputNombreCategoria" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre de la Categoría" required>
+                            
+                            <select id="inputNegocioCategoria" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                <option value="" disabled selected>Selecciona un Negocio...</option>
+                                <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
+                            </select>
+
+                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Imagen de la categoría (Opcional si editas)</label>
+                                <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn-aceptar">Guardar Categoría</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 		<!-- ==========================================
              7. CRUD DE PRODUCTOS 
@@ -200,57 +411,112 @@
             <header class="panel-header">
                 <h2>Gestión de Productos</h2>
                 <div class="panel-acciones-top">
-                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar producto..."></div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nuevo Producto</button>
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="buscadorProductos" class="search-input" placeholder="Buscar por producto o negocio..." autocomplete="off">
+                    </div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalProducto()">
+                        <i class="fa-solid fa-plus"></i> Nuevo Producto
+                    </button>
                 </div>
             </header>
+            
+            <!-- Alertas -->
+            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+
             <section class="panel-contenido-crud">
                 <div class="tabla-contenedor">
                     <table class="tabla-oscura">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Negocio</th>
-                                <th>Categoría</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
+                            <tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Negocio</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr>
                         </thead>
-                        <tbody>
-                            <!-- Iteración sobre listaProductos -->
+                        <tbody id="tablaProductosBody">
                             <tr th:each="producto : ${listaProductos}">
                                 <td th:text="'#' + ${producto.idProducto}"></td>
                                 
+                                <!-- Renderizado de Imagen y Nombre -->
                                 <td>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <!-- Si más adelante subes imágenes, puedes poner un <img> aquí -->
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" th:src="@{'/productos/' + ${producto.imagen}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                                        <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
+                                            <i class="fa-solid fa-box"></i>
+                                        </div>
                                         <span th:text="${producto.nombre}"></span>
                                     </div>
                                 </td>
                                 
                                 <td th:text="|S/ ${producto.precio != null ? producto.precio : '0.00'}|"></td>
-                                
-                                <!-- Uso de ?. para navegación segura -->
                                 <td th:text="${producto.negocio?.nombre}"></td>
                                 <td th:text="${producto.categoriaProducto?.nombre}"></td>
                                 
                                 <td>
-                                    <span class="badge" 
-                                          th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
-                                          th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
+                                    <span class="badge" th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
                                 </td>
                                 
                                 <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-icon editar" title="Modificar" 
+                                            th:onclick="abrirModalProducto([[${producto.idProducto}]], [[${producto.nombre}]], [[${producto.descripcion}]], [[${producto.precio}]], [[${producto.disponible}]], [[${producto.negocio?.idNegocio}]], [[${producto.categoriaProducto?.idCategoriaProducto}]])">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <form th:action="@{/panel/productos/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?');">
+                                        <input type="hidden" name="idProducto" th:value="${producto.idProducto}">
+                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+            
+            <!-- MODAL HTML PRODUCTOS -->
+            <div id="modalProducto" class="modal-overlay">
+                <div class="modal-content" style="width: 500px;">
+                    <form th:action="@{/panel/productos/guardar}" method="POST" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h3 class="modal-titulo" id="tituloModalProducto">Nuevo Producto</h3>
+                            <span class="btn-text" onclick="document.getElementById('modalProducto').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+                        </div>
+                        
+                        <div class="modal-body" style="flex-direction: column; gap: 12px; max-height: 65vh;">
+                            <input type="hidden" id="inputIdProducto" name="idProducto">
+
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inputNombreProducto" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombre del Producto" required>
+                                <input type="number" step="0.01" id="inputPrecioProducto" name="precio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Precio (S/)" required>
+                            </div>
+
+                            <textarea id="inputDescripcionProducto" name="descripcion" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; resize: none; height: 60px;" placeholder="Descripción corta..."></textarea>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <select id="inputNegocioProducto" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                    <option value="" disabled selected>Negocio...</option>
+                                    <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
+                                </select>
+                                <select id="inputCategoriaProducto" name="categoriaProducto.idCategoriaProducto" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                    <option value="" disabled selected>Categoría...</option>
+                                    <option th:each="c : ${listaCategorias}" th:value="${c.idCategoriaProducto}" th:text="${c.nombre}"></option>
+                                </select>
+                            </div>
+                            
+                            <select id="inputDisponibleProducto" name="disponible" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                <option value="true">Disponible</option>
+                                <option value="false">Agotado</option>
+                            </select>
+
+                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Foto del producto (Opcional si editas)</label>
+                                <input type="file" name="archivoImagen" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn-aceptar">Guardar Producto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <!-- ==========================================
              5. CRUD DE PROMOCIONES 
@@ -259,32 +525,162 @@
             <header class="panel-header">
                 <h2>Gestión de Promociones</h2>
                 <div class="panel-acciones-top">
-                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar promoción..."></div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Nueva Promoción</button>
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="buscadorPromociones" class="search-input" placeholder="Buscar por negocio..." autocomplete="off">
+                    </div>
+                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalPromo()">
+                        <i class="fa-solid fa-plus"></i> Nueva Promoción
+                    </button>
                 </div>
             </header>
+            
+            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><span th:text="${mensajeError}"></span></div>
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><span th:text="${mensajeExito}"></span></div>
+
             <section class="panel-contenido-crud">
                 <div class="tabla-contenedor">
                     <table class="tabla-oscura">
                         <thead>
-                            <tr><th>ID</th><th>Título</th><th>Vigencia</th><th>Negocio</th><th>Estado</th><th>Acciones</th></tr>
+                            <tr><th>ID</th><th>Promoción</th><th>Fechas</th><th>Negocio</th><th>Index</th><th>Estado Real</th><th>Acciones</th></tr>
                         </thead>
-                       <tbody>
-						    <tr th:each="promo : ${listaPromociones}">
-						        <td th:text="'#' + ${promo.idPromocion}"></td>
-						        <td th:text="${promo.titulo}"></td>
-						        <td th:text="${#temporals.format(promo.fechaInicio, 'dd/MM/yyyy') + ' - ' + #temporals.format(promo.fechaFin, 'dd/MM/yyyy')}"></td>
-						        <td th:text="${promo.negocio.nombre}"></td>
-						        <td><span class="badge admin" th:text="${promo.estado ? 'Activa' : 'Inactiva'}"></span></td>
-						        <td class="acciones-celda">
-						            <button class="btn-icon editar" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
-						            <button class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-						        </td>
-						    </tr>
-						</tbody>
+                        <tbody id="tablaPromocionesBody">
+                            <tr th:each="promo : ${listaPromociones}">
+                                <td th:text="'#' + ${promo.idPromocion}"></td>
+                                
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img th:if="${promo.imagenBanner != null}" th:src="@{'/promociones/' + ${promo.imagenBanner}}" style="width: 60px; height: 35px; border-radius: 5px; object-fit: cover;">
+                                        <div>
+                                            <strong th:text="${promo.titulo}" style="display: block;"></strong>
+                                            <small th:if="${promo.horaInicio != null}" style="color: gray;" th:text="${promo.horaInicio + ' a ' + promo.horaFin}"></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td th:text="${#temporals.format(promo.fechaInicio, 'dd/MM/yyyy') + ' al ' + #temporals.format(promo.fechaFin, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${promo.negocio?.nombre}"></td>
+                                
+                                <td><i class="fa-solid fa-star" th:style="${promo.mostrarEnIndex != null and promo.mostrarEnIndex ? 'color: #ffaa00;' : 'color: #444;'}"></i></td>
+                                
+                                <td>
+                                    <!-- Llama al método Java para saber si AHORA está activa -->
+                                    <span class="badge" th:style="${promo.isActivaHoy()} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
+                                          th:text="${promo.isActivaHoy()} ? 'Activa AHORA' : 'Inactiva'"></span>
+                                </td>
+                                
+                                <td class="acciones-celda">
+                                    <button class="btn-icon editar" th:onclick="abrirModalPromo([[${promo.idPromocion}]], [[${promo.titulo}]], [[${promo.descripcion}]], [[${promo.fechaInicio}]], [[${promo.fechaFin}]], [[${promo.horaInicio}]], [[${promo.horaFin}]], [[${promo.diasActivos}]], [[${promo.mostrarEnIndex}]], [[${promo.estado}]], [[${promo.negocio?.idNegocio}]])"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <form th:action="@{/panel/promociones/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar promoción?');">
+                                        <input type="hidden" name="idPromocion" th:value="${promo.idPromocion}">
+                                        <button type="submit" class="btn-icon eliminar"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- MODAL HTML PROMOCIONES -->
+            <div id="modalPromo" class="modal-overlay">
+                <div class="modal-content" style="width: 600px;">
+                    <form th:action="@{/panel/promociones/guardar}" method="POST" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h3 class="modal-titulo" id="tituloModalPromo">Nueva Promoción</h3>
+                            <span class="btn-text" onclick="document.getElementById('modalPromo').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+                        </div>
+                        
+                        <div class="modal-body" style="flex-direction: column; gap: 15px; max-height: 75vh; overflow-y: auto; padding-right: 10px;">
+                            <input type="hidden" id="inputIdPromo" name="idPromocion">
+                            
+                            <!-- SECCIÓN 1: Datos Generales -->
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inputTituloPromo" name="titulo" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; flex: 1;" placeholder="Título de la promoción" required>
+                                <select id="inputNegocioPromo" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 200px;" required>
+                                    <option value="" disabled selected>Negocio...</option>
+                                    <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
+                                </select>
+                            </div>
+
+                            <!-- SECCIÓN 2: Configuración de Tiempo (Agrupada y Opcional) -->
+                            <fieldset style="border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; margin: 0;">
+                                <legend style="font-size: 12px; color: var(--naranja-marca); font-weight: bold; padding: 0 5px;">Vigencia (Opcional - Dejar vacío para siempre activo)</legend>
+                                
+                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 11px; color: gray;">Fecha Inicio</label>
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="datetime-local" id="inputFechaInicio" name="fechaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
+                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputFechaInicio').value=''" title="Limpiar Fecha" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 11px; color: gray;">Fecha Fin</label>
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="datetime-local" id="inputFechaFin" name="fechaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
+                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputFechaFin').value=''" title="Limpiar Fecha" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 11px; color: gray;">Hora Inicio Diaria</label>
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="time" id="inputHoraInicio" name="horaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
+                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputHoraInicio').value=''" title="Limpiar Hora" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 11px; color: gray;">Hora Fin Diaria</label>
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="time" id="inputHoraFin" name="horaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
+                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputHoraFin').value=''" title="Limpiar Hora" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 11px; color: gray; margin-bottom: 5px; display: block;">Días Activos (Dejar vacío para todos los días)</label>
+                                    <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 5px 0;">
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="1" class="check-dia"> Lun</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="2" class="check-dia"> Mar</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="3" class="check-dia"> Mié</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="4" class="check-dia"> Jue</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="5" class="check-dia"> Vie</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="6" class="check-dia"> Sáb</label>
+                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="7" class="check-dia"> Dom</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- SECCIÓN 3: Visibilidad y Banner -->
+                            <div style="display: flex; gap: 10px;">
+                                <div style="flex: 1; display: flex; align-items: center; background: rgba(255,102,0,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--naranja-marca);">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: var(--texto-principal);">
+                                        <input type="checkbox" id="inputIndexPromo" name="mostrarEnIndex" value="true"> Mostrar en Carrusel
+                                    </label>
+                                </div>
+                                
+                                <select id="inputEstadoPromo" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); flex: 1;" required>
+                                    <option value="true">Estado: Activo</option>
+                                    <option value="false">Estado: Apagado (Ocultar)</option>
+                                </select>
+                            </div>
+
+                            <div style="border: 1px dashed var(--borde-sutil); padding: 15px; border-radius: 8px; text-align: center;">
+                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Imagen Promocional (Proporción horizontal recomendada)</label>
+                                <input type="file" name="archivoBanner" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer" style="margin-top: 10px;">
+                            <button type="submit" class="btn-aceptar" style="width: 100%; padding: 12px;">Guardar Promoción</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- ==========================================
@@ -331,6 +727,6 @@
         </div>
 
     </main>
-
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

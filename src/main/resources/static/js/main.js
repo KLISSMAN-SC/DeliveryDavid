@@ -338,3 +338,421 @@ window.addEventListener('click', function(event) {
         cerrarModalPedido();
     }
 });
+// ==========================================
+// LÓGICA DEL MODAL CRUD USUARIOS
+// ==========================================
+function abrirModalUsuario(id, nombres, apellidos, dni, telefono, correo, idRol) {
+    // Si viene con ID, es una edición
+    if (id) {
+        document.getElementById('tituloModalUsuario').innerText = 'Editar Usuario';
+        document.getElementById('inputIdUsuario').value = id;
+        document.getElementById('inputNombres').value = nombres || '';
+        document.getElementById('inputApellidos').value = apellidos || '';
+        document.getElementById('inputDni').value = dni || '';
+        document.getElementById('inputTelefono').value = telefono || '';
+        document.getElementById('inputCorreo').value = correo || '';
+        document.getElementById('inputRol').value = idRol;
+        // La contraseña se deja vacía por seguridad
+        document.getElementById('inputPassword').value = '';
+        document.getElementById('inputPassword').placeholder = 'Nueva contraseña (Opcional)';
+        document.getElementById('inputPassword').removeAttribute('required');
+    } else {
+        // Es un nuevo usuario, vaciamos todo
+        document.getElementById('tituloModalUsuario').innerText = 'Nuevo Usuario';
+        document.getElementById('inputIdUsuario').value = '';
+        document.getElementById('inputNombres').value = '';
+        document.getElementById('inputApellidos').value = '';
+        document.getElementById('inputDni').value = '';
+        document.getElementById('inputTelefono').value = '';
+        document.getElementById('inputCorreo').value = '';
+        document.getElementById('inputRol').value = '';
+        document.getElementById('inputPassword').value = '';
+        document.getElementById('inputPassword').placeholder = 'Contraseña';
+        document.getElementById('inputPassword').setAttribute('required', 'true');
+    }
+
+    // Mostrar el modal
+    document.getElementById('modalUsuario').style.display = 'flex';
+}
+// ==========================================
+// BUSCADOR DINÁMICO EN TIEMPO REAL (PANEL)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorUsuarios = document.getElementById('buscadorUsuarios');
+    const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
+
+    if (buscadorUsuarios && tablaUsuariosBody) {
+        buscadorUsuarios.addEventListener('input', function() {
+            // Convertimos lo que el usuario escribe a minúsculas
+            const filtro = this.value.toLowerCase();
+            const filas = tablaUsuariosBody.getElementsByTagName('tr');
+
+            // Recorremos todas las filas de la tabla
+            for (let i = 0; i < filas.length; i++) {
+                // Obtenemos la columna de Nombres (índice 1) y DNI (índice 2)
+                const colNombre = filas[i].getElementsByTagName('td')[1];
+                const colDni = filas[i].getElementsByTagName('td')[2];
+                
+                if (colNombre || colDni) {
+                    const textoNombre = colNombre.textContent || colNombre.innerText;
+                    const textoDni = colDni.textContent || colDni.innerText;
+                    
+                    // Verificamos si el texto escrito coincide con el nombre o el DNI
+                    if (textoNombre.toLowerCase().indexOf(filtro) > -1 || textoDni.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = ""; // Muestra la fila
+                    } else {
+                        filas[i].style.display = "none"; // Oculta la fila
+                    }
+                }
+            }
+        });
+    }
+});
+// ==========================================
+// OCULTAR ALERTAS AUTOMÁTICAMENTE (PANEL)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const alertas = document.querySelectorAll('.alerta-mensaje');
+    
+    if (alertas.length > 0) {
+        alertas.forEach(alerta => {
+            // Esperar 4 segundos antes de iniciar el desvanecimiento
+            setTimeout(() => {
+                alerta.style.opacity = '0';
+                
+                // Esperar medio segundo más para que termine la animación CSS y luego quitar el espacio
+                setTimeout(() => {
+                    alerta.style.display = 'none';
+                }, 500);
+            }, 4000);
+        });
+    }
+});
+// ==========================================
+// MODAL CRUD NEGOCIOS
+// ==========================================
+function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro) {
+    if (id) {
+        document.getElementById('tituloModalNegocio').innerText = 'Editar Negocio';
+        document.getElementById('inputIdNegocio').value = id;
+        document.getElementById('inputNombreNegocio').value = nombre || '';
+        document.getElementById('inputDireccionNegocio').value = direccion || '';
+        document.getElementById('inputLatitud').value = latitud || '';
+        document.getElementById('inputLongitud').value = longitud || '';
+        document.getElementById('inputTelefonoNegocio').value = telefono || '';
+        document.getElementById('inputEstado').value = estado || 'ABIERTO';
+        document.getElementById('inputTipoNegocio').value = idTipo || '';
+        document.getElementById('inputZona').value = idZona || '';
+        document.getElementById('inputCentro').value = idCentro || '';
+    } else {
+        document.getElementById('tituloModalNegocio').innerText = 'Nuevo Negocio';
+        document.getElementById('inputIdNegocio').value = '';
+        document.getElementById('inputNombreNegocio').value = '';
+        document.getElementById('inputDireccionNegocio').value = '';
+        document.getElementById('inputLatitud').value = '';
+        document.getElementById('inputLongitud').value = '';
+        document.getElementById('inputTelefonoNegocio').value = '';
+        document.getElementById('inputEstado').value = 'ABIERTO';
+        document.getElementById('inputTipoNegocio').value = '';
+        document.getElementById('inputZona').value = '';
+        document.getElementById('inputCentro').value = '';
+    }
+    document.getElementById('modalNegocio').style.display = 'flex';
+}
+
+// ==========================================
+// BUSCADOR DINÁMICO EN TIEMPO REAL (NEGOCIOS)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorNegocios = document.getElementById('buscadorNegocios');
+    const tablaNegociosBody = document.getElementById('tablaNegociosBody');
+
+    if (buscadorNegocios && tablaNegociosBody) {
+        buscadorNegocios.addEventListener('input', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = tablaNegociosBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < filas.length; i++) {
+                // Buscamos coincidencia en Nombre (índice 1)
+                const colNombre = filas[i].getElementsByTagName('td')[1];
+                
+                if (colNombre) {
+                    const textoNombre = colNombre.textContent || colNombre.innerText;
+                    if (textoNombre.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = ""; 
+                    } else {
+                        filas[i].style.display = "none"; 
+                    }
+                }
+            }
+        });
+    }
+});
+// ==========================================
+// MODAL CRUD CATEGORÍAS
+// ==========================================
+function abrirModalCategoria(id, nombre, idNegocio) {
+    if (id) {
+        document.getElementById('tituloModalCategoria').innerText = 'Editar Categoría';
+        document.getElementById('inputIdCategoria').value = id;
+        document.getElementById('inputNombreCategoria').value = nombre || '';
+        document.getElementById('inputNegocioCategoria').value = idNegocio || '';
+    } else {
+        document.getElementById('tituloModalCategoria').innerText = 'Nueva Categoría';
+        document.getElementById('inputIdCategoria').value = '';
+        document.getElementById('inputNombreCategoria').value = '';
+        document.getElementById('inputNegocioCategoria').value = '';
+    }
+    document.getElementById('modalCategoria').style.display = 'flex';
+}
+
+// ==========================================
+// BUSCADOR DINÁMICO EN TIEMPO REAL (CATEGORÍAS)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorCategorias = document.getElementById('buscadorCategorias');
+    const tablaCategoriasBody = document.getElementById('tablaCategoriasBody');
+
+    if (buscadorCategorias && tablaCategoriasBody) {
+        buscadorCategorias.addEventListener('input', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = tablaCategoriasBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < filas.length; i++) {
+                // Buscamos coincidencia en la columna de Categoría (índice 1)
+                const colCategoria = filas[i].getElementsByTagName('td')[1];
+                
+                if (colCategoria) {
+                    const textoCategoria = colCategoria.textContent || colCategoria.innerText;
+                    if (textoCategoria.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = ""; 
+                    } else {
+                        filas[i].style.display = "none"; 
+                    }
+                }
+            }
+        });
+    }
+});
+// ==========================================
+// MODAL CRUD PRODUCTOS
+// ==========================================
+function abrirModalProducto(id, nombre, descripcion, precio, disponible, idNegocio, idCategoria) {
+    if (id) {
+        document.getElementById('tituloModalProducto').innerText = 'Editar Producto';
+        document.getElementById('inputIdProducto').value = id;
+        document.getElementById('inputNombreProducto').value = nombre || '';
+        document.getElementById('inputDescripcionProducto').value = descripcion || '';
+        document.getElementById('inputPrecioProducto').value = precio || '';
+        // Convertimos el booleano en texto para el selector
+        document.getElementById('inputDisponibleProducto').value = (disponible !== false) ? 'true' : 'false';
+        document.getElementById('inputNegocioProducto').value = idNegocio || '';
+        document.getElementById('inputCategoriaProducto').value = idCategoria || '';
+    } else {
+        document.getElementById('tituloModalProducto').innerText = 'Nuevo Producto';
+        document.getElementById('inputIdProducto').value = '';
+        document.getElementById('inputNombreProducto').value = '';
+        document.getElementById('inputDescripcionProducto').value = '';
+        document.getElementById('inputPrecioProducto').value = '';
+        document.getElementById('inputDisponibleProducto').value = 'true';
+        document.getElementById('inputNegocioProducto').value = '';
+        document.getElementById('inputCategoriaProducto').value = '';
+    }
+    document.getElementById('modalProducto').style.display = 'flex';
+}
+
+// ==========================================
+// BUSCADOR DINÁMICO DUAL (PRODUCTOS O NEGOCIO)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorProductos = document.getElementById('buscadorProductos');
+    const tablaProductosBody = document.getElementById('tablaProductosBody');
+
+    if (buscadorProductos && tablaProductosBody) {
+        buscadorProductos.addEventListener('input', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = tablaProductosBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < filas.length; i++) {
+                // Obtenemos la columna Nombre (índice 1) y Negocio (índice 3)
+                const colNombre = filas[i].getElementsByTagName('td')[1];
+                const colNegocio = filas[i].getElementsByTagName('td')[3];
+                
+                if (colNombre || colNegocio) {
+                    const textoNombre = colNombre ? (colNombre.textContent || colNombre.innerText) : "";
+                    const textoNegocio = colNegocio ? (colNegocio.textContent || colNegocio.innerText) : "";
+                    
+                    // Comprobamos si el texto escrito coincide con ALGUNA de las dos columnas
+                    if (textoNombre.toLowerCase().indexOf(filtro) > -1 || textoNegocio.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = ""; 
+                    } else {
+                        filas[i].style.display = "none"; 
+                    }
+                }
+            }
+        });
+    }
+});
+// ==========================================
+// MODAL Y BÚSQUEDA DE PROMOCIONES
+// ==========================================
+function abrirModalPromo(id, titulo, desc, fInicio, fFin, hInicio, hFin, dias, enIndex, estado, idNegocio) {
+    // 1. Limpiar checkboxes de días
+    document.querySelectorAll('.check-dia').forEach(chk => chk.checked = false);
+
+    if (id) {
+        document.getElementById('tituloModalPromo').innerText = 'Editar Promoción';
+        document.getElementById('inputIdPromo').value = id;
+        document.getElementById('inputTituloPromo').value = titulo || '';
+        document.getElementById('inputFechaInicio').value = fInicio ? fInicio.substring(0, 16) : '';
+        document.getElementById('inputFechaFin').value = fFin ? fFin.substring(0, 16) : '';
+        document.getElementById('inputHoraInicio').value = hInicio || '';
+        document.getElementById('inputHoraFin').value = hFin || '';
+        document.getElementById('inputIndexPromo').checked = (enIndex === true || enIndex === 'true');
+        document.getElementById('inputEstadoPromo').value = (estado !== false) ? 'true' : 'false';
+        document.getElementById('inputNegocioPromo').value = idNegocio || '';
+        
+        // Marcar los checkboxes guardados (ej: "1,3,5")
+        if (dias) {
+            dias.split(',').forEach(dia => {
+                let checkbox = document.querySelector(`.check-dia[value="${dia}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+    } else {
+        document.getElementById('tituloModalPromo').innerText = 'Nueva Promoción';
+        document.getElementById('inputIdPromo').value = '';
+        document.getElementById('inputTituloPromo').value = '';
+        document.getElementById('inputFechaInicio').value = '';
+        document.getElementById('inputFechaFin').value = '';
+        document.getElementById('inputHoraInicio').value = '';
+        document.getElementById('inputHoraFin').value = '';
+        document.getElementById('inputIndexPromo').checked = false;
+        document.getElementById('inputEstadoPromo').value = 'true';
+        document.getElementById('inputNegocioPromo').value = '';
+    }
+    document.getElementById('modalPromo').style.display = 'flex';
+}
+
+// Búsqueda por Negocio (Índice 3 en la tabla)
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorPromos = document.getElementById('buscadorPromociones');
+    const tablaPromosBody = document.getElementById('tablaPromocionesBody');
+
+    if (buscadorPromos && tablaPromosBody) {
+        buscadorPromos.addEventListener('input', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = tablaPromosBody.getElementsByTagName('tr');
+            for (let i = 0; i < filas.length; i++) {
+                const colNegocio = filas[i].getElementsByTagName('td')[3];
+                if (colNegocio) {
+                    const texto = colNegocio.textContent || colNegocio.innerText;
+                    filas[i].style.display = texto.toLowerCase().indexOf(filtro) > -1 ? "" : "none";
+                }
+            }
+        });
+    }
+});
+// ==========================================
+// CARRUSEL DE PROMOCIONES: SWIPE / ARRASTRAR
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const carrusel = document.querySelector('.banner-promociones');
+    if (!carrusel) return;
+
+    let posXInicial = 0;
+    let isDragging = false;
+    let esUnArrastre = false;
+
+    const iniciarArrastre = (e) => {
+        isDragging = true;
+        esUnArrastre = false;
+        posXInicial = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    };
+
+    const moverArrastre = (e) => {
+        if (!isDragging) return;
+        const posXActual = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        const distancia = Math.abs(posXInicial - posXActual);
+        
+        if (distancia > 10) esUnArrastre = true;
+    };
+
+    const finalizarArrastre = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (!esUnArrastre) return; 
+
+        // Recuperar posición final exacta (incluso si el mouse sale del cuadro)
+        let posXFinal = 0;
+        if(e.type === 'mouseleave' || e.type === 'mouseup') {
+            posXFinal = e.pageX;
+        } else if (e.changedTouches) {
+            posXFinal = e.changedTouches[0].clientX;
+        }
+
+        const diferencia = posXInicial - posXFinal;
+        
+        const puntos = Array.from(document.querySelectorAll('.promo-dots .dot'));
+        if (puntos.length <= 1) return; 
+        
+        let indiceActual = puntos.findIndex(punto => punto.classList.contains('activo'));
+        if (indiceActual === -1) indiceActual = 0;
+
+        // Sensibilidad ajustada a 40px para que se sienta fluido
+        if (diferencia > 40) { 
+            cambiarSlide((indiceActual + 1) % puntos.length);
+        } else if (diferencia < -40) {
+            cambiarSlide((indiceActual - 1 + puntos.length) % puntos.length);
+        }
+    };
+
+    // Eventos PC
+    carrusel.addEventListener('mousedown', iniciarArrastre);
+    carrusel.addEventListener('mousemove', moverArrastre);
+    carrusel.addEventListener('mouseup', finalizarArrastre);
+    carrusel.addEventListener('mouseleave', finalizarArrastre); 
+
+    // Eventos Móvil
+    carrusel.addEventListener('touchstart', iniciarArrastre, {passive: true});
+    carrusel.addEventListener('touchmove', moverArrastre, {passive: true});
+    carrusel.addEventListener('touchend', finalizarArrastre);
+
+    // GESTIÓN INTELIGENTE DEL CLIC
+    const slides = document.querySelectorAll('.promo-slide');
+    slides.forEach(slide => {
+        slide.addEventListener('click', (e) => {
+            // Si estaba arrastrando, detenemos todo para que no abra el restaurante
+            if (esUnArrastre) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
+            // Si fue un clic simple, redirigimos
+            const idNegocio = slide.getAttribute('data-negocio');
+            if (idNegocio) {
+                abrirRestaurante(idNegocio);
+            }
+        });
+    });
+});
+
+// ==========================================
+// FUNCIÓN CAMBIAR SLIDE (Si no la tienes aún)
+// ==========================================
+function cambiarSlide(indice) {
+    const slides = document.querySelectorAll('.promo-slide');
+    const dots = document.querySelectorAll('.promo-dots .dot');
+    
+    if (slides.length === 0) return;
+
+    // Remover la clase 'activo' de todos
+    slides.forEach(s => s.classList.remove('activo'));
+    dots.forEach(d => d.classList.remove('activo'));
+
+    // Añadir la clase 'activo' al nuevo índice
+    slides[indice].classList.add('activo');
+    dots[indice].classList.add('activo');
+}
