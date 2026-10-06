@@ -4,6 +4,7 @@ import com.proyecto.model.CategoriaProducto;
 import com.proyecto.model.Negocio;
 import com.proyecto.model.Producto;
 import com.proyecto.model.Promocion;
+import com.proyecto.model.TipoNegocio;
 import com.proyecto.model.Usuario;
 import com.proyecto.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -405,5 +406,32 @@ public class PanelController {
         promocionRepo.deleteById(idPromocion);
         redirectAttributes.addFlashAttribute("mensajeExito", "Promoción eliminada.");
         return "redirect:/panel?modulo=promociones";
+    }
+    
+    @PostMapping("/tipos_negocio/ocultar")
+    public String ocultarTipoNegocio(@RequestParam("idTipoNegocio") Integer idTipoNegocio, RedirectAttributes redirectAttributes) {
+        TipoNegocio tipo = tipoNegocioRepo.findById(idTipoNegocio).orElse(null);
+        if (tipo != null) {
+            tipo.setEstado(false); // Lo marcamos como oculto
+            tipoNegocioRepo.save(tipo);
+            redirectAttributes.addFlashAttribute("mensajeExito", "El tipo de negocio ha sido ocultado del catálogo.");
+        }
+        return "redirect:/panel?modulo=tipos_negocio";
+    }
+
+    @PostMapping("/tipos_negocio/guardar")
+    public String guardarTipoNegocio(@ModelAttribute TipoNegocio tipo, RedirectAttributes redirectAttributes) {
+        try {
+            // Si es un tipo nuevo (ID nulo), por defecto lo hacemos visible
+            if (tipo.getIdTipoNegocio() == null && tipo.getEstado() == null) {
+                tipo.setEstado(true);
+            }
+            
+            tipoNegocioRepo.save(tipo);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Tipo de negocio guardado correctamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al guardar el tipo de negocio.");
+        }
+        return "redirect:/panel?modulo=tipos_negocio";
     }
 }

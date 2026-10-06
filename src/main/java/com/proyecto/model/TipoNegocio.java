@@ -21,5 +21,8 @@ public class TipoNegocio {
 	
 	@Column(length=200)
 	private String icono;
+	
+	@Column(name = "estado")
+    private Boolean estado = true; 
 
 }

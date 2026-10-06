@@ -34,7 +34,7 @@ public class SecurityConfig {
         http
             .authenticationProvider(authProvider) // Activa la validación con BD
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/imagenes/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/imagenes/**","/restaurante/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**").permitAll()
                 .requestMatchers("/", "/login", "/registro/**", "/verificar/**", "/api/**").permitAll()
                 .requestMatchers("/panel/**").hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
                 .anyRequest().authenticated()

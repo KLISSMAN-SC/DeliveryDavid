@@ -756,3 +756,51 @@ function cambiarSlide(indice) {
     slides[indice].classList.add('activo');
     dots[indice].classList.add('activo');
 }
+// ==========================================
+// MODAL CRUD TIPOS DE NEGOCIO
+// ==========================================
+function abrirModalTipoNegocio(id, nombre, icono, estado) {
+    if (id) {
+        document.getElementById('tituloModalTipo').innerText = 'Editar Tipo de Negocio';
+        document.getElementById('inputIdTipo').value = id;
+        document.getElementById('inputNombreTipo').value = nombre || '';
+        //document.getElementById('inputIconoTipo').value = icono || '';
+        document.getElementById('inputEstadoTipo').value = (estado !== false) ? 'true' : 'false';
+    } else {
+        document.getElementById('tituloModalTipo').innerText = 'Nuevo Tipo de Negocio';
+        document.getElementById('inputIdTipo').value = '';
+        document.getElementById('inputNombreTipo').value = '';
+        //document.getElementById('inputIconoTipo').value = '';
+        document.getElementById('inputEstadoTipo').value = 'true';
+    }
+    document.getElementById('modalTipoNegocio').style.display = 'flex';
+}
+
+// ==========================================
+// BUSCADOR DINÁMICO EN TIEMPO REAL (TIPOS)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const buscadorTipos = document.getElementById('buscadorTipos');
+    const tablaTiposBody = document.getElementById('tablaTiposBody');
+
+    if (buscadorTipos && tablaTiposBody) {
+        buscadorTipos.addEventListener('input', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = tablaTiposBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < filas.length; i++) {
+                // Buscamos coincidencia en la columna Nombre (índice 1)
+                const colNombre = filas[i].getElementsByTagName('td')[1];
+                
+                if (colNombre) {
+                    const textoNombre = colNombre.textContent || colNombre.innerText;
+                    if (textoNombre.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = ""; 
+                    } else {
+                        filas[i].style.display = "none"; 
+                    }
+                }
+            }
+        });
+    }
+});

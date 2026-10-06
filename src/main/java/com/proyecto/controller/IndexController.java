@@ -40,47 +40,53 @@ public class IndexController {
             @RequestParam(required = false) String categoria,
             Model model) {
         
-        // Listas base para los botones
-        model.addAttribute("listaTipos", tipoNegocioService.obtenerTodos());
+        // 1. Filtrar los botones superiores (Tipos de Negocio)
+        List<TipoNegocio> tiposActivos = tipoNegocioService.obtenerTodos().stream()
+                .filter(t -> t.getEstado() != null && t.getEstado())
+                .collect(Collectors.toList());
+        model.addAttribute("listaTipos", tiposActivos);
+        
         model.addAttribute("listaZonas", zonaService.obtenerTodas());
 
-        // Ejecutar consulta maestra con los filtros (si son nulos, la BD los ignora)
+        // Ejecutar consulta maestra de negocios
         List<Negocio> negociosMostrar = negocioService.buscarConFiltrosCombinados(tipoId, zonaId, categoria);
         
-     // Dentro de tu @GetMapping("/")
+        // 2. Filtrar negocios cuyas categorías están ocultas
+        List<Negocio> negociosVisibles = negociosMostrar.stream()
+                .filter(n -> n.getTipoNegocio() != null 
+                          && n.getTipoNegocio().getEstado() != null 
+                          && n.getTipoNegocio().getEstado())
+                .collect(Collectors.toList());
+        
         List<Promocion> promocionesIndex = promocionRepo.findAll().stream()
-                .filter(p -> p.getMostrarEnIndex() != null && p.getMostrarEnIndex()) // Seleccionadas por el admin
-                .filter(Promocion::isActivaHoy) // Magia: Solo pasan las que cumplen fecha, hora y día
+                .filter(p -> p.getMostrarEnIndex() != null && p.getMostrarEnIndex()) 
+                .filter(Promocion::isActivaHoy) 
                 .collect(Collectors.toList());
                 
         model.addAttribute("promocionesCarrusel", promocionesIndex);
 
-        
-        boolean esRestaurante = true; // Por defecto asumimos restaurante
+        boolean esRestaurante = true; 
         String tituloSeccion = "Restaurantes cerca de ti";
 
         if (tipoId != null) {
             TipoNegocio tipoSel = tipoNegocioService.obtenerPorId(tipoId);
             if (tipoSel != null) {
                 tituloSeccion = tipoSel.getNombre() + " cerca de ti";
-                // Si NO contiene la palabra restaurante/comida, ocultamos la sección de categorías
                 if (!tipoSel.getNombre().toLowerCase().contains("restaurante")) {
                     esRestaurante = false;
                 }
             }
         }
 
-        // Enviamos las listas y los identificadores seleccionados a la vista
-        model.addAttribute("listaNegocios", negociosMostrar);
+        // Enviamos las listas filtradas a la vista
+        model.addAttribute("listaNegocios", negociosVisibles); // <--- Variable actualizada
         model.addAttribute("esRestaurante", esRestaurante);
         model.addAttribute("tituloSeccion", tituloSeccion);
         
-        // Mantenemos el estado actual de los filtros
         model.addAttribute("tipoSeleccionado", tipoId);
         model.addAttribute("zonaSeleccionada", zonaId);
         model.addAttribute("categoriaSeleccionada", categoria);
 
-        // Si es restaurante, enviamos las categorías únicas
         if (esRestaurante) {
             model.addAttribute("listaCategorias", categoriaProductoService.obtenerCategoriasUnicas());
         }
