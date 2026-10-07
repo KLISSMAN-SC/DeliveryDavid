@@ -1,0 +1,328 @@
+/* Comparte la paleta de estilos.css y no necesita JavaScript ni recursos externos. */
+body.pagina-error {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 28px clamp(20px, 4vw, 56px) 24px;
+    opacity: 1;
+}
+
+.pagina-error *,
+.pagina-error *::before,
+.pagina-error *::after {
+    box-sizing: border-box;
+}
+
+.error-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--borde-sutil);
+}
+
+.error-logo,
+.error-header-link {
+    text-decoration: none;
+}
+
+.error-header-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--texto-secundario);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.error-header-link span {
+    color: var(--naranja-marca);
+    font-size: 21px;
+}
+
+.error-header-link:hover {
+    color: var(--texto-principal);
+}
+
+.error-main {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    width: 100%;
+    padding: 64px 0;
+}
+
+.error-card {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    align-items: center;
+    gap: 64px;
+    width: 100%;
+    max-width: 1060px;
+    padding: 64px 60px;
+    overflow: hidden;
+    background: linear-gradient(120deg, rgba(255, 102, 0, 0.055), transparent 46%), var(--fondo-tarjetas);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 24px;
+}
+
+.error-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.error-icon {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 22px;
+    color: var(--naranja-marca);
+    background-color: rgba(255, 102, 0, 0.09);
+    border: 1px solid rgba(255, 102, 0, 0.25);
+    border-radius: 22px;
+}
+
+.error-icon svg {
+    width: 38px;
+    height: 38px;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.error-code {
+    color: var(--naranja-marca);
+    font-size: clamp(112px, 14vw, 176px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -9px;
+    text-shadow: 0 8px 52px rgba(255, 102, 0, 0.15);
+}
+
+.error-code-caption {
+    margin-top: 24px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    text-align: center;
+}
+
+.error-content {
+    min-width: 0;
+}
+
+.error-eyebrow {
+    margin: 0 0 16px;
+    color: var(--naranja-marca);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.error-content h1 {
+    margin: 0 0 20px;
+    color: var(--texto-principal);
+    font-size: clamp(30px, 3.2vw, 42px);
+    font-weight: 800;
+    line-height: 1.16;
+    letter-spacing: -1px;
+}
+
+.error-description {
+    max-width: 46ch;
+    margin: 0;
+    color: var(--texto-secundario);
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.error-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 13px 22px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.error-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+}
+
+.error-btn-primary {
+    color: var(--fondo-principal);
+    background-color: var(--naranja-marca);
+}
+
+.error-btn-primary:hover {
+    background-color: #ff812e;
+}
+
+.error-btn-secondary {
+    color: var(--texto-principal);
+    border-color: var(--borde-sutil);
+}
+
+.error-btn-secondary:hover {
+    background-color: rgba(255, 102, 0, 0.08);
+    border-color: var(--naranja-marca);
+}
+
+.pagina-error a:focus-visible {
+    outline: 2px solid var(--naranja-marca);
+    outline-offset: 5px;
+}
+
+.error-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 26px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--borde-sutil);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.error-note-mark {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.error-footer {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.error-footer span {
+    margin: 0 6px;
+    color: var(--naranja-marca);
+}
+
+@media (max-width: 760px) {
+    body.pagina-error {
+        padding-top: 22px;
+    }
+
+    .error-header {
+        padding-bottom: 22px;
+    }
+
+    .error-logo strong {
+        font-size: 22px;
+        letter-spacing: 0;
+    }
+
+    .error-header-link {
+        font-size: 12px;
+    }
+
+    .error-main {
+        padding: 36px 0;
+    }
+
+    .error-card {
+        grid-template-columns: 1fr;
+        gap: 36px;
+        max-width: 480px;
+        padding: 36px 28px;
+        background: linear-gradient(180deg, rgba(255, 102, 0, 0.055), transparent 55%), var(--fondo-tarjetas);
+        text-align: center;
+    }
+
+    .error-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 16px;
+        border-radius: 18px;
+    }
+
+    .error-icon svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .error-code {
+        font-size: 112px;
+        letter-spacing: -6px;
+    }
+
+    .error-code-caption {
+        margin-top: 12px;
+    }
+
+    .error-description {
+        margin: 0 auto;
+        font-size: 14px;
+    }
+
+    .error-actions {
+        justify-content: center;
+    }
+
+    .error-note {
+        text-align: left;
+    }
+}
+
+@media (max-width: 380px) {
+    .error-header-link {
+        gap: 5px;
+    }
+
+    .error-logo strong {
+        font-size: 19px;
+    }
+
+    .error-card {
+        padding: 30px 20px;
+    }
+
+    .error-btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.pagina-error,
+    .error-btn {
+        transition: none;
+    }
+}

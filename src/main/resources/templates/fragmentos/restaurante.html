@@ -8,7 +8,6 @@
     <!-- CABECERA DEL RESTAURANTE (Logo y Nombre Centrados) -->
     <div class="restaurante-header-centrado">
         <div class="restaurante-logo-caja">
-            <!-- Valida si hay logo guardado, sino pone un icono por defecto -->
             <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
                  th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
                  alt="Logo Restaurante">
@@ -20,7 +19,6 @@
             <h1 th:text="${negocio.nombre}">Nombre del Restaurante</h1>
             
             <div class="restaurante-tags">
-                <!--<span class="tag-estrellas"><i class="fa-solid fa-star"></i> 4.8 (120 opiniones)</span>-->
                 <span class="tag-estado" 
 				      th:style="${negocio.obtenerEstadoReal() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
 				      th:text="${negocio.obtenerEstadoReal()}">ABIERTO
@@ -35,146 +33,93 @@
 
     <hr class="separador-sutil">
 
-    <!-- BARRA DE BÚSQUEDA Y CATEGORÍAS INTERNAS -->
-    <div class="restaurante-navegacion">
-        <div class="search-container-interno">
-
-    		<i class="fa-solid fa-magnifying-glass"></i>
-    		<input
-        	type="text"
-       		id="buscarProductos"
-        	placeholder="Buscar productos..."
-        	class="search-input-interno"
-        	th:data-negocio="${negocio.idNegocio}"
-        	autocomplete="off">
-
-		</div>
+    <!-- ==========================================
+         VISTA 1: MODO WHATSAPP / SOLO CARTA
+         ========================================== -->
+    <div th:if="${negocio.modoWhatsapp != null and negocio.modoWhatsapp}" class="vista-carta-whatsapp" style="text-align: center; margin-top: 30px; padding-bottom: 50px;">
         
-        <!-- Botones de categorías tipo píldora -->
-        <ul class="restaurante-categorias-pills">
-            <li class="pill activo">Recomendados</li>
-            <li class="pill">Platos principales</li>
-            <li class="pill">Bebidas</li>
-            <li class="pill">Complementos</li>
-        </ul>
+        <div style="margin-bottom: 40px;">
+            <a th:href="'https://wa.me/51914896904?text=Hola,%20vengo%20de%20Dablyn%20Delivery%20y%20deseo%20hacer%20un%20pedido.'" 
+               target="_blank" 
+               class="btn-aceptar" style="display: inline-block; width: auto; padding: 15px 35px; font-size: 16px; text-decoration: none; background: #25D366; color: white; border-radius: 30px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
+                <i class="fa-brands fa-whatsapp" style="font-size: 22px; vertical-align: middle; margin-right: 8px;"></i> 
+                Pedir por WhatsApp
+            </a>
+            <p style="color: gray; font-size: 13px; margin-top: 15px;">Haz clic en el botón para enviar tu pedido directamente al local.</p>
+        </div>
+
+        <div th:if="${negocio.imagenCarta != null and !negocio.imagenCarta.isEmpty()}" style="max-width: 700px; margin: 0 auto;">
+            <img th:src="@{'/carta/' + ${negocio.imagenCarta}}" alt="Carta del Menú" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+        </div>
+        <div th:unless="${negocio.imagenCarta != null and !negocio.imagenCarta.isEmpty()}" style="color: gray; padding: 40px; border: 1px dashed #444; border-radius: 12px; max-width: 700px; margin: 0 auto;">
+            <i class="fa-solid fa-image" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>La carta de este local aún no ha sido subida.</p>
+        </div>
+
     </div>
 
-    <!-- LAYOUT PRINCIPAL (2 Columnas) -->
-    <div class="restaurante-layout">
+    <!-- ==========================================
+         VISTA 2: MODO E-COMMERCE (Normal)
+         ========================================== -->
+    <div th:unless="${negocio.modoWhatsapp != null and negocio.modoWhatsapp}">
         
-        <!-- Columna Izquierda: Lista de Productos -->
-        <div class="restaurante-productos-seccion">
-            <div class="titulo-seccion-productos">
-                <h2>Platos recomendados</h2>
-                <span class="tag-fotos"><i class="fa-regular fa-circle-check"></i> Fotos referenciales</span>
+        <div class="restaurante-navegacion">
+            <div class="search-container-interno">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscarProductos" placeholder="Buscar productos..." class="search-input-interno" th:data-negocio="${negocio.idNegocio}" autocomplete="off">
             </div>
-			<div class="grid-productos-interno"
-     		id="listaProductos"
-     		th:fragment="listaProductos">
-
-    		<article class="tarjeta-producto"
-             th:each="producto : ${productos}">
-
-
-        		<div class="producto-img-caja">
-
-            		<img
-                		th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
-                		th:src="@{'/productos/' + ${producto.imagen}}"
-                		alt="Producto">
-
-
-            	<div
-                		th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}"
-                		class="producto-placeholder">
-
-                		<i class="fa-solid fa-utensils"></i>
-
-            	</div>
-
+            <ul class="restaurante-categorias-pills">
+                <li class="pill activo">Recomendados</li>
+                <li class="pill">Platos principales</li>
+                <li class="pill">Bebidas</li>
+                <li class="pill">Complementos</li>
+            </ul>
         </div>
 
-
-        <div class="producto-info">
-
-            <h3 th:text="${producto.nombre}">
-                Nombre Producto
-            </h3>
-
-
-            <p class="producto-desc"
-               th:text="${producto.descripcion}">
-                Descripción
-            </p>
-
-
-            <div class="producto-footer">
-
-                <span class="producto-precio">
-
-                    S/
-
-                    <span th:text="${producto.precio}">
-                        0.00
-                    </span>
-
-                </span>
-
-
-               		 <button
-                    type="button"
-                    class="btn-add-carrito"
-                    th:data-producto="${producto.idProducto}"
-                    th:data-negocio="${negocio.idNegocio}"
-                    onclick="agregarAlCarrito(this)">
-
-                    <i class="fa-solid fa-plus"></i>
-
-                	</button>
-
-            	</div>
-
-        	</div>
-
-    	</article>
-
-
-    <!-- Si la búsqueda no encontró nada -->
-    			<div class="productos-no-encontrados"
-         		th:if="${#lists.isEmpty(productos)}">
-
-        		<i class="fa-solid fa-magnifying-glass"></i>
-
-        	<p>No encontramos productos con ese nombre.</p>
-
-    		</div>
-
-		</div>
-           
-        </div>
-
-        <!-- Columna Derecha: Carrito Flotante -->
-        <div class="restaurante-carrito-sidebar">
-            <div class="carrito-box">
-                <h3>Mi pedido</h3>
+        <div class="restaurante-layout">
+            <div class="restaurante-productos-seccion">
+                <div class="titulo-seccion-productos">
+                    <h2>Platos recomendados</h2>
+                    <span class="tag-fotos"><i class="fa-regular fa-circle-check"></i> Fotos referenciales</span>
+                </div>
                 
-                <!-- Estado vacío del carrito -->
-               <div id="contenido-carrito">
+                <div class="grid-productos-interno" id="listaProductos" th:fragment="listaProductos">
+                    <article class="tarjeta-producto" th:each="producto : ${productos}">
+                        <div class="producto-img-caja">
+                            <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" th:src="@{'/productos/' + ${producto.imagen}}" alt="Producto">
+                            <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" class="producto-placeholder"><i class="fa-solid fa-utensils"></i></div>
+                        </div>
+                        <div class="producto-info">
+                            <h3 th:text="${producto.nombre}">Nombre Producto</h3>
+                            <p class="producto-desc" th:text="${producto.descripcion}">Descripción</p>
+                            <div class="producto-footer">
+                                <span class="producto-precio">S/ <span th:text="${producto.precio}">0.00</span></span>
+                                <button type="button" class="btn-add-carrito" th:data-producto="${producto.idProducto}" th:data-negocio="${negocio.idNegocio}" onclick="agregarAlCarrito(this)">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
 
-        		<div class="carrito-vacio">
+                    <div class="productos-no-encontrados" th:if="${#lists.isEmpty(productos)}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <p>No encontramos productos con ese nombre.</p>
+                    </div>
+                </div>
+            </div>
 
-            		<i class="fa-solid fa-bag-shopping"></i>
-
-            		<p>Tu pedido está vacío</p>
-
-        		</div>
-
-    		   </div>
-                
-                <!-- Aquí se inyectarán los items del carrito mediante JavaScript después -->
+            <div class="restaurante-carrito-sidebar">
+                <div class="carrito-box">
+                    <h3>Mi pedido</h3>
+                    <div id="contenido-carrito">
+                        <div class="carrito-vacio">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <p>Tu pedido está vacío</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
     
 </div>

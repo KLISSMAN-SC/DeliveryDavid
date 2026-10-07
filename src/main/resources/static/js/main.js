@@ -450,10 +450,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ==========================================
+// LÓGICA DINÁMICA: MODO WHATSAPP / CARTA
+// ==========================================
+function toggleCargaCarta() {
+    const selectModo = document.getElementById('inputModoWhatsapp');
+    const contenedorCarta = document.getElementById('contenedorCarta');
+    const inputCarta = document.getElementById('inputArchivoCarta');
+    const textoAyuda = document.getElementById('textoAyudaCarta');
+
+    if (selectModo && contenedorCarta) {
+        if (selectModo.value === 'true') {
+            // Activar Modo Catálogo
+            contenedorCarta.style.opacity = '1';
+            contenedorCarta.style.pointerEvents = 'auto';
+            contenedorCarta.style.borderColor = '#ffaa00'; // Borde naranja llamativo
+            inputCarta.disabled = false;
+            textoAyuda.innerText = 'Sube la imagen del menú aquí';
+            textoAyuda.style.color = '#ffaa00';
+        } else {
+            // Volver a Modo E-commerce (Apagado)
+            contenedorCarta.style.opacity = '0.5';
+            contenedorCarta.style.pointerEvents = 'none';
+            contenedorCarta.style.borderColor = 'var(--borde-sutil)';
+            inputCarta.disabled = true;
+            inputCarta.value = ''; // Limpia el input por seguridad si cambia de opinión
+            textoAyuda.innerText = 'Requiere Modo Catálogo';
+            textoAyuda.style.color = 'gray';
+        }
+    }
+}
+
+
 // ==========================================
 // MODAL CRUD NEGOCIOS
 // ==========================================
-function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro, hInicio, hFin) {
+function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro, hInicio, hFin, modoWhatsapp) {
     if (id) {
         document.getElementById('tituloModalNegocio').innerText = 'Editar Negocio';
         document.getElementById('inputIdNegocio').value = id;
@@ -470,6 +503,7 @@ function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, e
         // Manejo de tiempos
         document.getElementById('inputHoraInicioNegocio').value = hInicio ? hInicio.substring(0, 5) : '';
         document.getElementById('inputHoraFinNegocio').value = hFin ? hFin.substring(0, 5) : '';
+		document.getElementById('inputModoWhatsapp').value = (modoWhatsapp === true || modoWhatsapp === 'true') ? 'true' : 'false';
     } else {
         document.getElementById('tituloModalNegocio').innerText = 'Nuevo Negocio';
         document.getElementById('inputIdNegocio').value = '';
@@ -486,6 +520,7 @@ function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, e
         // Limpiar tiempos
         document.getElementById('inputHoraInicioNegocio').value = '';
         document.getElementById('inputHoraFinNegocio').value = '';
+		document.getElementById('inputModoWhatsapp').value = 'false';
     }
     document.getElementById('modalNegocio').style.display = 'flex';
 }

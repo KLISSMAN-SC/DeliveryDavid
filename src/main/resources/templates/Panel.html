@@ -125,7 +125,7 @@
                             
                             <div style="display: flex; gap: 10px;">
                                 <input type="text" id="inputDni" name="dni" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="DNI" required maxlength="8">
-                                <input type="text" id="inputTelefono" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required>
+                                <input type="text" id="inputTelefono" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required maxlength="9">
                             </div>
 
                             <input type="email" id="inputCorreo" name="correoElectronico" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Correo Electrónico" required>
@@ -293,9 +293,9 @@
 								</td>
                                 <td class="acciones-celda">
                                     <button class="btn-icon editar" title="Modificar" 
-                                            th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]], [[${negocio.horaInicio}]], [[${negocio.horaFin}]])">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
+									        th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]], [[${negocio.horaInicio}]], [[${negocio.horaFin}]], [[${negocio.modoWhatsapp}]])">
+									        <i class="fa-solid fa-pen-to-square"></i>
+									</button>
                                     <form th:action="@{/panel/negocios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este negocio?');">
                                         <input type="hidden" name="idNegocio" th:value="${negocio.idNegocio}">
                                         <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
@@ -322,7 +322,7 @@
 
                 <!-- Fila 1 -->
                 <input type="text" id="inputNombreNegocio" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre del Negocio" required>
-                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Teléfono" required>
+                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Teléfono" required maxlength="9">
                 
                 <!-- Fila 2 (Ocupa ambas columnas) -->
                 <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
@@ -372,11 +372,38 @@
                     <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Logo del negocio (Opcional si editas)</label>
                     <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
                 </div>
-            </div>
+
+                <!-- Fila 8: Configuración de Modo de Venta y Carta -->
+                <div style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.15); margin-top: 5px;">
+                    <label style="font-size: 13px; color: var(--naranja-marca); display: block; margin-bottom: 12px; font-weight: bold;"><i class="fa-solid fa-shop"></i> Configuración de Venta</label>
+                    
+                    <div style="display: flex; gap: 15px; align-items: flex-start;">
+                        
+                        <!-- Select de Modo -->
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Tipo de Menú</label>
+                            <select id="inputModoWhatsapp" name="modoWhatsapp" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 100%; cursor: pointer;" onchange="toggleCargaCarta()" required>
+                                <option value="false">Modo E-commerce (Carrito, Productos y Buscador)</option>
+                                <option value="true">Modo Catálogo (Solo Carta y botón WhatsApp)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Contenedor Dinámico de la Carta -->
+                        <div id="contenedorCarta" style="flex: 1; border: 1px dashed var(--borde-sutil); padding: 8px 12px; border-radius: 8px; background: var(--fondo-principal); opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
+                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Imagen de la Carta</label>
+                            <input type="file" id="inputArchivoCarta" name="archivoCarta" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 11px; width: 100%;" disabled>
+                            <small id="textoAyudaCarta" style="font-size: 10px; color: gray; margin-top: 4px; display: block;">Requiere Modo Catálogo</small>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div> <!-- AQUÍ CIERRA EL MODAL-BODY -->
             
             <div class="modal-footer" style="margin-top: 15px;">
                 <button type="submit" class="btn-aceptar" style="width: 100%; padding: 12px; font-weight: bold; font-size: 14px;">Guardar Negocio</button>
             </div>
+
         </form>
     </div>
 </div>

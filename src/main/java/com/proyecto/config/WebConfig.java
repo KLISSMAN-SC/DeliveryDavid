@@ -28,5 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
         
         registry.addResourceHandler("/promociones/**")
         		.addResourceLocations(rutaBase + "promociones/");
+        
+        registry.addResourceHandler("/carta/**")
+        		.addResourceLocations(rutaBase + "carta/");
     }
 }

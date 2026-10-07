@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar Sesión - RIDE MEAL</title>
+    <title>Iniciar Sesión - Dablyn Delivery</title>
     
     <!-- Conexión al archivo CSS externo -->
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
@@ -17,12 +17,17 @@
             
             <!-- Logo -->
             <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
-                <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
+                <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
             </div>
             
             <h2>Iniciar sesión</h2>
             <p class="login-subtitulo">Bienvenido de nuevo, ingresa tus credenciales.</p>
-
+			
+			<!-- ALERTA DE CREDENCIALES INVÁLIDAS -->
+            <div th:if="${param.error}" style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);">
+                <i class="fa-solid fa-triangle-exclamation"></i> Correo electrónico o contraseña incorrectos.
+            </div>
+			
             <!-- Formulario -->
             <form th:action="@{/login}" method="POST">
                 

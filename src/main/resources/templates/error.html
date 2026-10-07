@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:with="codigo=${status != null and status ge 400 and status le 599 ? status : 500}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Error ' + codigo + ' | Dablyn Delivery'}">Error | Dablyn Delivery</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+</head>
+<body class="cargado pagina-error">
+    <header class="error-header">
+        <a class="error-logo logo-container" th:href="@{/}" aria-label="Dablyn Delivery, ir al inicio">
+            <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
+        </a>
+        <a class="error-header-link" th:href="@{/}">
+            Ir al inicio <span aria-hidden="true">&#8599;</span>
+        </a>
+    </header>
+
+    <main class="error-main">
+        <section class="error-card" aria-labelledby="error-titulo">
+            <div class="error-visual" aria-hidden="true">
+                <div class="error-icon">
+                    <svg th:if="${codigo == 401 or codigo == 403}" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 3 27 7v8c0 7-7 12-11 14C12 27 5 22 5 15V7L16 3Z"/>
+                        <rect x="11" y="14" width="10" height="8" rx="2"/>
+                        <path d="M13 14v-3a3 3 0 0 1 6 0v3M16 18v1"/>
+                    </svg>
+                    <svg th:if="${codigo == 404}" viewBox="0 0 32 32" fill="none">
+                        <path d="M25 14c0 7-9 15-9 15S7 21 7 14a9 9 0 1 1 18 0Z"/>
+                        <path d="m13 11 6 6m0-6-6 6"/>
+                    </svg>
+                    <svg th:if="${codigo != 401 and codigo != 403 and codigo != 404}" viewBox="0 0 32 32" fill="none">
+                        <path d="m16 4 13 23H3L16 4Z" stroke-linejoin="round"/>
+                        <path d="M16 12v7m0 3v1"/>
+                    </svg>
+                </div>
+                <span class="error-code" th:text="${codigo}">403</span>
+                <span class="error-code-caption">Hagamos una pausa en la ruta.</span>
+            </div>
+
+            <div class="error-content">
+                <th:block th:switch="${codigo}">
+                    <div th:case="403">
+                        <p class="error-eyebrow">ACCESO RESTRINGIDO</p>
+                        <h1 id="error-titulo">No tienes acceso a esta sección.</h1>
+                        <p class="error-description">Tu cuenta no tiene los permisos necesarios para entrar aquí. Puedes volver al inicio y seguir explorando Dablyn Delivery.</p>
+                    </div>
+                    <div th:case="401">
+                        <p class="error-eyebrow">INICIA SESIÓN</p>
+                        <h1 id="error-titulo">Primero, ingresa a tu cuenta.</h1>
+                        <p class="error-description">Necesitas iniciar sesión para continuar. Ingresa con tu cuenta o vuelve al inicio para explorar nuestros negocios.</p>
+                    </div>
+                    <div th:case="404">
+                        <p class="error-eyebrow">PÁGINA NO ENCONTRADA</p>
+                        <h1 id="error-titulo">Esta página se salió de la ruta.</h1>
+                        <p class="error-description">La página que buscas no existe o cambió de dirección. Vuelve al inicio y encuentra lo que necesitas.</p>
+                    </div>
+                    <div th:case="500">
+                        <p class="error-eyebrow">ALGO SALIÓ MAL</p>
+                        <h1 id="error-titulo">Tuvimos un pequeño contratiempo.</h1>
+                        <p class="error-description">No pudimos completar tu solicitud en este momento. Por favor, inténtalo más tarde o vuelve al inicio.</p>
+                    </div>
+                    <div th:case="*">
+                        <p class="error-eyebrow">NO PUDIMOS CONTINUAR</p>
+                        <h1 id="error-titulo">Hagamos una pausa.</h1>
+                        <p class="error-description">No pudimos completar tu solicitud. Puedes volver al inicio y continuar desde allí.</p>
+                    </div>
+                </th:block>
+
+                <div class="error-actions">
+                    <a class="error-btn error-btn-primary" th:href="@{/}">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                            <path d="m3 10 9-7 9 7v10H3V10Z"/>
+                            <path d="M9 20v-7h6v7"/>
+                        </svg>
+                        Volver al inicio
+                    </a>
+                    <a class="error-btn error-btn-secondary"
+                       th:if="${codigo == 401 or codigo == 403}"
+                       sec:authorize="isAnonymous()"
+                       th:href="@{/login}">Iniciar sesión</a>
+                </div>
+
+                <p class="error-note" th:if="${codigo == 403}">
+                    <span class="error-note-mark" aria-hidden="true">i</span>
+                    <span>Si crees que deberías tener acceso, consulta con el administrador.</span>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="error-footer">Dablyn Delivery <span aria-hidden="true">&middot;</span> Directo a tu puerta.</footer>
+</body>
+</html>

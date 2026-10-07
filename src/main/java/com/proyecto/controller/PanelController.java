@@ -21,9 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +47,8 @@ public class PanelController {
     
     @Autowired private ZonaRepository zonaRepo;
     @Autowired private CentroComercialRepository centroRepo;
+  
+
     
     @GetMapping
     public String mostrarPanel(
@@ -115,8 +120,9 @@ public class PanelController {
     // ==========================================
     @PostMapping("/negocios/guardar")
     public String guardarNegocio(@ModelAttribute Negocio negocio, 
-                                 @RequestParam(value = "archivoLogo", required = false) MultipartFile archivoLogo, 
-                                 RedirectAttributes redirectAttributes) {
+                                 @RequestParam(value = "archivoLogo", required = false) MultipartFile archivoLogo,
+                                 @RequestParam(value = "archivoCarta", required = false) MultipartFile archivoCarta,
+                                 RedirectAttributes redirectAttributes) { 
         try {
             boolean esEdicion = negocio.getIdNegocio() != null;
             Negocio existente = esEdicion ? negocioRepo.findById(negocio.getIdNegocio()).orElse(null) : null;
@@ -154,7 +160,34 @@ public class PanelController {
             // 2. Manejo de campos nulos
             if (negocio.getZona() != null && negocio.getZona().getIdZona() == null) negocio.setZona(null);
             if (negocio.getCentroComercial() != null && negocio.getCentroComercial().getIdCentroComercial() == null) negocio.setCentroComercial(null);
-
+            
+            if (archivoCarta != null && !archivoCarta.isEmpty()) {
+                try {
+                    // Generar nombre único para que no se sobreescriban
+                    String nombreArchivoCarta = System.currentTimeMillis() + "_" + archivoCarta.getOriginalFilename();
+                    // Ruta exacta hacia la carpeta "carta"
+                    Path rutaDirectorioCarta = Paths.get("RIDE_MEAL/carta"); 
+                    
+                    if (!Files.exists(rutaDirectorioCarta)) {
+                        Files.createDirectories(rutaDirectorioCarta);
+                    }
+                    
+                    Path rutaFichaCarta = rutaDirectorioCarta.resolve(nombreArchivoCarta);
+                    Files.copy(archivoCarta.getInputStream(), rutaFichaCarta, StandardCopyOption.REPLACE_EXISTING);
+                    
+                    // Guardar solo el nombre en la base de datos
+                    negocio.setImagenCarta(nombreArchivoCarta);
+                    
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Si no suben una nueva carta al editar, mantener la que ya estaba en BD
+                if (existente != null) {
+                    negocio.setImagenCarta(existente.getImagenCarta());
+                }
+            }
+            
             // 3. Guardar en BD
             
             negocioRepo.save(negocio);

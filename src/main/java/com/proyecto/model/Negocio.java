@@ -64,6 +64,12 @@ public class Negocio {
 	@Column(name = "horaFin")
 	private LocalTime horaFin;
 	
+	@Column(name = "modoWhatsapp")
+	private Boolean modoWhatsapp;
+	
+	@Column(name = "imagenCarta", length = 200)
+	private String imagenCarta;
+	
 	public String obtenerEstadoReal() {
 	    // Si el administrador configuró un horario, la hora del sistema toma el control
 	    if (this.horaInicio != null && this.horaFin != null) {
