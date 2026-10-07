@@ -81,7 +81,6 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`CENTRO_COMERCIAL` (
   UNIQUE INDEX `id_centro_comercial_UNIQUE` (`idCentroComercial` ASC) VISIBLE)
 ENGINE = InnoDB;
 
-
 -- -----------------------------------------------------
 -- Table `proyecto_david`.`NEGOCIO`
 -- -----------------------------------------------------
@@ -120,7 +119,6 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`NEGOCIO` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_david`.`CATEGORIAS_PRODUCTO`
@@ -292,8 +290,12 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`PROMOCION` (
   `titulo` VARCHAR(100) NOT NULL,
   `descripcion` VARCHAR(255) NULL,
   `imagenBanner` VARCHAR(255) NOT NULL,
-  `fechaInicio` DATETIME NOT NULL,
-  `fechaFin` DATETIME NOT NULL,
+  `fechaInicio` DATETIME NULL,
+  `fechaFin` DATETIME NULL,
+  `horaInicio` TIME NULL,
+  `horaFin` TIME NULL,
+  `diasActivos` VARCHAR(255) NULL,
+  `mostrarEnIndex` TINYINT(1) NULL DEFAULT 0,
   `estado` TINYINT(1) NULL DEFAULT 1,
   `idNegocio` INT NOT NULL,
   `idProducto` INT NULL,

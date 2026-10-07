@@ -22,9 +22,9 @@ public class DireccionUsuarioService {
 	    }
 
 
-	    public DireccionUsuario obtenerDireccionUsuario(Integer idDireccion,Integer idUsuario) {
+	    public DireccionUsuario obtenerDireccionUsuario(Integer idDireccionUsuario,Integer idUsuario) {
 
-	        return direccionUsuarioRepository.findByIdDireccionUsuarioAndUsuarioIdUsuario(idDireccion,idUsuario).orElseThrow(() ->
+	        return direccionUsuarioRepository.findByIdDireccionUsuarioAndUsuarioIdUsuario(idDireccionUsuario,idUsuario).orElseThrow(() ->
 	                    new RuntimeException("La dirección no pertenece al usuario"));
 	    }
 

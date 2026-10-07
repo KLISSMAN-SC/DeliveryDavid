@@ -18,7 +18,8 @@
             <!-- SI TIENE DIRECCIONES -->
             <div class="lista-direcciones" th:if="${!#lists.isEmpty(direcciones)}">
                 <label class="direccion-opcion" th:each="direccion : ${direcciones}">
-                    <input type="radio" name="direccionPedido" th:value="${direccion.idDireccion}" th:data-direccion="${direccion.direccion}" th:data-referencia="${direccion.referencia}" th:data-latitud="${direccion.latitud}" th:data-longitud="${direccion.longitud}" th:checked="${direccionSeleccionada != null and direccion.idDireccion == direccionSeleccionada.idDireccion}">
+                    <input type="radio" name="direccionPedido" th:value="${direccion.idDireccionUsuario}" th:data-direccion="${direccion.direccion}" th:data-referencia="${direccion.referencia}" th:data-latitud="${direccion.latitud}" th:data-longitud="${direccion.longitud}" 
+                    th:checked="${direccionSeleccionada != null and direccion.idDireccionUsuario == direccionSeleccionada.idDireccionUsuario}">
                     <div class="direccion-info">
                         <strong th:text="${direccion.alias}">Casa</strong>
                         <span th:text="${direccion.direccion}">Dirección</span>

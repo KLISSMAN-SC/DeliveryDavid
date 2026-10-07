@@ -1,0 +1,423 @@
+<div
+    th:fragment="modalPedidoConfirmado"
+    id="modalPedidoConfirmado"
+    class="modal-pedido-overlay">
+
+    <div class="modal-seguimiento">
+
+
+        <!-- ========================= -->
+        <!-- CABECERA -->
+        <!-- ========================= -->
+
+        <div class="seguimiento-header">
+
+            <span>
+                Pedido realizado
+            </span>
+
+            <strong>
+                Orden #
+                <span
+                    th:text="${pedido.idPedido}">
+                    0
+                </span>
+            </strong>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- MAPA -->
+        <!-- ========================= -->
+
+        <div class="seguimiento-mapa">
+
+            <iframe
+                width="100%"
+                height="200"
+                style="border:0;"
+                loading="lazy"
+                allowfullscreen
+
+                th:src="|https://www.google.com/maps/embed/v1/place?key=${googleMapsKey}&q=${pedido.latitudEnvio},${pedido.longitudEnvio}|">
+            </iframe>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ESTADO -->
+        <!-- ========================= -->
+
+        <div class="estado-pedido">
+
+
+            <div class="estado-linea">
+
+
+                <div class="estado-paso activo">
+
+                    <div class="estado-icono">
+
+                        <i class="fa-solid fa-receipt"></i>
+
+                    </div>
+
+                    <span>Pedido</span>
+
+                </div>
+
+
+                <div class="estado-barra"></div>
+
+
+                <div class="estado-paso">
+
+                    <div class="estado-icono">
+
+                        <i class="fa-solid fa-motorcycle"></i>
+
+                    </div>
+
+                    <span>En camino</span>
+
+                </div>
+
+
+                <div class="estado-barra"></div>
+
+
+                <div class="estado-paso">
+
+                    <div class="estado-icono">
+
+                        <i class="fa-solid fa-house"></i>
+
+                    </div>
+
+                    <span>Entregado</span>
+
+                </div>
+
+
+            </div>
+
+
+            <h3>
+
+                Tu pedido ha sido registrado
+
+            </h3>
+
+
+            <p>
+
+                Estado:
+
+                <strong
+                    th:text="${pedido.estadoPedido}">
+
+                    PENDIENTE
+
+                </strong>
+
+            </p>
+
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- DIRECCIÓN -->
+        <!-- ========================= -->
+
+        <section class="seguimiento-seccion">
+
+
+            <span class="seguimiento-label">
+
+                ENTREGA FINAL
+
+            </span>
+
+
+            <h3>
+
+                <i class="fa-solid fa-house"></i>
+
+                <span
+                    th:text="${pedido.direccionEnvio}">
+
+                    Dirección
+
+                </span>
+
+            </h3>
+
+
+            <p
+                th:if="${pedido.referencia != null}">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <span
+                    th:text="${pedido.referencia}">
+
+                    Referencia
+
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <i class="fa-solid fa-wallet"></i>
+
+                <span
+                    th:text="${pedido.metodoPago}">
+
+                    Método de pago
+
+                </span>
+
+            </p>
+
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- COSTOS -->
+        <!-- ========================= -->
+
+        <section class="seguimiento-seccion">
+
+
+            <div class="titulo-centro">
+
+                DETALLE DEL PEDIDO
+
+            </div>
+
+
+            <div class="detalle-total-fila">
+
+                <span>
+                    Costo de productos
+                </span>
+
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            pedido.total
+                            - pedido.costoEnvio
+                            - pedido.propina,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+            <div class="detalle-total-fila">
+
+                <span>
+                    Costo de envío
+                </span>
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            pedido.costoEnvio,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+            <div class="detalle-total-fila">
+
+                <span>
+                    Propina
+                </span>
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            pedido.propina,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+            <div class="detalle-total-fila total">
+
+                <strong>
+                    TOTAL
+                </strong>
+
+                <strong>
+
+                    S/
+
+                    <span
+                        th:text="${#numbers.formatDecimal(
+                            pedido.total,
+                            1,
+                            2
+                        )}">
+
+                        0.00
+
+                    </span>
+
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- PRODUCTOS -->
+        <!-- ========================= -->
+
+        <section class="seguimiento-seccion">
+
+
+            <div class="titulo-centro">
+
+                PRODUCTOS AGREGADOS
+
+                ·
+
+                <span
+                    th:text="${#lists.size(detalles)}">
+
+                    0
+
+                </span>
+
+                productos
+
+            </div>
+
+
+            <div
+                class="producto-confirmado"
+                th:each="detalle : ${detalles}">
+
+
+                <div class="producto-confirmado-info">
+
+
+                    <h4
+                        th:text="${detalle.producto.nombre}">
+
+                        Producto
+
+                    </h4>
+
+
+                    <p
+                        th:text="${detalle.producto.descripcion}">
+
+                        Descripción
+
+                    </p>
+
+
+                    <span>
+
+                        Cantidad:
+
+                        <strong
+                            th:text="${detalle.cantidad}">
+
+                            1
+
+                        </strong>
+
+                    </span>
+
+
+                    <span>
+
+                        Precio unitario:
+
+                        S/
+
+                        <strong
+                            th:text="${#numbers.formatDecimal(
+                                detalle.precioUnitario,
+                                1,
+                                2
+                            )}">
+
+                            0.00
+
+                        </strong>
+
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- BOTÓN -->
+        <!-- ========================= -->
+
+        <button
+            type="button"
+            class="btn-volver-tienda"
+            onclick="finalizarVistaPedido()">
+
+            Volver a la tienda
+
+        </button>
+
+
+    </div>
+
+</div>

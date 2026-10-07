@@ -267,102 +267,164 @@ function seleccionarPropina(valor) {
 
 function confirmarPedido(boton) {
 
-    const idUsuario = obtenerIdUsuario();
+	const idUsuario =
+	        obtenerIdUsuario();
 
 
-    const idNegocio =
-        boton.dataset.negocio;
+	    const idNegocio =
+	        boton.dataset.negocio;
 
 
-    // DIRECCIÓN SELECCIONADA
-
-    const direccionSeleccionada =
-        document.querySelector(
-            'input[name="direccionPedido"]:checked'
-        );
+	    const direccionSeleccionada =
+	        document.querySelector(
+	            'input[name="direccionPedido"]:checked'
+	        );
 
 
-    if (!direccionSeleccionada) {
+	    if (!direccionSeleccionada) {
 
-        alert(
-            "Selecciona una dirección de entrega."
-        );
+	        alert(
+	            "Selecciona una dirección de entrega."
+	        );
 
-        return;
-    }
-
-
-    const idDireccion =
-        direccionSeleccionada.value;
+	        return;
+	    }
 
 
-    const metodoPago =
-        document.getElementById(
-            "metodoPagoPedido"
-        ).value;
+	    const idDireccion =
+	        direccionSeleccionada.value;
 
 
-    const propina =
-        document.getElementById(
-            "propinaPedido"
-        ).value;
+	    const metodoPago =
+	        document.getElementById(
+	            "metodoPagoPedido"
+	        ).value;
 
 
-    const datos =
-        new URLSearchParams();
+	    const propina =
+	        document.getElementById(
+	            "propinaPedido"
+	        ).value;
 
 
-    datos.append(
-        "idUsuario",
-        idUsuario
-    );
+	    const datos =
+	        new URLSearchParams();
 
 
-    datos.append(
-        "idNegocio",
-        idNegocio
-    );
+	    datos.append(
+	        "idUsuario",
+	        idUsuario
+	    );
+
+	    datos.append(
+	        "idNegocio",
+	        idNegocio
+	    );
+
+	    datos.append(
+	        "idDireccion",
+	        idDireccion
+	    );
+
+	    datos.append(
+	        "metodoPago",
+	        metodoPago
+	    );
+
+	    datos.append(
+	        "propina",
+	        propina
+	    );
 
 
-    datos.append(
-        "idDireccion",
-        idDireccion
-    );
+	    boton.disabled = true;
+
+	    boton.textContent =
+	        "Procesando pedido...";
 
 
-    datos.append(
-        "metodoPago",
-        metodoPago
-    );
+	    // ====================================
+	    // CREAR PEDIDO
+	    // ====================================
+
+	    fetch(
+	        "/api/pedido/confirmar",
+	        {
+
+	            method: "POST",
+
+	            headers: {
+
+	                "Content-Type":
+	                    "application/x-www-form-urlencoded"
+	            },
+
+	            body:
+	                datos.toString()
+	        }
+	    )
 
 
-    datos.append(
-        "propina",
-        propina
-    );
+	    .then(response => {
+
+	        if (!response.ok) {
+
+	            throw new Error(
+	                "No se pudo registrar el pedido"
+	            );
+	        }
 
 
-    boton.disabled = true;
-
-    boton.textContent =
-        "Procesando...";
+	        return response.json();
+	    })
 
 
-    fetch(
-        "/api/pedido/confirmar",
-        {
+	    .then(resultado => {
 
-            method: "POST",
 
-            headers: {
+	        if (!resultado.ok) {
 
-                "Content-Type":
-                    "application/x-www-form-urlencoded"
-            },
+	            throw new Error(
+	                resultado.mensaje ||
+	                "Error creando pedido"
+	            );
+	        }
 
-            body:
-                datos.toString()
-        }
+
+	        console.log(
+	            "Pedido creado:",
+	            resultado.idPedido
+	        );
+
+
+	        // Mostrar segundo modal
+
+	        return mostrarPedidoConfirmado(
+	            resultado.idPedido
+	        );
+	    })
+
+
+	    .catch(error => {
+
+	        console.error(
+	            "Error confirmando pedido:",
+	            error
+	        );
+
+
+	        boton.disabled = false;
+
+	        boton.textContent =
+	            "Hacer pedido";
+	    });
+}
+function mostrarPedidoConfirmado(
+    idPedido
+) {
+
+    return fetch(
+        `/api/pedido/confirmacion/${idPedido}`
     )
 
     .then(response => {
@@ -370,49 +432,64 @@ function confirmarPedido(boton) {
         if (!response.ok) {
 
             throw new Error(
-                "No se pudo registrar el pedido"
+                "No se pudo cargar la confirmación"
             );
         }
 
 
-        return response.json();
+        return response.text();
     })
 
-    .then(resultado => {
 
-        console.log(
-            "Pedido creado:",
-            resultado
-        );
+    .then(html => {
 
 
-        alert(
-            "Pedido #" +
-            resultado.idPedido +
-            " registrado correctamente."
-        );
+        const contenedor =
+            document.getElementById(
+                "contenedor-modal-pedido"
+            );
 
 
-        cerrarModalPedido();
+        if (!contenedor) {
+
+            throw new Error(
+                "No existe el contenedor del modal"
+            );
+        }
 
 
-        location.reload();
+        // REEMPLAZAMOS EL CHECKOUT
+        // POR EL SEGUIMIENTO
 
-    })
-
-    .catch(error => {
-
-        console.error(
-            "Error confirmando pedido:",
-            error
-        );
+        contenedor.innerHTML =
+            html;
 
 
-        boton.disabled = false;
-
-
-        boton.textContent =
-            "Hacer pedido";
-
+        document.body.style.overflow =
+            "hidden";
     });
+}
+function finalizarVistaPedido() {
+
+    const contenedor =
+        document.getElementById(
+            "contenedor-modal-pedido"
+        );
+
+
+    if (contenedor) {
+
+        contenedor.innerHTML =
+            "";
+    }
+
+
+    document.body.style.overflow =
+        "";
+
+
+    // Como el carrito anterior quedó FINALIZADO,
+    // recargamos para empezar limpio.
+
+    location.reload();
 }

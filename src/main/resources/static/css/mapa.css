@@ -1,0 +1,167 @@
+.modal-seguimiento {
+    width: min(720px, 95%);
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+    color: #222;
+
+    border-radius: 18px;
+
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+.seguimiento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 25px;
+
+    border-bottom: 1px solid #ddd;
+}
+
+
+.seguimiento-mapa iframe {
+    display: block;
+
+    width: 100%;
+    height: 200px;
+
+    border: none;
+}
+
+
+.estado-pedido {
+    padding: 25px;
+    text-align: center;
+}
+
+
+.estado-linea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 25px;
+}
+
+
+.estado-paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.estado-icono {
+    width: 60px;
+    height: 60px;
+
+    border: 2px solid #ddd;
+
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 23px;
+
+    background: white;
+}
+
+
+.estado-paso.activo .estado-icono {
+    border-color: #ff6500;
+    color: #ff6500;
+}
+
+
+.estado-barra {
+    width: 110px;
+    height: 3px;
+
+    background: #ddd;
+}
+
+
+.seguimiento-seccion {
+    margin: 0 25px;
+
+    padding: 22px 0;
+
+    border-top: 1px solid #ddd;
+}
+
+
+.seguimiento-label,
+.titulo-centro {
+    display: block;
+
+    text-align: center;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 15px;
+}
+
+
+.detalle-total-fila {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 10px 12px;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.detalle-total-fila.total {
+    font-size: 18px;
+}
+
+
+.producto-confirmado {
+    padding: 15px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.producto-confirmado-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.btn-volver-tienda {
+    display: block;
+
+    margin: 20px auto 30px;
+
+    padding: 13px 35px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #ff6500;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}

@@ -9,13 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.proyecto.model.Carrito;
+import com.proyecto.model.DetallePedido;
 import com.proyecto.model.DireccionUsuario;
 import com.proyecto.model.Pedido;
 import com.proyecto.services.DireccionUsuarioService;
@@ -42,14 +46,15 @@ public class PedidoController {
     // =======================================
     // ABRIR MODAL
     // =======================================
+    // ========================================
+    // CHECKOUT
+    // ========================================
 
     @GetMapping("/resumen")
     public String mostrarResumen(
 
             @RequestParam Integer idUsuario,
-
             @RequestParam Integer idNegocio,
-
             Model model) {
 
 
@@ -61,7 +66,6 @@ public class PedidoController {
                 );
 
 
-        // Direcciones disponibles
         List<DireccionUsuario> direcciones =
                 direccionUsuarioService
                 .listarPorUsuario(
@@ -69,15 +73,13 @@ public class PedidoController {
                 );
 
 
-        // Principal
-        DireccionUsuario
-            direccionSeleccionada =
+        DireccionUsuario direccionSeleccionada =
                 direccionUsuarioService
                 .obtenerPrincipalOPrimera(
                         idUsuario
                 );
 
-        //hola
+
         BigDecimal subtotal =
                 pedidoService
                 .calcularSubtotal(
@@ -106,36 +108,30 @@ public class PedidoController {
                 carrito
         );
 
-
         model.addAttribute(
                 "direcciones",
                 direcciones
         );
-
 
         model.addAttribute(
                 "direccionSeleccionada",
                 direccionSeleccionada
         );
 
-
         model.addAttribute(
                 "subtotal",
                 subtotal
         );
-
 
         model.addAttribute(
                 "envio",
                 envio
         );
 
-
         model.addAttribute(
                 "total",
                 total
         );
-
 
         model.addAttribute(
                 "googleMapsKey",
@@ -148,24 +144,27 @@ public class PedidoController {
     }
 
 
-    // =======================================
-    // CONFIRMAR
-    // =======================================
+    // ========================================
+    // CREAR PEDIDO
+    // ========================================
 
-    @PostMapping("/confirmar")
+    @PostMapping(
+    		 value = "/confirmar",
+    		  consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+    		  produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseBody
-    public Map<String, Object>
-        confirmarPedido(
+    public ResponseEntity<Map<String, Object>>
+    confirmarPedido(
 
             @RequestParam Integer idUsuario,
-
             @RequestParam Integer idNegocio,
-
             @RequestParam Integer idDireccion,
-
             @RequestParam String metodoPago,
 
-            @RequestParam(defaultValue = "0")
+            @RequestParam(
+                defaultValue = "0"
+            )
             BigDecimal propina) {
 
 
@@ -189,12 +188,10 @@ public class PedidoController {
                 true
         );
 
-
         respuesta.put(
                 "idPedido",
                 pedido.getIdPedido()
         );
-
 
         respuesta.put(
                 "mensaje",
@@ -202,8 +199,65 @@ public class PedidoController {
         );
 
 
-        return respuesta;
+        return ResponseEntity
+                .ok()
+                .contentType(
+                    MediaType.APPLICATION_JSON
+                )
+                .body(respuesta);
     }
+
+
+    // ========================================
+    // MODAL PEDIDO CREADO
+    // ========================================
+
+    @GetMapping(
+        "/confirmacion/{idPedido}"
+    )
+    public String mostrarConfirmacion(
+
+            @PathVariable Integer idPedido,
+
+            Model model) {
+
+
+        Pedido pedido =
+                pedidoService
+                .obtenerPedido(
+                        idPedido
+                );
+
+
+        List<DetallePedido> detalles =
+                pedidoService
+                .obtenerDetallesPedido(
+                        idPedido
+                );
+
+
+        model.addAttribute(
+                "pedido",
+                pedido
+        );
+
+
+        model.addAttribute(
+                "detalles",
+                detalles
+        );
+
+
+        model.addAttribute(
+                "googleMapsKey",
+                googleMapsApiKey
+        );
+
+
+        return
+            "fragmentos/pedido-confirmado-modal :: modalPedidoConfirmado";
+    }
+   
 	
 	}
 

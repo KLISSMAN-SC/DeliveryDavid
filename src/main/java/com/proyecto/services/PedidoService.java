@@ -2,6 +2,7 @@ package com.proyecto.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,6 @@ public class PedidoService {
 	            direccionUsuarioService;
 
 
-	    // ========================================
-	    // OBTENER CARRITO
-	    // ========================================
-
 	    public Carrito obtenerCarritoCheckout(
 	            Integer idUsuario,
 	            Integer idNegocio) {
@@ -56,15 +53,15 @@ public class PedidoService {
 	                )
 	                .orElseThrow(() ->
 	                    new RuntimeException(
-	                        "No existe un carrito activo"
+	                        "No existe carrito activo"
 	                    )
 	                );
 	    }
 
 
-	    // ========================================
-	    // CALCULAR SUBTOTAL
-	    // ========================================
+	    // ==========================================
+	    // SUBTOTAL
+	    // ==========================================
 
 	    public BigDecimal calcularSubtotal(
 	            Carrito carrito) {
@@ -75,9 +72,7 @@ public class PedidoService {
 
 	                .map(detalle ->
 
-	                    detalle
-	                    .getPrecioUnitario()
-
+	                    detalle.getPrecioUnitario()
 	                    .multiply(
 	                        BigDecimal.valueOf(
 	                            detalle.getCantidad()
@@ -93,25 +88,24 @@ public class PedidoService {
 	    }
 
 
-	    // ========================================
+	    // ==========================================
 	    // CONFIRMAR PEDIDO
-	    // ========================================
+	    // ==========================================
 
 	    @Transactional
 	    public Pedido confirmarPedido(
 
 	            Integer idUsuario,
-
 	            Integer idNegocio,
-
-	            Integer idDireccion,
-
+	            Integer idDireccionUsuario,
 	            String metodoPago,
-
 	            BigDecimal propina) {
 
 
-	        // 1. Obtener carrito
+	        // =====================================
+	        // 1. OBTENER CARRITO
+	        // =====================================
+
 	        Carrito carrito =
 	                obtenerCarritoCheckout(
 	                        idUsuario,
@@ -119,33 +113,35 @@ public class PedidoService {
 	                );
 
 
-	        if (
-	            carrito.getDetalles() == null ||
-	            carrito.getDetalles().isEmpty()
-	        ) {
+	        if (carrito.getDetalles() == null ||
+	            carrito.getDetalles().isEmpty()) {
 
 	            throw new RuntimeException(
-	                "El carrito está vacío"
+	                    "El carrito está vacío"
 	            );
 	        }
 
 
-	        // 2. Obtener dirección
-	        // y verificar que pertenezca al usuario
+	        // =====================================
+	        // 2. DIRECCIÓN
+	        // =====================================
+
 	        DireccionUsuario direccion =
 	                direccionUsuarioService
 	                .obtenerDireccionUsuario(
-	                        idDireccion,
+	                        idDireccionUsuario,
 	                        idUsuario
 	                );
 
 
-	        // 3. Calcular subtotal
+	        // =====================================
+	        // 3. TOTALES
+	        // =====================================
+
 	        BigDecimal subtotal =
 	                calcularSubtotal(carrito);
 
 
-	        // 4. Envío
 	        BigDecimal costoEnvio =
 	                carrito
 	                .getNegocio()
@@ -158,13 +154,11 @@ public class PedidoService {
 	        }
 
 
-	        // 5. Propina
 	        if (propina == null) {
 	            propina = BigDecimal.ZERO;
 	        }
 
 
-	        // 6. Total
 	        BigDecimal total =
 	                subtotal
 	                .add(costoEnvio)
@@ -172,7 +166,7 @@ public class PedidoService {
 
 
 	        // =====================================
-	        // CREAR PEDIDO
+	        // 4. INSERT PEDIDO
 	        // =====================================
 
 	        Pedido pedido =
@@ -182,7 +176,6 @@ public class PedidoService {
 	        pedido.setUsuario(
 	                carrito.getUsuario()
 	        );
-
 
 	        pedido.setNegocio(
 	                carrito.getNegocio()
@@ -214,44 +207,45 @@ public class PedidoService {
 	        );
 
 
-	        // MUY IMPORTANTE:
-	        // hacemos una COPIA de la dirección
+	        // Copia histórica de dirección
 
 	        pedido.setDireccionEnvio(
 	                direccion.getDireccion()
 	        );
 
-
 	        pedido.setReferencia(
 	                direccion.getReferencia()
 	        );
 
-
 	        pedido.setLatitudEnvio(
 	                direccion.getLatitud()
 	        );
-
 
 	        pedido.setLongitudEnvio(
 	                direccion.getLongitud()
 	        );
 
 
+	        // Si tu fecha la maneja MySQL automáticamente,
+	        // NO pongas esto.
+	        //
+	        // pedido.setFechaHora(
+	        //        LocalDateTime.now()
+	        // );
+
+
 	        pedido =
-	                pedidoRepository.save(
-	                    pedido
-	                );
+	            pedidoRepository.save(pedido);
 
 
 	        // =====================================
-	        // CARRITO → DETALLE PEDIDO
+	        // 5. DETALLE_CARRITO → DETALLE_PEDIDO
 	        // =====================================
 
 	        for (
 	            DetalleCarrito detalleCarrito
-	            : carrito.getDetalles()
+	                : carrito.getDetalles()
 	        ) {
-
 
 	            DetallePedido detallePedido =
 	                    new DetallePedido();
@@ -307,7 +301,7 @@ public class PedidoService {
 
 
 	        // =====================================
-	        // FINALIZAR CARRITO
+	        // 6. FINALIZAR CARRITO
 	        // =====================================
 
 	        carrito.setEstado(
@@ -321,6 +315,38 @@ public class PedidoService {
 
 
 	        return pedido;
+	    }
+
+
+	    // ==========================================
+	    // OBTENER PEDIDO
+	    // ==========================================
+
+	    public Pedido obtenerPedido(
+	            Integer idPedido) {
+
+	        return pedidoRepository
+	                .findById(idPedido)
+	                .orElseThrow(() ->
+	                    new RuntimeException(
+	                        "Pedido no encontrado"
+	                    )
+	                );
+	    }
+
+
+	    // ==========================================
+	    // OBTENER DETALLES
+	    // ==========================================
+
+	    public List<DetallePedido>
+	    obtenerDetallesPedido(
+	            Integer idPedido) {
+
+	        return detallePedidoRepository
+	                .findByPedidoIdPedido(
+	                        idPedido
+	                );
 	    }
 	
 	 	
