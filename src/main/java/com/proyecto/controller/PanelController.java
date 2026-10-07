@@ -156,6 +156,7 @@ public class PanelController {
             if (negocio.getCentroComercial() != null && negocio.getCentroComercial().getIdCentroComercial() == null) negocio.setCentroComercial(null);
 
             // 3. Guardar en BD
+            
             negocioRepo.save(negocio);
             redirectAttributes.addFlashAttribute("mensajeExito", esEdicion ? "Negocio actualizado correctamente." : "Nuevo negocio creado con éxito.");
             

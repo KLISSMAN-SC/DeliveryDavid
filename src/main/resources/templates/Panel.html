@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Gestión - RIDE MEAL</title>
+    <title>Panel de Gestión - Dablyn Delivery</title>
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
     <link rel="stylesheet" th:href="@{/css/panel.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -12,7 +12,7 @@
     <!-- BARRA LATERAL (SIDEBAR) -->
     <aside class="panel-sidebar">
         <div class="panel-logo">
-            <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
+            <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
             <span class="badge-rol" sec:authorize="hasRole('ADMINISTRADOR')">Módulo Admin</span>
             <span class="badge-rol" sec:authorize="hasRole('REPARTIDOR')" style="background: rgba(0, 150, 255, 0.2); color: #0096ff;">Módulo Repartidor</span>
         </div>
@@ -223,6 +223,8 @@
                             
                            <!--  <input type="text" id="inputIconoTipo" name="icono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Ruta imagen (ej: hamburguesas.png) o ícono FA" required>-->
                             
+                            
+                            
                             <select id="inputEstadoTipo" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
                                 <option value="true">Estado: Visible en Catálogo</option>
                                 <option value="false">Estado: Oculto</option>
@@ -283,12 +285,16 @@
                                 <td th:text="${negocio.direccion}"></td>
                                 <td th:text="${negocio.telefono}"></td>
                                 <td>
-                                    <span class="badge" th:style="${negocio.estado != null and negocio.estado.name() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${negocio.estado}"></span>
-                                </td>
+    <!-- Reemplazamos negocio.estado por negocio.obtenerEstadoReal() -->
+								    <span class="badge" 
+								          th:style="${negocio.obtenerEstadoReal() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
+								          th:text="${negocio.obtenerEstadoReal()}">
+								    </span>
+								</td>
                                 <td class="acciones-celda">
                                     <button class="btn-icon editar" title="Modificar" 
-                                            th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]])">
-                                        <i class="fa-solid fa-pen-to-square"></i>
+                                            th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]], [[${negocio.horaInicio}]], [[${negocio.horaFin}]])">
+                                            <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
                                     <form th:action="@{/panel/negocios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este negocio?');">
                                         <input type="hidden" name="idNegocio" th:value="${negocio.idNegocio}">
@@ -301,71 +307,79 @@
                 </div>
             </section>
             
-            <!-- MODAL HTML NEGOCIOS -->
-            <div id="modalNegocio" class="modal-overlay">
-                <div class="modal-content" style="width: 500px;">
-                    <!-- enctype para permitir subida de archivos -->
-                    <form th:action="@{/panel/negocios/guardar}" method="POST" enctype="multipart/form-data">
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalNegocio">Nuevo Negocio</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalNegocio').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 12px; max-height: 60vh;">
-                            <input type="hidden" id="inputIdNegocio" name="idNegocio">
+            <!-- MODAL HTML NEGOCIOS (Rediseñado) -->
+<div id="modalNegocio" class="modal-overlay">
+    <div class="modal-content" style="width: 580px;"> <!-- Ligeramente más ancho para 2 columnas -->
+        <form th:action="@{/panel/negocios/guardar}" method="POST" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h3 class="modal-titulo" id="tituloModalNegocio">Nuevo Negocio</h3>
+                <span class="btn-text" onclick="document.getElementById('modalNegocio').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+            </div>
+            
+            <!-- Usamos CSS Grid de 2 columnas para organizar los inputs -->
+            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-height: 65vh; overflow-y: auto; padding-right: 10px;">
+                <input type="hidden" id="inputIdNegocio" name="idNegocio">
 
-                            <!-- Nombre y Teléfono -->
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="inputNombreNegocio" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombre del Negocio" required>
-                                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required>
-                            </div>
-                            
-                            <!-- Dirección -->
-                            <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
-                            
-                            <!-- Coordenadas -->
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" step="any" id="inputLatitud" name="latitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Latitud (Opcional)">
-                                <input type="number" step="any" id="inputLongitud" name="longitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Longitud (Opcional)">
-                            </div>
-                            
-                            <!-- Estado y Tipo de Negocio -->
-                            <div style="display: flex; gap: 10px;">
-                                <select id="inputEstado" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                    <option value="ABIERTO">ABIERTO</option>
-                                    <option value="CERRADO">CERRADO</option>
-                                </select>
-                                <select id="inputTipoNegocio" name="tipoNegocio.idTipoNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                    <option value="" disabled selected>Categoría...</option>
-                                    <option th:each="t : ${listaTipos}" th:value="${t.idTipoNegocio}" th:text="${t.nombre}"></option>
-                                </select>
-                            </div>
-                            
-                            <!-- Llaves foráneas que aceptan NULL -->
-                            <div style="display: flex; gap: 10px;">
-                                <select id="inputZona" name="zona.idZona" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
-                                    <option value="">Sin Zona Específica</option>
-                                    <option th:each="z : ${listaZonas}" th:value="${z.idZona}" th:text="${z.nombre}"></option>
-                                </select>
-                                <select id="inputCentro" name="centroComercial.idCentroComercial" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
-                                    <option value="">Sin Centro Comercial</option>
-                                    <option th:each="c : ${listaCentros}" th:value="${c.idCentroComercial}" th:text="${c.nombre}"></option>
-                                </select>
-                            </div>
+                <!-- Fila 1 -->
+                <input type="text" id="inputNombreNegocio" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre del Negocio" required>
+                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Teléfono" required>
+                
+                <!-- Fila 2 (Ocupa ambas columnas) -->
+                <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
+                
+                <!-- Fila 3 -->
+                <input type="number" step="any" id="inputLatitud" name="latitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Latitud (Opcional)">
+                <input type="number" step="any" id="inputLongitud" name="longitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Longitud (Opcional)">
+                
+                <!-- Fila 4: Horario (Ocupa ambas columnas) -->
+                <fieldset style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 12px; border-radius: 8px; margin: 0;">
+                    <legend style="font-size: 11px; color: gray; padding: 0 5px;">Horario de Atención (Opcional)</legend>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Apertura</label>
+                            <input type="time" id="inputHoraInicioNegocio" name="horaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Cierre</label>
+                            <input type="time" id="inputHoraFinNegocio" name="horaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;">
+                        </div>
+                    </div>
+                    <small style="font-size: 10px; color: var(--naranja-marca); margin-top: 8px; display: block;">* Si configuras el horario, el estado (Abierto/Cerrado) cambiará automáticamente.</small>
+                </fieldset>
 
-                            <!-- Input de Archivo Físico -->
-                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px; margin-top: 5px;">
-                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Logo del negocio (Opcional si editas)</label>
-                                <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-aceptar">Guardar Negocio</button>
-                        </div>
-                    </form>
+                <!-- Fila 5 -->
+                <select id="inputEstado" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);" required>
+                    <option value="ABIERTO">ABIERTO</option>
+                    <option value="CERRADO">CERRADO</option>
+                </select>
+                <select id="inputTipoNegocio" name="tipoNegocio.idTipoNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);" required>
+                    <option value="" disabled selected>Categoría...</option>
+                    <option th:each="t : ${listaTipos}" th:value="${t.idTipoNegocio}" th:text="${t.nombre}"></option>
+                </select>
+                
+                <!-- Fila 6 -->
+                <select id="inputZona" name="zona.idZona" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+                    <option value="">Sin Zona Específica</option>
+                    <option th:each="z : ${listaZonas}" th:value="${z.idZona}" th:text="${z.nombre}"></option>
+                </select>
+                <select id="inputCentro" name="centroComercial.idCentroComercial" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+                    <option value="">Sin Centro Comercial</option>
+                    <option th:each="c : ${listaCentros}" th:value="${c.idCentroComercial}" th:text="${c.nombre}"></option>
+                </select>
+
+                <!-- Fila 7 (Ocupa ambas columnas) -->
+                <div style="grid-column: 1 / -1; border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+                    <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Logo del negocio (Opcional si editas)</label>
+                    <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
                 </div>
             </div>
+            
+            <div class="modal-footer" style="margin-top: 15px;">
+                <button type="submit" class="btn-aceptar" style="width: 100%; padding: 12px; font-weight: bold; font-size: 14px;">Guardar Negocio</button>
+            </div>
+        </form>
+    </div>
+</div>
         </div>
 
         <!-- ==========================================

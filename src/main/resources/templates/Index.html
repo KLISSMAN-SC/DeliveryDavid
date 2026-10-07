@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>RIDE MEAL - Delivery</title>
+    <title>DABLYN - Delivery</title>
     
     <!-- Conexión al archivo CSS externo -->
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
@@ -19,7 +19,7 @@
         <!-- Logo estructurado -->
         <div class="logo-container">
             <!-- Si tienes la imagen del logo usa la etiqueta <img>, por ahora recreo el diseño visualmente -->
-            <strong><span class="logo-italic">RIDE</span> <span class="logo-orange">MEAL</span></strong>
+            <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
         </div>
         
         <!-- Buscador mejorado (Más ancho y centrado) -->
@@ -257,35 +257,60 @@
         <div class="grid-restaurantes">
             
             <!-- Tarjeta generada automáticamente por cada negocio -->
-            <article th:each="negocio : ${listaNegocios}" class="tarjeta-restaurante" th:data-id="${negocio.idNegocio}" onclick="abrirRestaurante(this.dataset.id)">	
-         	
-                <!-- Contenedor de Imagen -->
-                <div class="tarjeta-img-contenedor">
-                    <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
-                         th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
-                         alt="Logo del negocio">
-                    
-                    <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" class="tarjeta-placeholder">
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-                </div>
+<article th:each="negocio : ${listaNegocios}" 
+         th:with="estadoReal=${negocio.obtenerEstadoReal()}"
+         th:classappend="${estadoReal == 'CERRADO'} ? ' tarjeta-cerrada' : ''"
+         class="tarjeta-restaurante" 
+         th:data-id="${negocio.idNegocio}" 
+         th:onclick="${estadoReal == 'ABIERTO'} ? 'abrirRestaurante(this.dataset.id)' : ''"
+         th:style="${estadoReal == 'ABIERTO'} ? 'cursor: pointer;' : 'cursor: not-allowed;'">	
+ 	
+    <!-- Contenedor de Imagen -->
+    <div class="tarjeta-img-contenedor" style="position: relative;">
+        <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
+             th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
+             alt="Logo del negocio">
+        
+        <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" class="tarjeta-placeholder">
+            <i class="fa-solid fa-image"></i>
+        </div>
+        
+        <!-- OVERLAY CERRADO (Fondo oscuro con Candado) -->
+<div th:if="${estadoReal == 'CERRADO'}" class="overlay-cerrado">
+    <i class="fa-solid fa-lock" style="font-size: 32px; color: #ccc;"></i>
+    <span style="font-size: 13px; font-weight: bold; margin-top: 8px; color: #ff5555; letter-spacing: 1px;">CERRADO</span>
+    
+    <!-- Mostrar Horario si está configurado -->
+    <div th:if="${negocio.horaInicio != null and negocio.horaFin != null}" style="margin-top: 8px; font-size: 11px; color: #ddd; text-align: center; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;">
+        Apertura: <span th:text="${#temporals.format(negocio.horaInicio, 'HH:mm')}"></span><br>
+        Cierre: <span th:text="${#temporals.format(negocio.horaFin, 'HH:mm')}"></span>
+    </div>
+</div>
+    </div>
 
-                <!-- Contenedor de Información -->
-                <div class="tarjeta-info">
-                    <h3 class="tarjeta-titulo" th:text="${negocio.nombre}">Nombre Negocio</h3>
-                    
-                    <!-- Subtítulo con separador de punto medio (•) -->
-                    <p class="tarjeta-subtitulo" th:text="${negocio.tipoNegocio.nombre + ' • ' + negocio.direccion}">Categoría • Dirección</p>
-                    
-                    <!-- Pie de tarjeta con tiempo y precio alineados a los extremos -->
-                    <div class="tarjeta-footer">
-                        <span class="tarjeta-tiempo">
-                            <i class="fa-regular fa-clock"></i> 25 - 40 min
-                        </span>
-                        <span class="tarjeta-precio">S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span></span>
-                    </div>
-                </div>
-            </article>
+    <!-- Contenedor de Información -->
+    <div class="tarjeta-info">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+            <h3 class="tarjeta-titulo" th:text="${negocio.nombre}" style="margin: 0; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Nombre Negocio</h3>
+            
+            <!-- Etiqueta de Estado Dinámica -->
+            <span th:style="${estadoReal == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;'" 
+                  th:text="${estadoReal}">
+            </span>
+        </div>
+        
+        <!-- Subtítulo con separador de punto medio (•) -->
+        <p class="tarjeta-subtitulo" th:text="${negocio.tipoNegocio.nombre + ' • ' + negocio.direccion}" style="margin-top: 0;">Categoría • Dirección</p>
+        
+        <!-- Pie de tarjeta con tiempo y precio alineados a los extremos -->
+        <div class="tarjeta-footer">
+            <span class="tarjeta-tiempo">
+                <i class="fa-regular fa-clock"></i> 25 - 40 min
+            </span>
+            <span class="tarjeta-precio">S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span></span>
+        </div>
+    </div>
+</article>
 
         </div>
         <!-- NUEVO: Contenedor del botón "Ver más" -->
@@ -305,7 +330,7 @@
     <footer>
         <div class="footer-izq">
             <div>
-                <strong>RIDE MEAL</strong>
+                <strong>Dablyn Delivery</strong>
             </div>
             <p>Comida que encaja con tu día.</p>
             
@@ -317,7 +342,7 @@
                 <a href="https://api.whatsapp.com/send?phone=51984690217&text=Hola%20RIDE%20MEAL,%20necesito%20ayuda%20con%20un%20pedido" target="_blank" rel="noopener noreferrer" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
             
-            <p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> RIDE MEAL</p>
+            <p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Dablyn Delivery</p>
         </div>
         
         <div class="footer-der">

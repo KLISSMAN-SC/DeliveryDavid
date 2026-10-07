@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name="NEGOCIO")
@@ -55,5 +57,33 @@ public class Negocio {
 	@JoinColumn(name="idCentroComercial") // Puede ser nulo según tu BD
 	@ToString.Exclude 
 	private CentroComercial centroComercial;
+	
+	@Column(name = "horaInicio")
+	private LocalTime horaInicio;
 
+	@Column(name = "horaFin")
+	private LocalTime horaFin;
+	
+	public String obtenerEstadoReal() {
+	    // Si el administrador configuró un horario, la hora del sistema toma el control
+	    if (this.horaInicio != null && this.horaFin != null) {
+	        LocalTime ahora = LocalTime.now(ZoneId.of("America/Lima"));
+	        
+	        if (horaInicio.isBefore(horaFin)) { 
+	            // Horario diurno (Ej: 08:00 a 22:00)
+	            if (!ahora.isBefore(horaInicio) && !ahora.isAfter(horaFin)) {
+	                return "ABIERTO";
+	            }
+	        } else { 
+	            // Horario nocturno (Ej: 18:00 a 02:00)
+	            if (!ahora.isBefore(horaInicio) || !ahora.isAfter(horaFin)) {
+	                return "ABIERTO";
+	            }
+	        }
+	        return "CERRADO"; // Si tiene horario pero la hora actual no encaja
+	    }
+	    
+	    // Si NO hay horario configurado (campos vacíos), respeta el botón manual de la base de datos
+	    return (this.estado != null) ? this.estado.name() : "CERRADO";
+	}
 }

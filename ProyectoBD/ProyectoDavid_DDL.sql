@@ -97,6 +97,8 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`NEGOCIO` (
   `idTipoNegocio` INT NOT NULL,
   `idZona` INT NOT NULL,
   `idCentroComercial` INT NULL,
+  `horaInicio` TIME NULL,
+  `horaFin` TIME NULL,
   PRIMARY KEY (`idNegocio`),
   UNIQUE INDEX `id_negocio_UNIQUE` (`idNegocio` ASC) VISIBLE,
   INDEX `fk_NEGOCIOS_TIPO_NEGOCIO_idx` (`idTipoNegocio` ASC) VISIBLE,

@@ -118,32 +118,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(data.length === 0){
                     dropdownResultados.innerHTML = `<div class="search-no-results">No se encontraron resultados</div>`;
                 } else {
-                    data.forEach(negocio => {
-                        const div = document.createElement("div");
-                        div.className = "search-item";
-                        
-						// Ruta corregida usando JavaScript puro en lugar de sintaxis Thymeleaf
-						 const imagenHTML = (negocio.imagenLogo && negocio.imagenLogo.trim() !== "") 
-						  ? `<img src="/api/imagenes/${negocio.imagenLogo.trim()}" class="search-item-img" alt="Logo">`
-						  : `<div class="search-item-placeholder">
-						   <i class="fa-solid fa-image"></i>
-						    </div>`;
-						                      
-                        div.innerHTML = `
-                            ${imagenHTML}
-                            <div class="search-item-info" onclick="abrirRestaurante(${negocio.id})">
-                                <span class="search-item-title">${negocio.nombre}</span>
-                                <span class="search-item-sub">${negocio.tipo} - ${negocio.direccion}</span>
-                            </div>
-                        `;
-                        
-                        div.addEventListener('click', () => {
-                            inputBuscar.value = negocio.nombre;
-                            dropdownResultados.style.display = 'none';
-                        });
+					data.forEach(negocio => {
+					    const div = document.createElement("div");
+					    const estaCerrado = negocio.estado === 'CERRADO';
+					    div.className = estaCerrado ? "search-item search-item-cerrado" : "search-item";
+					    
+					    let imagenHTML = "";
+					    const filtroEstilo = estaCerrado ? 'filter: grayscale(90%);' : '';
+					    const lockOverlay = estaCerrado ? '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; border-radius: 6px;"><i class="fa-solid fa-lock" style="font-size: 14px; color: #ff5555;"></i></div>' : '';
 
-                        dropdownResultados.appendChild(div);
-                    });
+					    if (negocio.imagenLogo && negocio.imagenLogo.trim() !== "") {
+					        imagenHTML = '<div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">' +
+					                     '<img src="/api/imagenes/' + negocio.imagenLogo.trim() + '" class="search-item-img" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; ' + filtroEstilo + '">' +
+					                     lockOverlay +
+					                     '</div>';
+					    } else {
+					        imagenHTML = '<div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 6px; ' + filtroEstilo + '">' +
+					                     '<i class="fa-solid fa-image"></i>' +
+					                     lockOverlay +
+					                     '</div>';
+					    }
+					                      
+					    const badgeBg = estaCerrado ? 'rgba(255,85,85,0.1)' : 'rgba(0,255,0,0.1)';
+					    const badgeColor = estaCerrado ? '#ff5555' : '#00ff00';
+					    const clickAttr = estaCerrado ? '' : 'onclick="abrirRestaurante(' + negocio.id + ')"';
+
+					    div.innerHTML = imagenHTML +
+					        '<div class="search-item-info" ' + clickAttr + ' style="flex-grow: 1; overflow: hidden;">' +
+					            '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+					                '<span class="search-item-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + negocio.nombre + '</span>' +
+					                '<span style="font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 10px; background: ' + badgeBg + '; color: ' + badgeColor + ';">' + negocio.estado + '</span>' +
+					            '</div>' +
+					            '<span class="search-item-sub" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + negocio.tipo + ' - ' + negocio.direccion + '</span>' +
+					        '</div>';
+					    
+					    if (estaCerrado) {
+					        div.style.cursor = 'not-allowed';
+					        div.style.opacity = '0.75';
+					        div.style.filter = 'grayscale(80%)';
+					        div.style.pointerEvents = 'none';
+					    } else {
+					        div.addEventListener('click', () => {
+					            inputBuscar.value = negocio.nombre;
+					            dropdownResultados.style.display = 'none';
+					        });
+					    }
+
+					    dropdownResultados.appendChild(div);
+					});
                 }
                 dropdownResultados.style.display = "block";
             })
@@ -431,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // MODAL CRUD NEGOCIOS
 // ==========================================
-function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro) {
+function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro, hInicio, hFin) {
     if (id) {
         document.getElementById('tituloModalNegocio').innerText = 'Editar Negocio';
         document.getElementById('inputIdNegocio').value = id;
@@ -444,6 +466,10 @@ function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, e
         document.getElementById('inputTipoNegocio').value = idTipo || '';
         document.getElementById('inputZona').value = idZona || '';
         document.getElementById('inputCentro').value = idCentro || '';
+        
+        // Manejo de tiempos
+        document.getElementById('inputHoraInicioNegocio').value = hInicio ? hInicio.substring(0, 5) : '';
+        document.getElementById('inputHoraFinNegocio').value = hFin ? hFin.substring(0, 5) : '';
     } else {
         document.getElementById('tituloModalNegocio').innerText = 'Nuevo Negocio';
         document.getElementById('inputIdNegocio').value = '';
@@ -456,6 +482,10 @@ function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, e
         document.getElementById('inputTipoNegocio').value = '';
         document.getElementById('inputZona').value = '';
         document.getElementById('inputCentro').value = '';
+        
+        // Limpiar tiempos
+        document.getElementById('inputHoraInicioNegocio').value = '';
+        document.getElementById('inputHoraFinNegocio').value = '';
     }
     document.getElementById('modalNegocio').style.display = 'flex';
 }

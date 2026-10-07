@@ -34,7 +34,7 @@ public class NegocioController {
                 map.put("id", n.getIdNegocio());
                 map.put("nombre", n.getNombre());
                 map.put("direccion", n.getDireccion());
-                map.put("estado", n.getEstado());
+                map.put("estado", n.obtenerEstadoReal());
                 map.put("imagenLogo", n.getImagenLogo());
                 map.put("tipo", n.getTipoNegocio() != null ? n.getTipoNegocio().getNombre() : "");
                 return map;
