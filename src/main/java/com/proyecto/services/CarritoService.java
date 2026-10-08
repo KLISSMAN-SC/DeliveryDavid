@@ -15,6 +15,8 @@ import com.proyecto.repository.DetalleCarritoRepository;
 import com.proyecto.repository.NegocioRepository;
 import com.proyecto.repository.ProductoRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CarritoService {
 	 
@@ -69,81 +71,64 @@ public class CarritoService {
 	    // =====================================================
 	    // AGREGAR PRODUCTO
 	    // =====================================================
-
+	 @Transactional
 	 public Carrito agregarProducto(
-		        Integer idUsuario,
-		        Integer idNegocio,
-		        Integer idProducto) {
-
-		    Carrito carrito =
-		            obtenerOCrearCarrito(
-		                    idUsuario,
-		                    idNegocio
-		            );
+	         Integer idUsuario,
+	         Integer idNegocio,
+	         Integer idProducto) {
 
 
-		    Producto producto =
-		            productoRepository.findById(idProducto)
-		            .orElseThrow(() ->
-		                new RuntimeException(
-		                    "No existe el producto"
-		                )
-		            );
+	     Carrito carrito =
+	             obtenerOCrearCarrito(
+	                     idUsuario,
+	                     idNegocio
+	             );
 
 
-		    if (!producto.getNegocio()
-		            .getIdNegocio()
-		            .equals(idNegocio)) {
-
-		        throw new RuntimeException(
-		            "El producto no pertenece a este restaurante"
-		        );
-		    }
-
-
-		    DetalleCarrito detalle =
-		            detalleCarritoRepository
-		            .findByCarritoIdCarritoAndProductoIdProducto(
-		                    carrito.getIdCarrito(),
-		                    idProducto
-		            )
-		            .orElse(null);
+	     Producto producto =
+	             productoRepository
+	             .findById(idProducto)
+	             .orElseThrow(() ->
+	                 new RuntimeException(
+	                     "Producto no encontrado"
+	                 )
+	             );
 
 
-		    if (detalle == null) {
+	     if (!producto
+	             .getNegocio()
+	             .getIdNegocio()
+	             .equals(idNegocio)) {
 
-		        detalle = new DetalleCarrito();
-
-		        detalle.setCarrito(carrito);
-		        detalle.setProducto(producto);
-		        detalle.setCantidad(1);
-		        detalle.setPrecioUnitario(producto.getPrecio());
-
-		    } else {
-
-		        detalle.setCantidad(
-		                detalle.getCantidad() + 1
-		        );
-		    }
+	         throw new RuntimeException(
+	             "El producto no pertenece al negocio"
+	         );
+	     }
 
 
-		    detalleCarritoRepository.save(detalle);
+	     detalleCarritoRepository
+	             .agregarOIncrementar(
+	                     carrito.getIdCarrito(),
+	                     producto.getIdProducto(),
+	                     producto.getPrecio()
+	             );
 
 
-		    carrito.setFechaActualizacion(
-		            LocalDateTime.now()
-		    );
+	     // MUY IMPORTANTE:
+	     // volver a consultar el carrito actualizado
 
-		    carritoRepository.save(carrito);
-
-
-		    // Volvemos a consultar el carrito
-		    // para obtener sus detalles actualizados
-
-		    return carritoRepository
-		            .findById(carrito.getIdCarrito())
-		            .orElseThrow();
-		}
+	     return carritoRepository
+	             .buscarCarritoCompleto(
+	                     idUsuario,
+	                     idNegocio
+	             )
+	             .orElseThrow(() ->
+	                 new RuntimeException(
+	                     "No se pudo recuperar el carrito"
+	                 )
+	             );
+	 }
+	 
 	 public Carrito disminuirProducto(
 		        Integer idUsuario,
 		        Integer idNegocio,

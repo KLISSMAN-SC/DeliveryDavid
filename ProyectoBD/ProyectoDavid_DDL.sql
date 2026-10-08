@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`TIPO_NEGOCIO` (
   `idTipoNegocio` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NULL,
   `icono` VARCHAR(200) NULL,
+  `estado` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`idTipoNegocio`),
   UNIQUE INDEX `id_tipo_negocio_UNIQUE` (`idTipoNegocio` ASC) VISIBLE)
 ENGINE = InnoDB;
@@ -96,8 +97,10 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`NEGOCIO` (
   `idTipoNegocio` INT NOT NULL,
   `idZona` INT NOT NULL,
   `idCentroComercial` INT NULL,
-  `horaInicio` TIME NULL,
-  `horaFin` TIME NULL,
+  `horaInicio` time DEFAULT NULL,
+  `horaFin` time DEFAULT NULL,
+  `modoWhatsapp` tinyint(1) DEFAULT '0',
+  `imagenCarta` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`idNegocio`),
   UNIQUE INDEX `id_negocio_UNIQUE` (`idNegocio` ASC) VISIBLE,
   INDEX `fk_NEGOCIOS_TIPO_NEGOCIO_idx` (`idTipoNegocio` ASC) VISIBLE,
@@ -268,8 +271,16 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`DETALLE_CARRITO` (
   `idCarrito` INT NOT NULL,
   `idProducto` INT NOT NULL,
   PRIMARY KEY (`idDetalleCarrito`),
-  INDEX `fk_DETALLE_CARRITO_CARRITO1_idx` (`idCarrito` ASC) VISIBLE,
-  INDEX `fk_DETALLE_CARRITO_PRODUCTO1_idx` (`idProducto` ASC) VISIBLE,
+ 
+    -- Evita repetir el mismo producto
+    -- dentro del mismo carrito
+    UNIQUE KEY `uk_detalle_carrito_producto`
+        (`idCarrito`, `idProducto`),
+
+    -- Índice para PRODUCTO
+    INDEX `fk_DETALLE_CARRITO_PRODUCTO1_idx`
+        (`idProducto` ASC),
+  
   CONSTRAINT `fk_DETALLE_CARRITO_CARRITO1`
     FOREIGN KEY (`idCarrito`)
     REFERENCES `proyecto_david`.`CARRITO` (`idCarrito`)

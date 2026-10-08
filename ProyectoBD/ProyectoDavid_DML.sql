@@ -20,15 +20,21 @@ INSERT INTO `zona` VALUES
 (7,'MANANTAY',5.00);
 
 INSERT INTO `negocio` VALUES 
-(28,'Tierra Verde','Av. San Martín Mz A',-8.38310000,-74.55210000,'999111222','ABIERTO','tierra_verde.jpg',1,1,NULL),
-(37,'Manu Inmaculada','Jr. Inmaculada 456',-8.38420000,-74.55320000,'999222333','ABIERTO','manu_inmaculada.jpg',1,1,NULL),
-(38,'Typical Wings','Av. Yarinacocha 789',-8.36540000,-74.57120000,'999333444','ABIERTO','typical_wings.jpg',1,1,NULL),
-(39,'Manu Cafe Real Plaza','Av. Centenario (Real Plaza)',-8.38550000,-74.55440000,'999444555','ABIERTO','manu_real_plaza.jpg',1,1,1),
-(40,'Norkys Polleria','Jr. Tarapacá 111',-8.38120000,-74.55110000,'999555666','ABIERTO','Norky_polleria.jpg',1,1,NULL),
-(41,'Donatito','Jr. Sucre 222',-8.38230000,-74.55220000,'999666777','ABIERTO','donatito.jpg',1,1,NULL),
-(42,'Dolce Candy\'s','Jr. 7 de Junio 333',-8.38000000,-74.55000000,'999777888','ABIERTO','dolce_candys.jpg',1,1,NULL),
-(43,'Tropical Fruit','Jr. Ucayali 444',-8.37910000,-74.54920000,'999888999','ABIERTO','tropical_fruit.jpg',1,1,NULL),
-(44,'Esencia Bakery','Jr. Guillermo Sisley 555',-8.38440000,-74.56110000,'999000111','ABIERTO','esencia_bakery.jpg',1,1,NULL);
+(28,'Tierra Verde','Av. San Martín Mz A',-8.38310000,-74.55210000,'999111222','ABIERTO','b6dacf91-4969-401d-abbf-3bbf78f846bd.jpg',1,1,NULL,'10:14:00','10:55:00',0,NULL),
+(37,'Manu Inmaculada','Jr. Inmaculada 456',-8.38420000,-74.55320000,'999222333','ABIERTO','manu_inmaculada.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(38,'Typical Wings','Av. Yarinacocha 789',-8.36540000,-74.57120000,'999333444','ABIERTO','typical_wings.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(39,'Manu Cafe Real Plaza','Av. Centenario (Real Plaza)',-8.38550000,-74.55440000,'999444555','ABIERTO','manu_real_plaza.jpg',1,1,1,NULL,NULL,0,NULL),
+(40,'Norkys Polleria','Jr. Tarapacá 111',-8.38120000,-74.55110000,'999555666','ABIERTO','Norky_polleria.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(41,'Donatito','Jr. Sucre 222',-8.38230000,-74.55220000,'999666777','ABIERTO','donatito.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(42,'Dolce Candy\'s','Jr. 7 de Junio 333',-8.38000000,-74.55000000,'999777888','ABIERTO','dolce_candys.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(43,'Tropical Fruit','Jr. Ucayali 444',-8.37910000,-74.54920000,'999888999','ABIERTO','tropical_fruit.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(44,'Esencia Bakery','Jr. Guillermo Sisley 555',-8.38440000,-74.56110000,'999000111','ABIERTO','esencia_bakery.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(45,'nuevo','por ahi',-15.25400000,-8.23650000,'123456789','ABIERTO','8e78726d-48a3-48e0-96ee-5ec973711ada.jpg',3,1,NULL,NULL,NULL,0,NULL),
+(46,'asd','asd',-8.38480531,-74.55610146,'976647382','CERRADO','b97fb86e-c46a-4a99-89fc-bcd7838ccc9c.png',1,1,NULL,NULL,NULL,0,NULL),
+(47,'asd','asd',-8.48672373,-74.51462820,'976647382','CERRADO','ASD.png',1,1,NULL,NULL,NULL,0,NULL),
+(48,'Brosteria David','no se por donde es',NULL,NULL,'98665478','ABIERTO','4f037381-2fb4-40f8-b28c-21352d3983d4.jpg',1,7,NULL,NULL,NULL,0,NULL),
+(49,'KonWa','por hai',NULL,NULL,'96558745','ABIERTO','cc7805a3-2e69-4400-b7b9-e08a4615a95e.jpg',1,6,NULL,NULL,NULL,0,NULL),(50,'Ben Hur','no se',NULL,NULL,'952456987','ABIERTO','193ac19d-667d-481c-8f02-2279cd68f173.jpg',1,1,NULL,NULL,NULL,0,NULL),
+(51,'carta','asdads',NULL,NULL,'131232132','ABIERTO',NULL,1,1,NULL,NULL,NULL,1,'1791407419723_cartanueva.jpg');
 
 INSERT INTO `rol` (`idRol`, `nombre`) VALUES 
 (1, 'Administrador'),

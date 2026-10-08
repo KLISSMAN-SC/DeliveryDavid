@@ -493,3 +493,263 @@ function finalizarVistaPedido() {
 
     location.reload();
 }
+function abrirModalAgregarDireccion() {
+
+    const contenedor =
+        document.getElementById(
+            "contenedor-modal-direccion"
+        );
+
+
+    contenedor.innerHTML = `
+
+        <div class="modal-direccion-overlay">
+
+            <div class="modal-direccion-box">
+
+                <button
+                    type="button"
+                    class="btn-cerrar-direccion"
+                    onclick="cerrarModalDireccion()">
+                    ×
+                </button>
+
+
+                <div class="direccion-icono">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                </div>
+
+
+                <h2>
+                    Detecta tu dirección
+                </h2>
+
+
+                <p>
+                    Usaremos tu ubicación actual
+                    para registrar tu dirección
+                    de entrega.
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn-detectar-direccion"
+                    onclick="detectarUbicacionActual()">
+
+                    Detectar mi ubicación
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn-direccion-secundario">
+
+                    Usar una dirección guardada
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn-direccion-secundario">
+
+                    Ingresar dirección manualmente
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+function detectarUbicacionActual() {
+
+    if (!navigator.geolocation) {
+
+        alert(
+            "Tu navegador no permite obtener la ubicación."
+        );
+
+        return;
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        // ==========================
+        // PERMITIÓ UBICACIÓN
+        // ==========================
+
+        function(position) {
+
+            const latitud =
+                position.coords.latitude;
+
+            const longitud =
+                position.coords.longitude;
+
+
+            console.log(
+                "Latitud:",
+                latitud
+            );
+
+            console.log(
+                "Longitud:",
+                longitud
+            );
+
+
+            mostrarUbicacionDetectada(
+                latitud,
+                longitud
+            );
+        },
+
+
+        // ==========================
+        // ERROR / DENEGADO
+        // ==========================
+
+        function(error) {
+
+            switch(error.code) {
+
+                case error.PERMISSION_DENIED:
+
+                    alert(
+                        "No permitiste acceder a tu ubicación."
+                    );
+
+                    break;
+
+
+                case error.POSITION_UNAVAILABLE:
+
+                    alert(
+                        "No pudimos determinar tu ubicación."
+                    );
+
+                    break;
+
+
+                case error.TIMEOUT:
+
+                    alert(
+                        "La ubicación tardó demasiado."
+                    );
+
+                    break;
+
+
+                default:
+
+                    alert(
+                        "No se pudo obtener tu ubicación."
+                    );
+            }
+        },
+
+
+        // ==========================
+        // CONFIGURACIÓN
+        // ==========================
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+function mostrarUbicacionDetectada(
+    latitud,
+    longitud
+) {
+
+    const contenedor =
+        document.getElementById(
+            "contenedor-modal-direccion"
+        );
+
+
+    const modal =
+        document.getElementById(
+            "modalPedido"
+        );
+
+
+    const googleKey =
+        modal.dataset.googleKey;
+
+
+    const coordenadas =
+        `${latitud},${longitud}`;
+
+
+    contenedor.innerHTML = `
+
+        <div class="modal-direccion-overlay">
+
+            <div class="modal-direccion-box">
+
+                <h2>
+                    Confirma tu ubicación
+                </h2>
+
+
+                <iframe
+                    class="mapa-nueva-direccion"
+
+                    src="https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(googleKey)}&q=${encodeURIComponent(coordenadas)}">
+
+                </iframe>
+
+
+                <input
+                    type="hidden"
+                    id="nuevaLatitud"
+                    value="${latitud}">
+
+
+                <input
+                    type="hidden"
+                    id="nuevaLongitud"
+                    value="${longitud}">
+
+
+                <input
+                    type="text"
+                    id="aliasDireccion"
+                    placeholder="Casa, Trabajo...">
+
+
+                <input
+                    type="text"
+                    id="direccionTexto"
+                    placeholder="Dirección">
+
+
+                <input
+                    type="text"
+                    id="referenciaDireccion"
+                    placeholder="Referencia">
+
+
+                <button
+                    type="button"
+                    onclick="guardarNuevaDireccion()">
+
+                    Guardar dirección
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
