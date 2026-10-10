@@ -164,4 +164,97 @@
     font-weight: bold;
 
     cursor: pointer;
+} 
+.modal-direccion-overlay {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.75);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 200000;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+.modal-direccion-box {
+    position: relative;
+
+    width: min(430px, 95%);
+
+    background: #ffffff;
+    color: #111111;
+
+    border-radius: 20px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    box-sizing: border-box;
+}
+
+.btn-cerrar-direccion {
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #eee;
+
+    cursor: pointer;
+}
+
+.direccion-icono {
+    font-size: 45px;
+    color: #ff6500;
+
+    margin-bottom: 15px;
+}
+
+.btn-detectar-direccion {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 20px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #ff6500;
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.btn-direccion-secundario {
+    width: 100%;
+
+    padding: 13px;
+
+    margin-top: 10px;
+
+    border: 1px solid #ddd;
+    border-radius: 12px;
+
+    background: white;
+
+    cursor: pointer;
 }

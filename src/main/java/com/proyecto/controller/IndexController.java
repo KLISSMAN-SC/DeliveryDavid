@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,9 @@ public class IndexController {
     @Autowired
     private NegocioService negocioService; // <-- Inyectar
     
+    @Value("${google.maps.api-key:}")
+    private String googleMapsApiKey;
+    
     @GetMapping("/")
     public String paginaPrincipal(
             @RequestParam(required = false) Integer tipoId,
@@ -47,6 +51,10 @@ public class IndexController {
         model.addAttribute("listaTipos", tiposActivos);
         
         model.addAttribute("listaZonas", zonaService.obtenerTodas());
+        model.addAttribute(
+        	    "googleMapsKey",
+        	    googleMapsApiKey
+        	);
 
         // Ejecutar consulta maestra de negocios
         List<Negocio> negociosMostrar = negocioService.buscarConFiltrosCombinados(tipoId, zonaId, categoria);

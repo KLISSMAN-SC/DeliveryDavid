@@ -21,4 +21,9 @@ public interface DireccionUsuarioRepository extends JpaRepository<DireccionUsuar
     // comprueba que la dirección realmente
     // pertenece al usuario.
     Optional<DireccionUsuario> findByIdDireccionUsuarioAndUsuarioIdUsuario(Integer idDireccion,Integer idUsuario);
+    
+    boolean existsByUsuarioIdUsuarioAndPrincipalTrue(
+            Integer idUsuario
+    );
+    
 }

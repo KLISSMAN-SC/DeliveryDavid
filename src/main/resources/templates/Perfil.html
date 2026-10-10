@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Perfil - Dablyn Delivery</title>
+    
+    <!-- Conexión a tus estilos generales -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<!-- Usamos la clase body-login para heredar el fondo oscuro centrado y el degradado sutil -->
+<body class="body-login cargado">
+
+    <!-- Ampliamos un poco el wrapper para que las dos columnas respiren bien -->
+    <div class="login-wrapper" style="max-width: 650px; width: 100%; margin: 20px;">
+        
+        <!-- Botón Volver (Estilo limpio sobre la tarjeta) -->
+        <div style="margin-bottom: 20px; display: flex;">
+            <a th:href="@{/}" class="volver-inicio" style="font-size: 15px; text-decoration: none;">
+                <i class="fa-solid fa-arrow-left"></i> Volver al inicio
+            </a>
+        </div>
+
+        <div class="login-card" style="padding: 40px;">
+            
+            <!-- Avatar y Título -->
+            <div style="text-align: center; margin-bottom: 35px;">
+                <div style="width: 80px; height: 80px; background: rgba(255, 102, 0, 0.1); color: var(--naranja-marca); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; margin: 0 auto 15px; box-shadow: 0 0 20px rgba(255, 102, 0, 0.15);">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <h2>Mi Perfil</h2>
+                <p class="login-subtitulo" style="margin-bottom: 0;">Actualiza tus datos personales y credenciales de acceso.</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${mensajeExito}" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(0,255,0,0.3); text-align: center; font-size: 13px;">
+                <i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span>
+            </div>
+            <div th:if="${mensajeError}" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,85,85,0.3); text-align: center; font-size: 13px;">
+                <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span>
+            </div>
+
+            <!-- Formulario con Inputs estilo Login (Icono por dentro) -->
+            <form th:action="@{/perfil/actualizar}" method="POST">
+                
+                <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                <input type="hidden" name="rol.idRol" th:value="${usuario.rol.idRol}">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    
+                    <!-- Nombres -->
+                    <div class="input-group-login" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-signature"></i>
+                        <input type="text" name="nombres" th:value="${usuario.nombres}" placeholder="Nombres" required>
+                    </div>
+                    
+                    <!-- Apellidos -->
+                    <div class="input-group-login" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-signature"></i>
+                        <input type="text" name="apellidos" th:value="${usuario.apellidos}" placeholder="Apellidos" required>
+                    </div>
+                    
+                    <!-- Teléfono (Ahora ocupa todo el ancho) -->
+                    <div class="input-group-login" style="grid-column: 1 / -1; margin-bottom: 0;">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" name="telefono" th:value="${usuario.telefono}" placeholder="Teléfono" required maxlength="15"
+                               inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+
+                    <!-- Correo (Bloqueado / Solo lectura) -->
+                    <div class="input-group-login" style="grid-column: 1 / -1; margin-bottom: 0; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); cursor: not-allowed;" title="El correo no se puede modificar">
+                        <i class="fa-solid fa-envelope" style="color: #555;"></i>
+                        <input type="email" name="correoElectronico" th:value="${usuario.correoElectronico}" placeholder="Correo Electrónico" readonly style="color: #777; cursor: not-allowed; pointer-events: none;">
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="input-group-login" style="grid-column: 1 / -1; margin-bottom: 0; margin-top: 10px; border: 1px dashed var(--borde-sutil); background: rgba(0,0,0,0.3);">
+                        <i class="fa-solid fa-lock" style="color: var(--naranja-marca);"></i>
+                        <input type="password" name="password" placeholder="Nueva contraseña (deja en blanco si no deseas cambiarla)">
+                    </div>
+
+                </div>
+
+                <!-- Botón Guardar Principal -->
+                <button type="submit" class="btn-aceptar" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 15px;">
+                    <i class="fa-solid fa-floppy-disk" style="margin-right: 5px;"></i> Guardar Cambios
+                </button>
+                
+            </form>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

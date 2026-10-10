@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.proyecto.model.Carrito;
 import com.proyecto.model.DetalleCarrito;
@@ -17,7 +18,7 @@ import com.proyecto.repository.CarritoRepository;
 import com.proyecto.repository.DetallePedidoRepository;
 import com.proyecto.repository.PedidoRepository;
 
-import jakarta.transaction.Transactional;
+
 
 @Service
 public class PedidoService {

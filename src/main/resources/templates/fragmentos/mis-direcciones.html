@@ -1,0 +1,195 @@
+<div
+    th:fragment="vistaDirecciones"
+    class="vista-mis-direcciones fade-in">
+
+
+    <!-- CABECERA -->
+
+    <div class="direcciones-header">
+
+        <div>
+
+            <button
+                type="button"
+                class="btn-volver-direcciones"
+                onclick="volverInicio()">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </button>
+
+
+            <div>
+
+                <h1>
+                    Mis direcciones
+                </h1>
+
+                <p>
+                    Administra tus lugares de entrega.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="btn-nueva-direccion"
+            onclick="abrirModalAgregarDireccion('direcciones')">
+
+            <i class="fa-solid fa-plus"></i>
+
+            Nueva dirección
+
+        </button>
+
+    </div>
+
+
+
+    <!-- ===================================== -->
+    <!-- SI HAY DIRECCIONES -->
+    <!-- ===================================== -->
+
+    <div
+        class="direcciones-lista"
+        th:if="${!#lists.isEmpty(direcciones)}">
+
+
+        <article
+            class="direccion-card"
+            th:each="direccion : ${direcciones}">
+
+
+            <div class="direccion-card-icono">
+
+                <i
+                    th:class="${
+                        direccion.alias != null
+                        and direccion.alias.toLowerCase().contains('trabajo')
+                        ? 'fa-solid fa-building'
+                        : 'fa-solid fa-house'
+                    }">
+                </i>
+
+            </div>
+
+
+
+            <div class="direccion-card-info">
+
+
+                <div class="direccion-card-titulo">
+
+                    <h3
+                        th:text="${direccion.alias}">
+                        Casa
+                    </h3>
+
+
+                    <span
+                        class="badge-principal"
+                        th:if="${direccion.principal}">
+
+                        Principal
+
+                    </span>
+
+                </div>
+
+
+                <p
+                    class="direccion-card-direccion"
+                    th:text="${direccion.direccion}">
+
+                    Av. Yarinacocha 789
+
+                </p>
+
+
+                <p
+                    class="direccion-card-referencia"
+                    th:if="${direccion.referencia != null
+                        and !direccion.referencia.isEmpty()}">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <span
+                        th:text="${direccion.referencia}">
+                    </span>
+
+                </p>
+
+            </div>
+
+
+
+            <!-- ACCIONES -->
+
+            <div class="direccion-card-acciones">
+
+
+                <button
+                    type="button"
+                    class="btn-eliminar-direccion"
+
+                    th:data-direccion="${direccion.idDireccionUsuario}"
+
+                    onclick="eliminarDireccionUsuario(this)">
+
+                    <i class="fa-regular fa-trash-can"></i>
+
+                </button>
+
+
+            </div>
+
+        </article>
+
+    </div>
+
+
+
+    <!-- ===================================== -->
+    <!-- SIN DIRECCIONES -->
+    <!-- ===================================== -->
+
+    <div
+        class="direcciones-vacio"
+        th:if="${#lists.isEmpty(direcciones)}">
+
+
+        <div class="direcciones-vacio-icono">
+
+            <i class="fa-solid fa-location-dot"></i>
+
+        </div>
+
+
+        <h2>
+            No tienes direcciones guardadas
+        </h2>
+
+
+        <p>
+            Agrega una dirección para realizar
+            tus pedidos más rápido.
+        </p>
+
+
+        <button
+            type="button"
+            onclick="abrirModalAgregarDireccion()">
+
+            <i class="fa-solid fa-plus"></i>
+
+            Agregar dirección
+
+        </button>
+
+    </div>
+
+
+</div>

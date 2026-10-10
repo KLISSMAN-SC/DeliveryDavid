@@ -7,6 +7,7 @@
     <!-- Conexión al archivo CSS externo -->
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
     <link rel="stylesheet" th:href="@{/css/mapa.css}">
+    <link rel="stylesheet" th:href="@{/css/direccion.css}">
     
     <!-- Librería FontAwesome para los íconos de redes sociales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -31,10 +32,19 @@
             <!-- Contenedor desplegable dinámico -->
             <div id="dropdownResultados" class="search-dropdown"></div>
         </div>
-
+		
         <!-- Acciones de Usuario (Ubicación, Carrito, Login) -->
         <div class="user-actions">
-            
+            <button
+    	type="button"
+    	class="btn-agregar-direccion"
+    	onclick="abrirModalAgregarDireccion('inicio')">
+
+    	<i class="fa-solid fa-plus"></i>
+
+   		Agregar dirección
+
+		</button>
             <div class="redes-sociales">
                 
                 <a href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
@@ -70,9 +80,19 @@
             <i class="fa-solid fa-chart-line"></i> Panel de Gestión
         </a>
         
-        <a href="#">
+        <a th:href="@{/perfil}">
             <i class="fa-solid fa-id-badge"></i> Mi Perfil
         </a>
+        <button
+        type="button"
+        class="menu-usuario-opcion"
+        onclick="abrirMisDirecciones()">
+
+        <i class="fa-solid fa-location-dot"></i>
+
+        Mis direcciones
+
+    	</button>
         
         <div class="dropdown-divisor"></div>
         
@@ -364,7 +384,31 @@
     <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
     <div id="modalFiltros" class="modal-overlay"></div>
     <div id="contenedor-modal-pedido"></div>
-    <div id="contenedor-modal-direccion"></div>
+    <div
+    th:replace="~{fragmentos/direccion-modal :: modalDireccion}">
+	</div>
+	
+	<!-- TOAST -->
+	<div id="toastNotificacion" class="toast-notificacion">
+
+    <div class="toast-icono">
+        <i class="fa-solid fa-circle-check"></i>
+    </div>
+
+    <div class="toast-contenido">
+
+        <strong id="toastTitulo">
+            Dirección guardada
+        </strong>
+
+        <span id="toastMensaje">
+            La dirección se registró correctamente.
+        </span>
+
+    </div>
+
+</div>
+    
     <script th:inline="javascript">
 
     window.idUsuarioValidado =
@@ -377,5 +421,6 @@
 <script th:src="@{/js/carrito.js}"></script>
 <script th:src="@{/js/productos.js}"></script>
 <script th:src="@{/js/pedido.js}"></script>
+<script th:src="@{/js/direccion.js}"></script>
 </body>
 </html>

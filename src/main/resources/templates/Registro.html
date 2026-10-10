@@ -27,15 +27,11 @@
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="input-group-login" style="flex: 1;">
-                        <i class="fa-solid fa-id-card"></i>
-                        <input type="text" name="dni" placeholder="DNI (8 dígitos)" maxlength="8" required>
-                    </div>
-                    <div class="input-group-login" style="flex: 1;">
-                        <i class="fa-solid fa-phone"></i>
-                        <input type="text" name="telefono" placeholder="Teléfono" required maxlength="9">
-                    </div>
+                <!-- DNI ELIMINADO. Teléfono ahora ocupa el ancho completo con validación numérica -->
+                <div class="input-group-login">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="text" name="telefono" placeholder="Teléfono" required maxlength="9" 
+                           inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="input-group-login">

@@ -1,0 +1,328 @@
+<div
+    th:fragment="modalDireccion"
+    id="modalDireccion"
+    class="modal-direccion-overlay"
+     th:data-google-key="${googleMapsKey}">
+
+    <div class="modal-direccion-box">
+
+        <!-- CERRAR -->
+        <button
+            type="button"
+            class="btn-cerrar-direccion"
+            onclick="cerrarModalDireccion()">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <!-- ====================================== -->
+        <!-- PASO 1: ELEGIR CÓMO AGREGAR DIRECCIÓN -->
+        <!-- ====================================== -->
+
+        <div
+            id="pasoElegirDireccion"
+            class="direccion-paso">
+
+            <div class="direccion-icono-principal">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+            </div>
+
+
+            <h2>
+                Agregar dirección
+            </h2>
+
+
+            <p class="direccion-subtitulo">
+
+                Elige cómo deseas registrar
+                tu ubicación de entrega.
+
+            </p>
+
+
+            <!-- UBICACIÓN ACTUAL -->
+
+            <button
+                type="button"
+                class="direccion-opcion-principal"
+                onclick="detectarUbicacionActual()">
+
+                <div class="direccion-opcion-icono">
+
+                    <i class="fa-solid fa-location-crosshairs"></i>
+
+                </div>
+
+
+                <div class="direccion-opcion-texto">
+
+                    <strong>
+                        Detectar mi ubicación
+                    </strong>
+
+                    <span>
+                        Usar la ubicación actual
+                        de este dispositivo
+                    </span>
+
+                </div>
+
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            </button>
+
+
+            <!-- DIRECCIÓN MANUAL -->
+
+            <button
+                type="button"
+                class="direccion-opcion-secundaria"
+                onclick="mostrarFormularioManual()">
+
+                <div class="direccion-opcion-icono">
+
+                    <i class="fa-solid fa-pen"></i>
+
+                </div>
+
+
+                <div class="direccion-opcion-texto">
+
+                    <strong>
+                        Ingresar dirección manualmente
+                    </strong>
+
+                    <span>
+                        Escribe tu dirección
+                        y referencia
+                    </span>
+
+                </div>
+
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ====================================== -->
+        <!-- PASO 2: UBICACIÓN DETECTADA -->
+        <!-- ====================================== -->
+
+        <div
+            id="pasoConfirmarDireccion"
+            class="direccion-paso oculto">
+
+
+            <button
+                type="button"
+                class="btn-volver-direccion"
+                onclick="volverElegirDireccion()">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </button>
+
+
+            <h2>
+                Confirma tu ubicación
+            </h2>
+
+
+            <p class="direccion-subtitulo">
+
+                Verifica el punto detectado
+                y completa los datos.
+
+            </p>
+
+
+            <!-- MAPA -->
+
+            <div class="mapa-nueva-direccion-contenedor">
+
+                <iframe
+                    id="mapaNuevaDireccion"
+                    class="mapa-nueva-direccion"
+                    loading="lazy"
+                    allowfullscreen>
+                </iframe>
+
+            </div>
+
+
+            <!-- COORDENADAS -->
+
+            <input
+                type="hidden"
+                id="nuevaLatitud">
+
+            <input
+                type="hidden"
+                id="nuevaLongitud">
+
+
+            <!-- FORMULARIO -->
+
+            <div class="campo-direccion">
+
+                <label for="aliasDireccion">
+                    Nombre de la dirección
+                </label>
+
+                <div class="input-direccion-wrapper">
+
+                    <i class="fa-solid fa-house"></i>
+
+                    <input
+                        type="text"
+                        id="aliasDireccion"
+                        placeholder="Casa, Trabajo, Universidad...">
+
+                </div>
+
+            </div>
+
+
+            <div class="campo-direccion">
+
+                <label for="direccionTexto">
+                    Dirección
+                </label>
+
+                <div class="input-direccion-wrapper">
+
+                    <i class="fa-solid fa-road"></i>
+
+                    <input
+                        type="text"
+                        id="direccionTexto"
+                        placeholder="Jr. Puerto Callao 250">
+
+                </div>
+
+            </div>
+
+
+            <div class="campo-direccion">
+
+                <label for="referenciaDireccion">
+                    Referencia
+                </label>
+
+                <div class="input-direccion-wrapper">
+
+                    <i class="fa-solid fa-map-pin"></i>
+
+                    <input
+                        type="text"
+                        id="referenciaDireccion"
+                        placeholder="Frente al parque, casa naranja...">
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="btn-guardar-direccion"
+                onclick="guardarNuevaDireccion()">
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Guardar dirección
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ====================================== -->
+        <!-- PASO MANUAL -->
+        <!-- ====================================== -->
+
+        <div
+            id="pasoDireccionManual"
+            class="direccion-paso oculto">
+
+
+            <button
+                type="button"
+                class="btn-volver-direccion"
+                onclick="volverElegirDireccion()">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </button>
+
+
+            <h2>
+                Ingresa tu dirección
+            </h2>
+
+
+            <p class="direccion-subtitulo">
+
+                Completa los datos manualmente.
+
+            </p>
+
+
+            <div class="campo-direccion">
+
+                <label for="aliasDireccionManual">
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    id="aliasDireccionManual"
+                    placeholder="Casa, Trabajo...">
+
+            </div>
+
+
+            <div class="campo-direccion">
+
+                <label for="direccionTextoManual">
+                    Dirección
+                </label>
+
+                <input
+                    type="text"
+                    id="direccionTextoManual"
+                    placeholder="Av. Centenario 450">
+
+            </div>
+
+
+            <div class="campo-direccion">
+
+                <label for="referenciaDireccionManual">
+                    Referencia
+                </label>
+
+                <input
+                    type="text"
+                    id="referenciaDireccionManual"
+                    placeholder="Frente al parque...">
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
