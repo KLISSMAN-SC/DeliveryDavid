@@ -869,3 +869,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+function filtrarSeccionMenu(seccion, elementoPill) {
+    // 1. Cambiar el estilo visual de los botones (pills)
+    const pills = document.querySelectorAll('.restaurante-categorias-pills .pill');
+    pills.forEach(pill => pill.classList.remove('activo'));
+    elementoPill.classList.add('activo');
+
+    // 2. Cambiar el título de la sección
+    const titulo = document.getElementById('tituloSeccionActual');
+    titulo.textContent = elementoPill.textContent;
+
+    // 3. Filtrar los productos
+    const productos = document.querySelectorAll('.item-menu');
+    let contadorVisibles = 0;
+
+    productos.forEach(producto => {
+        const seccionProducto = producto.getAttribute('data-seccion');
+        
+        if (seccion === 'TODOS' || seccionProducto === seccion) {
+            producto.style.display = 'flex'; // O el display que use tu grid (block, flex, grid)
+            contadorVisibles++;
+        } else {
+            producto.style.display = 'none';
+        }
+    });
+
+    // 4. Mostrar mensaje si la categoría está vacía
+    const mensajeVacio = document.getElementById('mensajeVacioMenu');
+    if (contadorVisibles === 0) {
+        mensajeVacio.style.display = 'flex';
+    } else {
+        mensajeVacio.style.display = 'none';
+    }
+}

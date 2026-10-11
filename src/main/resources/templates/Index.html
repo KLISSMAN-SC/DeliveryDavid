@@ -27,7 +27,7 @@
         <div class="search-wrapper">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputBuscar" class="search-input" placeholder="Busca negocios de restaurantes, farmacias, licoreria..." autocomplete="off">
+                <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar Negocio..." autocomplete="off">
             </div>
             <!-- Contenedor desplegable dinámico -->
             <div id="dropdownResultados" class="search-dropdown"></div>
@@ -45,10 +45,12 @@
    		Agregar dirección
 
 		</button>
-            <div class="redes-sociales">
-                
-                <a href="#" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
+            <!-- Botón de WhatsApp Cabecera Dinámico -->
+            <a th:if="${configApp.telefonoSoporte != null}" 
+               th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=' + ${configApp.mensajeWspCabecera}}" 
+               target="_blank" class="btn-wsp-cabecera" title="Ayuda por WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
             
     <!-- ==========================================
      USUARIO NO AUTENTICADO
@@ -354,12 +356,15 @@
             </div>
             <p>Comida que encaja con tu día.</p>
             
-            <!-- Íconos de Redes Sociales -->
+            <!-- Íconos de Redes Sociales Dinámicos -->
             <div class="redes-sociales">
-                <a href="#" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                <a href="https://api.whatsapp.com/send?phone=51984690217&text=Hola%20RIDE%20MEAL,%20necesito%20ayuda%20con%20un%20pedido" target="_blank" rel="noopener noreferrer" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a th:if="${configApp.linkFacebook != null and !configApp.linkFacebook.isEmpty()}" th:href="${configApp.linkFacebook}" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a th:if="${configApp.linkInstagram != null and !configApp.linkInstagram.isEmpty()}" th:href="${configApp.linkInstagram}" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a th:if="${configApp.linkTiktok != null and !configApp.linkTiktok.isEmpty()}" th:href="${configApp.linkTiktok}" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                
+                <a th:if="${configApp.telefonoSoporte != null}" 
+                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=' + ${configApp.mensajeWspFooter}}" 
+                   target="_blank" title="WhatsApp Soporte"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
             
             <p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Dablyn Delivery</p>

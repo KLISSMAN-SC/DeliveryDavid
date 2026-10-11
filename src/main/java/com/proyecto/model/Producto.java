@@ -31,6 +31,9 @@ public class Producto {
 	private String imagen;
 	
 	private Boolean disponible;
+	
+	@Column(name = "seccionMenu")
+    private String seccionMenu;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="idNegocio", nullable=false)

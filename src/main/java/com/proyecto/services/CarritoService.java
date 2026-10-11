@@ -68,66 +68,79 @@ public class CarritoService {
 	    }
 
 
+	// =====================================================
+	    // AGREGAR PRODUCTO (Optimizado)
 	    // =====================================================
-	    // AGREGAR PRODUCTO
-	    // =====================================================
-	 @Transactional
-	 public Carrito agregarProducto(
-	         Integer idUsuario,
-	         Integer idNegocio,
-	         Integer idProducto) {
+	    @Transactional
+	    public Carrito agregarProducto(
+	            Integer idUsuario,
+	            Integer idNegocio,
+	            Integer idProducto) {
 
 
-	     Carrito carrito =
-	             obtenerOCrearCarrito(
-	                     idUsuario,
-	                     idNegocio
-	             );
+	        Carrito carrito =
+	                obtenerOCrearCarrito(
+	                        idUsuario,
+	                        idNegocio
+	                );
 
 
-	     Producto producto =
-	             productoRepository
-	             .findById(idProducto)
-	             .orElseThrow(() ->
-	                 new RuntimeException(
-	                     "Producto no encontrado"
-	                 )
-	             );
+	        Producto producto =
+	                productoRepository
+	                .findById(idProducto)
+	                .orElseThrow(() ->
+	                    new RuntimeException(
+	                        "Producto no encontrado"
+	                    )
+	                );
 
 
-	     if (!producto
-	             .getNegocio()
-	             .getIdNegocio()
-	             .equals(idNegocio)) {
+	        if (!producto
+	                .getNegocio()
+	                .getIdNegocio()
+	                .equals(idNegocio)) {
 
-	         throw new RuntimeException(
-	             "El producto no pertenece al negocio"
-	         );
-	     }
+	            throw new RuntimeException(
+	                "El producto no pertenece al negocio"
+	            );
+	        }
 
+	        // Lógica JPA pura en lugar del Query nativo: Buscar si existe
+	        DetalleCarrito detalleExistente = detalleCarritoRepository
+	                .findByCarritoIdCarritoAndProductoIdProducto(carrito.getIdCarrito(), producto.getIdProducto())
+	                .orElse(null);
 
-	     detalleCarritoRepository
-	             .agregarOIncrementar(
-	                     carrito.getIdCarrito(),
-	                     producto.getIdProducto(),
-	                     producto.getPrecio()
-	             );
+	        if (detalleExistente != null) {
+	            // SI EXISTE: Actualizamos cantidad
+	            detalleExistente.setCantidad(detalleExistente.getCantidad() + 1);
+	            detalleCarritoRepository.save(detalleExistente);
+	        } else {
+	            // SI NO EXISTE: Lo creamos
+	            DetalleCarrito nuevoDetalle = new DetalleCarrito();
+	            nuevoDetalle.setCarrito(carrito);
+	            nuevoDetalle.setProducto(producto);
+	            nuevoDetalle.setCantidad(1);
+	            nuevoDetalle.setPrecioUnitario(producto.getPrecio());
+	            detalleCarritoRepository.save(nuevoDetalle);
+	        }
 
+	        // Actualizar la fecha del carrito
+	        carrito.setFechaActualizacion(LocalDateTime.now());
+	        carritoRepository.save(carrito);
 
-	     // MUY IMPORTANTE:
-	     // volver a consultar el carrito actualizado
-
-	     return carritoRepository
-	             .buscarCarritoCompleto(
-	                     idUsuario,
-	                     idNegocio
-	             )
-	             .orElseThrow(() ->
-	                 new RuntimeException(
-	                     "No se pudo recuperar el carrito"
-	                 )
-	             );
-	 }
+	        // MUY IMPORTANTE:
+	        // volver a consultar el carrito actualizado
+	        return carritoRepository
+	                .buscarCarritoCompleto(
+	                        idUsuario,
+	                        idNegocio
+	                )
+	                .orElseThrow(() ->
+	                    new RuntimeException(
+	                        "No se pudo recuperar el carrito"
+	                    )
+	                );
+	    }
 	 
 	 public Carrito disminuirProducto(
 		        Integer idUsuario,

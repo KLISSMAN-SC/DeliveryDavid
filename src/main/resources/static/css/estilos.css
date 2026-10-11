@@ -2145,3 +2145,63 @@ footer {
     transform: scale(1.1);
     transition: transform 0.3s ease;
 }
+/* =========================================================
+   BOTÓN DE WHATSAPP (CABECERA)
+   ========================================================= */
+.btn-wsp-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background-color: rgba(255, 255, 255, 0.05); /* Mismo fondo que el menú de perfil */
+    border: 1px solid var(--borde-sutil);        /* Borde gris oscuro uniforme */
+    border-radius: 50%;                          /* Diseño perfectamente circular */
+    color: var(--texto-principal);
+    font-size: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Efecto Hover: Resplandor verde estilo Glassmorphism */
+.btn-wsp-cabecera:hover {
+    border-color: #25D366; 
+    background-color: rgba(37, 211, 102, 0.1);
+    color: #25D366;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.15);
+}
+/* =========================================================
+   BOTÓN AGREGAR DIRECCIÓN (CABECERA)
+   ========================================================= */
+.btn-agregar-direccion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.05); /* Fondo semitransparente igual al menú */
+    border: 1px solid var(--borde-sutil);        /* Borde oscuro */
+    color: var(--texto-principal);               /* Texto blanco */
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 30px;                         /* Bordes muy redondeados (Píldora) */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    white-space: nowrap;                         /* Evita que el texto se divida en 2 líneas */
+}
+
+/* Color naranja exclusivo para el ícono de + */
+.btn-agregar-direccion i {
+    color: var(--naranja-marca);
+    font-size: 15px;
+}
+
+/* Efecto hover interactivo */
+.btn-agregar-direccion:hover {
+    border-color: var(--naranja-marca);
+    background-color: rgba(255, 102, 0, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.15);
+}

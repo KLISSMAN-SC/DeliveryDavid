@@ -1,6 +1,7 @@
 package com.proyecto.controller;
 
 import com.proyecto.model.CategoriaProducto;
+import com.proyecto.model.Configuracion;
 import com.proyecto.model.Negocio;
 import com.proyecto.model.Producto;
 import com.proyecto.model.Promocion;
@@ -47,6 +48,8 @@ public class PanelController {
     
     @Autowired private ZonaRepository zonaRepo;
     @Autowired private CentroComercialRepository centroRepo;
+    
+    @Autowired private ConfiguracionRepository configRepo;
   
 
     
@@ -109,6 +112,9 @@ public class PanelController {
                 break;
             case "pedidos":
                 model.addAttribute("listaPedidos", pedidoRepo.findAll());
+                break;
+            case "configuracion":
+                model.addAttribute("configApp", configRepo.findById(1).orElse(new Configuracion()));
                 break;
         }
 
@@ -467,5 +473,15 @@ public class PanelController {
             redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al guardar el tipo de negocio.");
         }
         return "redirect:/panel?modulo=tipos_negocio";
+    }
+ // ==========================================
+    // LÓGICA PARA CONFIGURACIÓN GLOBAL
+    // ==========================================
+    @PostMapping("/configuracion/guardar")
+    public String guardarConfiguracion(@ModelAttribute Configuracion config, RedirectAttributes redirectAttributes) {
+        config.setIdConfiguracion(1); // Siempre forzamos el ID 1 (Fila única)
+        configRepo.save(config);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Configuración global actualizada correctamente.");
+        return "redirect:/panel?modulo=configuracion";
     }
 }

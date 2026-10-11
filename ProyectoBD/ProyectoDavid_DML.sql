@@ -96,3 +96,6 @@ INSERT INTO `promocion` (`idPromocion`, `titulo`, `descripcion`, `imagenBanner`,
 INSERT INTO DIRECCION_USUARIO(alias,direccion,referencia,latitud,longitud,principal,idUsuario)VALUES
 ('Casa','Av. Centenario 123','Casa de fachada blanca',-8.3791470,-74.5538670,1,1),
 ('Trabajo','Jr. Independencia 450','Frente al parque',-8.3830000,-74.5560000,0,1);
+
+INSERT INTO `CONFIGURACION` (`idConfiguracion`, `telefonoSoporte`, `mensajeWspCabecera`, `mensajeWspFooter`) VALUES 
+(1, '984690217', 'Hola, necesito ayuda rápida en Dablyn Delivery.', 'Hola Dablyn Delivery, necesito ayuda con un pedido.');

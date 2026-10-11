@@ -28,6 +28,7 @@
                 <a th:href="@{/panel?modulo=categorias}" th:classappend="${modulo == 'categorias'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-list"></i> Categorías de Prod.</a>
                 <a th:href="@{/panel?modulo=productos}" th:classappend="${modulo == 'productos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-box-open"></i> Productos</a>
                 <a th:href="@{/panel?modulo=promociones}" th:classappend="${modulo == 'promociones'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-star"></i> Promociones</a>
+            	<a th:href="@{/panel?modulo=configuracion}" th:classappend="${modulo == 'configuracion'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración Global</a>
             </div>
             
             <!-- OPERACIONES: Visible para Administradores y Repartidores -->
@@ -601,7 +602,15 @@
                                 <option value="true">Disponible</option>
                                 <option value="false">Agotado</option>
                             </select>
-
+							<div style="display: flex; gap: 10px;">
+                                <select id="inputSeccionMenu" name="seccionMenu" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
+                                    <option value="" disabled selected>Sección en el Menú...</option>
+                                    <option value="RECOMENDADO">Platos Recomendados</option>
+                                    <option value="PRINCIPAL">Platos Principales</option>
+                                    <option value="BEBIDA">Bebidas</option>
+                                    <option value="COMPLEMENTO">Complementos / Postres</option>
+                                </select>
+                            </div>
                             <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
                                 <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Foto del producto (Opcional si editas)</label>
                                 <input type="file" name="archivoImagen" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
@@ -779,7 +788,99 @@
                 </div>
             </div>
         </div>
+		<!-- ==========================================
+             8. CONFIGURACIÓN GLOBAL 
+             ========================================== -->
+        <div th:if="${modulo == 'configuracion'}">
+            <header class="panel-header">
+                <h2>Configuración Global del Sistema</h2>
+            </header>
 
+            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+
+            <section class="panel-contenido-crud">
+                
+                <!-- Ajustamos el contenedor principal para que soporte las 2 columnas -->
+                <form th:action="@{/panel/configuracion/guardar}" method="POST" style="max-width: 900px;">
+                    
+                    <!-- CSS Grid: 2 columnas adaptables (se vuelven 1 en pantallas pequeñas) -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;">
+                        
+                        <!-- =====================================
+                             TARJETA 1: WHATSAPP (Verde)
+                             ===================================== -->
+                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(37, 211, 102, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+                            
+                            <!-- Brillo Neón Sutil en el fondo -->
+                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 211, 102, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+                            
+                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+                                <div style="width: 65px; height: 65px; background: rgba(37, 211, 102, 0.1); color: #25D366; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </div>
+                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Atención al Cliente</h3>
+                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Configura el número y los mensajes predefinidos.</p>
+                            </div>
+
+                            <!-- Inputs con Íconos Incrustados -->
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Número de Soporte">
+                                <i class="fa-solid fa-phone" style="color: #25D366;"></i>
+                                <input type="text" name="telefonoSoporte" th:value="${configApp.telefonoSoporte}" placeholder="N° WhatsApp (Ej: 984690217)" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Mensaje superior">
+                                <i class="fa-regular fa-comment-dots" style="color: gray;"></i>
+                                <input type="text" name="mensajeWspCabecera" th:value="${configApp.mensajeWspCabecera}" placeholder="Mensaje para el botón de la cabecera">
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 0;" title="Mensaje inferior">
+                                <i class="fa-regular fa-comment" style="color: gray;"></i>
+                                <input type="text" name="mensajeWspFooter" th:value="${configApp.mensajeWspFooter}" placeholder="Mensaje para el pie de página">
+                            </div>
+                        </div>
+
+                        <!-- =====================================
+                             TARJETA 2: REDES SOCIALES (Azul)
+                             ===================================== -->
+                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(24, 119, 242, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+                            
+                            <!-- Brillo Neón Sutil en el fondo -->
+                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(24, 119, 242, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+                            
+                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+                                <div style="width: 65px; height: 65px; background: rgba(24, 119, 242, 0.1); color: #1877F2; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(24, 119, 242, 0.2);">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </div>
+                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Redes Sociales</h3>
+                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Enlaces a tus perfiles oficiales del pie de página.</p>
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Facebook">
+                                <i class="fa-brands fa-facebook-f" style="color: #1877F2;"></i>
+                                <input type="text" name="linkFacebook" th:value="${configApp.linkFacebook}" placeholder="Enlace de la página de Facebook">
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Instagram">
+                                <i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
+                                <input type="text" name="linkInstagram" th:value="${configApp.linkInstagram}" placeholder="Enlace del perfil de Instagram">
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 0;" title="Link de TikTok">
+                                <i class="fa-brands fa-tiktok" style="color: #ffffff;"></i>
+                                <input type="text" name="linkTiktok" th:value="${configApp.linkTiktok}" placeholder="Enlace de la cuenta de TikTok">
+                            </div>
+                        </div>
+
+                    </div> <!-- FIN DEL GRID -->
+
+                    <!-- Botón Guardar (Centrado y ancho) -->
+                    <button type="submit" class="btn-aceptar" style="width: 100%; max-width: 400px; display: block; margin: 0 auto; padding: 16px; font-size: 16px; border-radius: 12px;">
+                        <i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i> Guardar Configuración Global
+                    </button>
+                    
+                </form>
+            </section>
+        </div>
         <!-- ==========================================
              6. CRUD DE PEDIDOS (Operaciones) 
              ========================================== -->

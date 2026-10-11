@@ -152,6 +152,7 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`PRODUCTO` (
   `precio` DECIMAL(10,2) NULL,
   `imagen` VARCHAR(255) NULL,
   `disponible` TINYINT(1) NULL DEFAULT 1,
+  `seccionMenu` ENUM('RECOMENDADO', 'PRINCIPAL', 'BEBIDA', 'COMPLEMENTO') NULL DEFAULT 'PRINCIPAL',
   `idNegocio` INT NOT NULL,
   `idCategoriaProducto` INT NOT NULL,
   PRIMARY KEY (`idProducto`),
@@ -344,6 +345,19 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`DIRECCION_USUARIO`(
         ON UPDATE NO ACTION) 
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `proyecto_david`.`CONFIGURACION`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`CONFIGURACION` (
+  `idConfiguracion` INT NOT NULL AUTO_INCREMENT,
+  `telefonoSoporte` VARCHAR(20) NULL,
+  `linkFacebook` VARCHAR(255) NULL,
+  `linkInstagram` VARCHAR(255) NULL,
+  `linkTiktok` VARCHAR(255) NULL,
+  `mensajeWspCabecera` VARCHAR(500) NULL,
+  `mensajeWspFooter` VARCHAR(500) NULL,
+  PRIMARY KEY (`idConfiguracion`))
+ENGINE = InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

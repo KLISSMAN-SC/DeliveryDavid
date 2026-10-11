@@ -39,7 +39,7 @@
     <div th:if="${negocio.modoWhatsapp != null and negocio.modoWhatsapp}" class="vista-carta-whatsapp" style="text-align: center; margin-top: 30px; padding-bottom: 50px;">
         
         <div style="margin-bottom: 40px;">
-            <a th:href="'https://wa.me/51914896904?text=Hola,%20vengo%20de%20Dablyn%20Delivery%20y%20deseo%20hacer%20un%20pedido.'" 
+            <a th:href="'https://wa.me/51' + ${negocio.telefono} + '?text=Hola,%20vengo%20de%20Dablyn%20Delivery%20y%20deseo%20hacer%20un%20pedido.'" 
                target="_blank" 
                class="btn-aceptar" style="display: inline-block; width: auto; padding: 15px 35px; font-size: 16px; text-decoration: none; background: #25D366; color: white; border-radius: 30px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                 <i class="fa-brands fa-whatsapp" style="font-size: 22px; vertical-align: middle; margin-right: 8px;"></i> 
@@ -68,23 +68,29 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="buscarProductos" placeholder="Buscar productos..." class="search-input-interno" th:data-negocio="${negocio.idNegocio}" autocomplete="off">
             </div>
+            
+            <!-- Botones de Filtro Interno (Añadimos onclick y data-seccion) -->
             <ul class="restaurante-categorias-pills">
-                <li class="pill activo">Recomendados</li>
-                <li class="pill">Platos principales</li>
-                <li class="pill">Bebidas</li>
-                <li class="pill">Complementos</li>
+                <li class="pill activo" data-seccion="TODOS" onclick="filtrarSeccionMenu('TODOS', this)">Todos</li>
+                <li class="pill" data-seccion="RECOMENDADO" onclick="filtrarSeccionMenu('RECOMENDADO', this)">Recomendados</li>
+                <li class="pill" data-seccion="PRINCIPAL" onclick="filtrarSeccionMenu('PRINCIPAL', this)">Platos principales</li>
+                <li class="pill" data-seccion="BEBIDA" onclick="filtrarSeccionMenu('BEBIDA', this)">Bebidas</li>
+                <li class="pill" data-seccion="COMPLEMENTO" onclick="filtrarSeccionMenu('COMPLEMENTO', this)">Complementos</li>
             </ul>
         </div>
 
         <div class="restaurante-layout">
             <div class="restaurante-productos-seccion">
                 <div class="titulo-seccion-productos">
-                    <h2>Platos recomendados</h2>
+                    <!-- Título dinámico -->
+                    <h2 id="tituloSeccionActual">Todos los productos</h2>
                     <span class="tag-fotos"><i class="fa-regular fa-circle-check"></i> Fotos referenciales</span>
                 </div>
                 
                 <div class="grid-productos-interno" id="listaProductos" th:fragment="listaProductos">
-                    <article class="tarjeta-producto" th:each="producto : ${productos}">
+                    
+                    <!-- Tarjeta de Producto: Añadimos th:data-seccion -->
+                    <article class="tarjeta-producto item-menu" th:each="producto : ${productos}" th:data-seccion="${producto.seccionMenu != null ? producto.seccionMenu : 'PRINCIPAL'}">
                         <div class="producto-img-caja">
                             <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" th:src="@{'/productos/' + ${producto.imagen}}" alt="Producto">
                             <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" class="producto-placeholder"><i class="fa-solid fa-utensils"></i></div>
@@ -101,12 +107,14 @@
                         </div>
                     </article>
 
-                    <div class="productos-no-encontrados" th:if="${#lists.isEmpty(productos)}">
+                    <div class="productos-no-encontrados" id="mensajeVacioMenu" style="display: none;">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <p>No encontramos productos con ese nombre.</p>
+                        <p>No hay productos en esta sección.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- ... (Tu carrito se queda igual) ... -->
 
             <div class="restaurante-carrito-sidebar">
                 <div class="carrito-box">
