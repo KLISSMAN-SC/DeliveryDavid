@@ -344,7 +344,7 @@
             <span class="tarjeta-tiempo">
                 <i class="fa-regular fa-clock"></i> 25 - 40 min
             </span>
-            <span class="tarjeta-precio">S/ <span th:text="${negocio.zona.costoEnvioBase}">0.00</span></span>
+            <span class="tarjeta-precio">S/ <span th:text="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : '10.00'}">0.00</span></span>
         </div>
     </div>
 </article>
