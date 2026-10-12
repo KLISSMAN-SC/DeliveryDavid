@@ -445,5 +445,42 @@
 <script th:src="@{/js/productos.js}"></script>
 <script th:src="@{/js/pedido.js}"></script>
 <script th:src="@{/js/direccion.js}"></script>
+<script th:inline="javascript">
+        window.idUsuarioValidado = /*[[${usuarioAutenticado != null ? usuarioAutenticado.idUsuario : null}]]*/ null;
+
+        // NUEVO SCRIPT: Detectar alertas de Spring Security y mostrar el Toast
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('alerta')) {
+                const alerta = urlParams.get('alerta');
+                const toast = document.getElementById("toastNotificacion");
+                const icono = toast.querySelector(".toast-icono i");
+                
+                if (alerta === 'mantenimiento') {
+                    document.getElementById("toastTitulo").textContent = "Sección en Mantenimiento";
+                    document.getElementById("toastMensaje").textContent = "El apartado de 'Mis Pedidos' está desactivado, algún día se activará.";
+                    icono.className = "fa-solid fa-person-digging"; // Cambiamos el ícono a uno de construcción
+                    icono.parentElement.style.background = "rgba(255, 170, 0, 0.2)"; // Color naranja
+                    icono.style.color = "#ffaa00";
+                } else if (alerta === 'denegado') {
+                    document.getElementById("toastTitulo").textContent = "Acceso Denegado";
+                    document.getElementById("toastMensaje").textContent = "No tienes permisos para acceder a esta área papi.";
+                    icono.className = "fa-solid fa-lock";
+                    icono.parentElement.style.background = "rgba(255, 85, 85, 0.2)"; // Color rojo
+                    icono.style.color = "#ff5555";
+                }
+
+                // Mostrar el Toast
+                toast.classList.add("mostrar");
+                setTimeout(() => {
+                    toast.classList.remove("mostrar");
+                }, 4000);
+
+                // Limpiar la URL para que la alerta no vuelva a salir al recargar la página
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+    </script>
 </body>
 </html>

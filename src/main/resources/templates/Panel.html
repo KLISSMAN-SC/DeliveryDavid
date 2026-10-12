@@ -800,18 +800,16 @@
 
             <section class="panel-contenido-crud">
                 
-                <!-- Ajustamos el contenedor principal para que soporte las 2 columnas -->
-                <form th:action="@{/panel/configuracion/guardar}" method="POST" style="max-width: 900px;">
+                <!-- Formulario sin max-width para que el grid ocupe toda la pantalla disponible -->
+                <form th:action="@{/panel/configuracion/guardar}" method="POST" style="width: 100%;">
                     
-                    <!-- CSS Grid: 2 columnas adaptables (se vuelven 1 en pantallas pequeñas) -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;">
+                    <!-- CSS Grid: 3 columnas adaptables (min-width ajustado a 320px) -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 30px;">
                         
                         <!-- =====================================
                              TARJETA 1: WHATSAPP (Verde)
                              ===================================== -->
                         <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(37, 211, 102, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
-                            
-                            <!-- Brillo Neón Sutil en el fondo -->
                             <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 211, 102, 0.15); filter: blur(50px); border-radius: 50%;"></div>
                             
                             <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
@@ -822,7 +820,6 @@
                                 <p style="color: gray; font-size: 13px; margin-top: 5px;">Configura el número y los mensajes predefinidos.</p>
                             </div>
 
-                            <!-- Inputs con Íconos Incrustados -->
                             <div class="input-group-login" style="margin-bottom: 15px;" title="Número de Soporte">
                                 <i class="fa-solid fa-phone" style="color: #25D366;"></i>
                                 <input type="text" name="telefonoSoporte" th:value="${configApp.telefonoSoporte}" placeholder="N° WhatsApp (Ej: 984690217)" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -830,12 +827,12 @@
 
                             <div class="input-group-login" style="margin-bottom: 15px;" title="Mensaje superior">
                                 <i class="fa-regular fa-comment-dots" style="color: gray;"></i>
-                                <input type="text" name="mensajeWspCabecera" th:value="${configApp.mensajeWspCabecera}" placeholder="Mensaje para el botón de la cabecera">
+                                <input type="text" name="mensajeWspCabecera" th:value="${configApp.mensajeWspCabecera}" placeholder="Mensaje de la cabecera">
                             </div>
 
                             <div class="input-group-login" style="margin-bottom: 0;" title="Mensaje inferior">
                                 <i class="fa-regular fa-comment" style="color: gray;"></i>
-                                <input type="text" name="mensajeWspFooter" th:value="${configApp.mensajeWspFooter}" placeholder="Mensaje para el pie de página">
+                                <input type="text" name="mensajeWspFooter" th:value="${configApp.mensajeWspFooter}" placeholder="Mensaje del pie de página">
                             </div>
                         </div>
 
@@ -843,8 +840,6 @@
                              TARJETA 2: REDES SOCIALES (Azul)
                              ===================================== -->
                         <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(24, 119, 242, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
-                            
-                            <!-- Brillo Neón Sutil en el fondo -->
                             <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(24, 119, 242, 0.15); filter: blur(50px); border-radius: 50%;"></div>
                             
                             <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
@@ -852,22 +847,52 @@
                                     <i class="fa-solid fa-share-nodes"></i>
                                 </div>
                                 <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Redes Sociales</h3>
-                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Enlaces a tus perfiles oficiales del pie de página.</p>
+                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Enlaces a tus perfiles oficiales.</p>
                             </div>
 
                             <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Facebook">
                                 <i class="fa-brands fa-facebook-f" style="color: #1877F2;"></i>
-                                <input type="text" name="linkFacebook" th:value="${configApp.linkFacebook}" placeholder="Enlace de la página de Facebook">
+                                <input type="text" name="linkFacebook" th:value="${configApp.linkFacebook}" placeholder="Página de Facebook">
                             </div>
 
                             <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Instagram">
                                 <i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
-                                <input type="text" name="linkInstagram" th:value="${configApp.linkInstagram}" placeholder="Enlace del perfil de Instagram">
+                                <input type="text" name="linkInstagram" th:value="${configApp.linkInstagram}" placeholder="Perfil de Instagram">
                             </div>
 
                             <div class="input-group-login" style="margin-bottom: 0;" title="Link de TikTok">
                                 <i class="fa-brands fa-tiktok" style="color: #ffffff;"></i>
-                                <input type="text" name="linkTiktok" th:value="${configApp.linkTiktok}" placeholder="Enlace de la cuenta de TikTok">
+                                <input type="text" name="linkTiktok" th:value="${configApp.linkTiktok}" placeholder="Cuenta de TikTok">
+                            </div>
+                        </div>
+
+                        <!-- =====================================
+                             TARJETA 3: TARIFAS DE DELIVERY (Naranja)
+                             ===================================== -->
+                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(255, 102, 0, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(255, 102, 0, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+                            
+                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+                                <div style="width: 65px; height: 65px; background: rgba(255, 102, 0, 0.1); color: var(--naranja-marca); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);">
+                                    <i class="fa-solid fa-motorcycle"></i>
+                                </div>
+                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Tarifas de Delivery</h3>
+                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Ajusta el cobro por distancia de entrega.</p>
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Precio Base (S/)">
+                                <i class="fa-solid fa-coins" style="color: var(--naranja-marca);"></i>
+                                <input type="number" step="0.01" name="precioBaseDelivery" th:value="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : 10.00}" placeholder="Precio Base (Ej: 10.00)" required>
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 15px;" title="Distancia Base (metros)">
+                                <i class="fa-solid fa-ruler-horizontal" style="color: gray;"></i>
+                                <input type="number" name="distanciaBaseMetros" th:value="${configApp.distanciaBaseMetros != null ? configApp.distanciaBaseMetros : 500}" placeholder="Distancia Base en metros (Ej: 500)" required>
+                            </div>
+
+                            <div class="input-group-login" style="margin-bottom: 0;" title="Precio por Km Adicional (S/)">
+                                <i class="fa-solid fa-road" style="color: gray;"></i>
+                                <input type="number" step="0.01" name="precioKmAdicional" th:value="${configApp.precioKmAdicional != null ? configApp.precioKmAdicional : 1.00}" placeholder="Precio por Km extra (Ej: 1.00)" required>
                             </div>
                         </div>
 

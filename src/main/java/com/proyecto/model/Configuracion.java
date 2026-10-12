@@ -35,4 +35,14 @@ public class Configuracion {
     
     @Column(name = "mensajeWspFooter", length = 500)
     private String mensajeWspFooter;
+    
+ // NUEVOS CAMPOS PARA TARIFAS DE DELIVERY
+    @Column(name = "precioBaseDelivery")
+    private Double precioBaseDelivery;
+    
+    @Column(name = "distanciaBaseMetros")
+    private Integer distanciaBaseMetros;
+    
+    @Column(name = "precioKmAdicional")
+    private Double precioKmAdicional;
 }

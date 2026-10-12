@@ -356,6 +356,9 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`CONFIGURACION` (
   `linkTiktok` VARCHAR(255) NULL,
   `mensajeWspCabecera` VARCHAR(500) NULL,
   `mensajeWspFooter` VARCHAR(500) NULL,
+  `precioBaseDelivery` DECIMAL(10,2) NULL DEFAULT 10.00,
+  `distanciaBaseMetros` INT NULL DEFAULT 500,
+  `precioKmAdicional` DECIMAL(10,2) NULL DEFAULT 1.00,
   PRIMARY KEY (`idConfiguracion`))
 ENGINE = InnoDB;
 
