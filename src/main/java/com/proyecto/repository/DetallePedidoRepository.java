@@ -11,4 +11,8 @@ public interface DetallePedidoRepository extends JpaRepository<DetallePedido, In
     List<DetallePedido> findByPedidoIdPedido(
             Integer idPedido
     );
+    List<DetallePedido>
+    findByPedidoIdPedidoIn(
+            List<Integer> idsPedidos
+    );
 }

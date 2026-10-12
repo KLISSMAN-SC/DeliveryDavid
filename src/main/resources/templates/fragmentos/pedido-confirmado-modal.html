@@ -4,14 +4,22 @@
     class="modal-pedido-overlay">
 
     <div class="modal-seguimiento">
+		<button
+    	type="button"
+    	class="btn-cerrar-detalle-pedido"
+    	onclick="cerrarDetallePedido()"
+    	title="Cerrar">
 
+    	<i class="fa-solid fa-xmark"></i>
+
+		</button>
 
         <!-- ========================= -->
         <!-- CABECERA -->
         <!-- ========================= -->
-
+		
         <div class="seguimiento-header">
-
+		
             <span>
                 Pedido realizado
             </span>
@@ -115,12 +123,35 @@
 
                 Estado:
 
-                <strong
-                    th:text="${pedido.estadoPedido}">
+                <span th:switch="${pedido.estadoPedido}">
 
-                    PENDIENTE
+    <span
+        th:case="'PENDIENTE'">
+        Pendiente de confirmación
+    </span>
 
-                </strong>
+    <span th:case="'CONFIRMADO'">
+        Pedido confirmado
+    </span>
+
+    <span th:case="'EN_CAMINO'">
+        En camino
+    </span>
+
+    <span th:case="'ENTREGADO'">
+        Entregado
+    </span>
+
+    <span th:case="'CANCELADO'">
+        Cancelado
+    </span>
+
+    <span
+        th:case="*"
+        th:text="${pedido.estadoPedido}">
+    </span>
+
+</span>
 
             </p>
 
@@ -244,32 +275,6 @@
                     <span
                         th:text="${#numbers.formatDecimal(
                             pedido.costoEnvio,
-                            1,
-                            2
-                        )}">
-
-                        0.00
-
-                    </span>
-
-                </strong>
-
-            </div>
-
-
-            <div class="detalle-total-fila">
-
-                <span>
-                    Propina
-                </span>
-
-                <strong>
-
-                    S/
-
-                    <span
-                        th:text="${#numbers.formatDecimal(
-                            pedido.propina,
                             1,
                             2
                         )}">
@@ -409,13 +414,44 @@
         <!-- ========================= -->
 
         <button
-            type="button"
-            class="btn-volver-tienda"
-            onclick="finalizarVistaPedido()">
+    	th:if="${pedido.estadoPedido != null
+        and (
+            pedido.estadoPedido.toString() == 'PENDIENTE'
+            or pedido.estadoPedido.toString() == 'CONFIRMADO'
+        )}"
 
-            Volver a la tienda
+    	type="button"
+    	class="btn-cancelar-orden"
 
-        </button>
+    	th:data-pedido="${pedido.idPedido}"
+
+    	onclick="cancelarPedido(
+        this.dataset.pedido,
+        this
+   		 )">
+
+    	<i class="fa-solid fa-ban"></i>
+
+    	Cancelar orden
+
+		</button>
+		
+		<button
+    	th:if="${pedido.estadoPedido != null
+        and (
+            pedido.estadoPedido.toString() == 'CANCELADO'
+            or pedido.estadoPedido.toString() == 'EN_CAMINO'
+            or pedido.estadoPedido.toString() == 'ENTREGADO'
+        )}"
+
+    	type="button"
+    	class="btn-cerrar-pedido-confirmado"
+
+    	onclick="cerrarDetallePedido()">
+
+    	Cerrar
+
+		</button>
 
 
     </div>

@@ -28,8 +28,54 @@ public class DireccionUsuarioService {
 	            String referencia,
 	            BigDecimal latitud,
 	            BigDecimal longitud) {
+		 	if (
+			        alias == null ||
+			        alias.isBlank()
+			    ) {
+
+			        throw new IllegalArgumentException(
+			            "El nombre de la dirección es obligatorio"
+			        );
+			    }
 
 
+			    if (
+			        direccion == null ||
+			        direccion.isBlank()
+			    ) {
+
+			        throw new IllegalArgumentException(
+			            "La dirección es obligatoria"
+			        );
+			    }
+
+
+			    if (
+			        latitud == null ||
+			        longitud == null
+			    ) {
+
+			        throw new IllegalArgumentException(
+			            "La ubicación es obligatoria"
+			        );
+			    }
+
+
+			    if (alias.length() > 30) {
+
+			        throw new IllegalArgumentException(
+			            "El alias no puede superar 30 caracteres"
+			        );
+			    }
+
+
+			    if (direccion.length() > 150) {
+
+			        throw new IllegalArgumentException(
+			            "La dirección no puede superar 150 caracteres"
+			        );
+			    }
+		 	
 	        Usuario usuario =
 	                usuarioRepository
 	                .findById(idUsuario)
@@ -50,7 +96,11 @@ public class DireccionUsuarioService {
 
 	        nueva.setDireccion(direccion);
 
-	        nueva.setReferencia(referencia);
+	        nueva.setReferencia(
+	                referencia != null
+	                    ? referencia.trim()
+	                    : null
+	            );
 
 	        nueva.setLatitud(latitud);
 

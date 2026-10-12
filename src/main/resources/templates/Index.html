@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
     <link rel="stylesheet" th:href="@{/css/mapa.css}">
     <link rel="stylesheet" th:href="@{/css/direccion.css}">
+    <link rel="stylesheet" th:href="@{/css/pedidos.css}">
     
     <!-- Librería FontAwesome para los íconos de redes sociales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -85,16 +86,30 @@
         <a th:href="@{/perfil}">
             <i class="fa-solid fa-id-badge"></i> Mi Perfil
         </a>
-        <button
-        type="button"
-        class="menu-usuario-opcion"
-        onclick="abrirMisDirecciones()">
+        <a
+    	th:href="@{/pedido/mis-pedidos(
+        idUsuario=${usuarioAutenticado.idUsuario}
+    	)}"
+    	class="menu-usuario-opcion">
 
-        <i class="fa-solid fa-location-dot"></i>
+    	<i class="fa-solid fa-bag-shopping"></i>
 
-        Mis direcciones
+    	<span>
+        Mis pedidos
+    	</span>
 
-    	</button>
+		</a>
+        
+        
+        <a
+    	th:href="@{/direcciones(idUsuario=${usuarioAutenticado.idUsuario})}"
+    	class="menu-usuario-opcion">
+
+    	<i class="fa-solid fa-location-dot"></i>
+
+    	<span>Mis direcciones</span>
+
+		</a>
         
         <div class="dropdown-divisor"></div>
         

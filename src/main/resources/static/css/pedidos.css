@@ -1,0 +1,718 @@
+/* ==========================================
+   PÁGINA MIS PEDIDOS
+   ========================================== */
+
+.pagina-mis-pedidos {
+    background: #080808;
+    color: #fff;
+    min-height: 100vh;
+}
+
+
+.mis-pedidos-contenedor {
+    max-width: 1550px;
+    margin: auto;
+    padding: 50px 35px;
+}
+
+
+/* ==========================================
+   CABECERA
+   ========================================== */
+
+.mis-pedidos-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+
+.mis-pedidos-header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+
+.mis-pedidos-header p {
+    margin: 6px 0 0;
+    color: #999;
+}
+
+
+.btn-volver-pedidos {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px solid #353535;
+
+    background: #191919;
+    color: #fff;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.btn-volver-pedidos:hover {
+    border-color: #ff6500;
+    color: #ff6500;
+}
+
+
+/* ==========================================
+   FILTROS
+   ========================================== */
+
+.filtros-pedidos {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+
+.filtro-pedido {
+    padding: 11px 22px;
+
+    border: 1px solid #333;
+    border-radius: 25px;
+
+    background: #191919;
+    color: #aaa;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.filtro-pedido:hover {
+    border-color: #555;
+    color: #fff;
+}
+
+
+.filtro-pedido.activo {
+    border-color: #ff6500;
+
+    background: rgba(255, 101, 0, 0.12);
+
+    color: #ff6500;
+}
+
+
+/* ==========================================
+   GRID DE PEDIDOS
+   ========================================== */
+
+.grid-mis-pedidos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(390px, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+/* ==========================================
+   TARJETA PEDIDO
+   ========================================== */
+
+.pedido-cliente-card {
+    background: #191919;
+
+    border: 1px solid #343434;
+    border-radius: 17px;
+
+    padding: 20px;
+
+    transition: 0.2s ease;
+}
+
+
+.pedido-cliente-card:hover {
+    border-color: #454545;
+    transform: translateY(-2px);
+}
+
+
+/* ==========================================
+   CABECERA DE TARJETA
+   ========================================== */
+
+.pedido-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+.pedido-negocio-logo {
+    width: 55px;
+    height: 55px;
+
+    min-width: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    overflow: hidden;
+
+    background: #242424;
+}
+
+
+.pedido-negocio-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.pedido-card-negocio {
+    flex: 1;
+    min-width: 0;
+}
+
+
+.pedido-card-negocio h3 {
+    margin: 0 0 5px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.pedido-card-negocio span {
+    color: #999;
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   ESTADOS
+   ========================================== */
+
+.pedido-estado {
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+
+.estado-cancelado {
+    color: #ff5959;
+
+    background:
+        rgba(255, 89, 89, 0.15);
+}
+
+
+.estado-entregado {
+    color: #55d67d;
+
+    background:
+        rgba(85, 214, 125, 0.14);
+}
+
+
+.estado-en_camino {
+    color: #52a8ff;
+
+    background:
+        rgba(82, 168, 255, 0.14);
+}
+
+
+.estado-confirmado,
+.estado-pendiente_de_whatsapp {
+    color: #ffb000;
+
+    background:
+        rgba(255, 176, 0, 0.15);
+}
+
+
+/* ==========================================
+   RESUMEN DE PRODUCTOS
+   Se mantiene por si vuelves a usarlo.
+   ========================================== */
+
+.pedido-productos-resumen {
+    margin: 18px 0;
+
+    padding: 14px;
+
+    background: #222;
+
+    border-radius: 11px;
+
+    color: #bbb;
+
+    font-size: 13px;
+}
+
+
+.pedido-productos-resumen div {
+    margin: 4px 0;
+}
+
+
+/* ==========================================
+   FOOTER DE TARJETA
+   ========================================== */
+
+.pedido-card-footer {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    border-top: 1px solid #303030;
+
+    padding-top: 16px;
+    margin-top: 20px;
+}
+
+
+.pedido-card-footer small {
+    display: block;
+
+    color: #888;
+
+    font-size: 10px;
+}
+
+
+.pedido-card-footer strong {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 20px;
+}
+
+
+.pedido-card-acciones {
+    display: flex;
+
+    gap: 8px;
+}
+
+
+/* ==========================================
+   BOTONES TARJETA
+   ========================================== */
+
+.btn-ver-pedido,
+.btn-cancelar-card {
+    padding: 10px 15px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+
+.btn-ver-pedido {
+    border: none;
+
+    background: #ff6500;
+
+    color: white;
+}
+
+
+.btn-ver-pedido:hover {
+    background: #e95b00;
+}
+
+
+.btn-cancelar-card {
+    border: 1px solid #ff4d4d;
+
+    background: transparent;
+
+    color: #ff4d4d;
+}
+
+
+.btn-cancelar-card:hover {
+    background: #ff4d4d;
+
+    color: #fff;
+}
+
+
+/* ==========================================
+   OVERLAY MODAL PEDIDO CONFIRMADO
+   ========================================== */
+
+.modal-pedido-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: rgba(0, 0, 0, 0.82);
+
+    z-index: 200000;
+}
+
+
+/* ==========================================
+   CONTENEDOR BLANCO DEL MODAL
+   IMPORTANTE:
+   position: relative hace que la X se coloque
+   respecto a este cuadro.
+   ========================================== */
+.modal-seguimiento {
+    position: relative;
+}
+.seguimiento-header {
+    padding-right: 70px;
+}
+
+
+/* ==========================================
+   BOTÓN X SUPERIOR
+   ========================================== */
+
+.btn-cerrar-detalle-pedido {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid #444;
+
+    border-radius: 50%;
+
+    background: #1f1f1f;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    z-index: 1000;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.btn-cerrar-detalle-pedido:hover {
+    background: #ff6500;
+
+    border-color: #ff6500;
+
+    color: #ffffff;
+
+    transform: scale(1.05);
+}
+
+
+.btn-cerrar-detalle-pedido:active {
+    transform: scale(0.95);
+}
+
+
+/* ==========================================
+   ZONA DE ACCIONES DEL PEDIDO CONFIRMADO
+   ========================================== */
+
+.acciones-pedido-confirmado {
+    padding: 20px;
+
+    margin-top: 10px;
+}
+
+
+/* ==========================================
+   BOTÓN CANCELAR ORDEN
+   ========================================== */
+
+.btn-cancelar-orden {
+    width: 100%;
+
+    padding: 14px 20px;
+
+    border: 1px solid #ff4d4d;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 77, 77, 0.10);
+
+    color: #ff4d4d;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.btn-cancelar-orden:hover {
+    background: #ff4d4d;
+
+    color: #ffffff;
+
+    transform: translateY(-1px);
+}
+
+
+.btn-cancelar-orden:active {
+    transform: translateY(0);
+}
+
+
+/* ==========================================
+   BOTÓN CERRAR INFERIOR
+   Para pedidos cancelados, entregados,
+   o que ya no pueden cancelarse.
+   ========================================== */
+
+.btn-cerrar-pedido-confirmado {
+    width: 100%;
+
+    padding: 14px 20px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #ff6500;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.btn-cerrar-pedido-confirmado:hover {
+    background: #e95b00;
+
+    transform: translateY(-1px);
+}
+
+
+.btn-cerrar-pedido-confirmado:active {
+    transform: translateY(0);
+}
+
+
+/* ==========================================
+   MENSAJE CUANDO FILTRO NO ENCUENTRA PEDIDOS
+   ========================================== */
+
+.sin-pedidos-filtro {
+    margin-top: 40px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #999;
+
+    background: #191919;
+
+    border: 1px solid #333;
+
+    border-radius: 15px;
+}
+
+
+/* ==========================================
+   ESTADO SIN PEDIDOS
+   ========================================== */
+
+.pedidos-vacio {
+    min-height: 350px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    background: #191919;
+
+    border: 1px solid #333;
+
+    border-radius: 18px;
+
+    color: #999;
+}
+
+
+.pedidos-vacio > i {
+    margin-bottom: 15px;
+
+    color: #ff6500;
+
+    font-size: 42px;
+}
+
+
+.pedidos-vacio h2 {
+    margin: 0 0 10px;
+
+    color: #fff;
+}
+
+
+.pedidos-vacio p {
+    margin: 0 0 20px;
+}
+
+
+.pedidos-vacio a {
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    background: #ff6500;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 700px) {
+
+    .mis-pedidos-contenedor {
+        padding: 30px 18px;
+    }
+
+
+    .mis-pedidos-header h1 {
+        font-size: 26px;
+    }
+
+
+    .grid-mis-pedidos {
+        grid-template-columns: 1fr;
+    }
+
+
+    .pedido-card-header {
+        flex-wrap: wrap;
+    }
+
+
+    .pedido-estado {
+        margin-left: 69px;
+    }
+
+
+    .pedido-card-footer {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .pedido-card-acciones {
+        width: 100%;
+    }
+
+
+    .btn-ver-pedido,
+    .btn-cancelar-card {
+        flex: 1;
+    }
+
+
+    .modal-pedido-overlay {
+        padding: 8px;
+    }
+
+
+    .modal-pedido-confirmado {
+        width: 100%;
+
+        max-height: 96vh;
+
+        border-radius: 15px;
+    }
+
+
+    .btn-cerrar-detalle-pedido {
+        top: 12px;
+        right: 12px;
+
+        width: 38px;
+        height: 38px;
+    }
+}

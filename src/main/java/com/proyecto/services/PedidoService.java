@@ -2,7 +2,10 @@ package com.proyecto.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -184,7 +187,7 @@ public class PedidoService {
 
 
 	        pedido.setEstadoPedido(
-	                EstadoPedido.PENDIENTE_DE_WHATSAPP
+	                EstadoPedido.PENDIENTE
 	        );
 
 
@@ -317,8 +320,66 @@ public class PedidoService {
 
 	        return pedido;
 	    }
+	    @Transactional
+	    public Pedido cancelarPedido(
+	            Integer idPedido,
+	            Integer idUsuario) {
 
 
+	        Pedido pedido =
+	                pedidoRepository
+	                .findByIdPedidoAndUsuarioIdUsuario(
+	                        idPedido,
+	                        idUsuario
+	                )
+	                .orElseThrow(() ->
+	                    new RuntimeException(
+	                        "Pedido no encontrado"
+	                    )
+	                );
+
+
+	        String estadoActual =
+	                pedido.getEstadoPedido().toString();
+
+
+	        // Ya cancelado
+	        if ("CANCELADO".equals(estadoActual)) {
+
+	            throw new RuntimeException(
+	                "El pedido ya se encuentra cancelado"
+	            );
+	        }
+
+
+	        // Ya entregado
+	        if ("ENTREGADO".equals(estadoActual)) {
+
+	            throw new RuntimeException(
+	                "Un pedido entregado no puede cancelarse"
+	            );
+	        }
+
+
+	        // Si ya salió a reparto, tampoco
+	        if ("EN_CAMINO".equals(estadoActual)) {
+
+	            throw new RuntimeException(
+	                "El pedido ya está en camino y no puede cancelarse"
+	            );
+	        }
+
+
+	        pedido.setEstadoPedido(
+	                EstadoPedido.CANCELADO
+	        );
+
+
+	        return pedidoRepository.save(
+	                pedido
+	        );
+
+	    }
 	    // ==========================================
 	    // OBTENER PEDIDO
 	    // ==========================================
@@ -334,6 +395,14 @@ public class PedidoService {
 	                    )
 	                );
 	    }
+	    public List<Pedido> listarPedidosUsuario(
+	            Integer idUsuario) {
+
+	        return pedidoRepository
+	                .findByUsuarioIdUsuarioOrderByIdPedidoDesc(
+	                        idUsuario
+	                );
+	    }
 
 
 	    // ==========================================
@@ -347,6 +416,40 @@ public class PedidoService {
 	        return detallePedidoRepository
 	                .findByPedidoIdPedido(
 	                        idPedido
+	                );
+	    }
+	    public Map<Integer, List<DetallePedido>>
+	    obtenerDetallesAgrupados(
+	            List<Pedido> pedidos) {
+
+
+	        if (pedidos.isEmpty()) {
+
+	            return new HashMap<>();
+	        }
+
+
+	        List<Integer> idsPedidos =
+	                pedidos.stream()
+	                .map(Pedido::getIdPedido)
+	                .toList();
+
+
+	        List<DetallePedido> detalles =
+	                detallePedidoRepository
+	                .findByPedidoIdPedidoIn(
+	                        idsPedidos
+	                );
+
+
+	        return detalles.stream()
+	                .collect(
+	                    Collectors.groupingBy(
+	                        detalle ->
+	                            detalle
+	                            .getPedido()
+	                            .getIdPedido()
+	                    )
 	                );
 	    }
 	

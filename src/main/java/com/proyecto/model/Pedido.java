@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Pedido {
 	
-	public enum EstadoPedido {PENDIENTE_DE_WHATSAPP,CONFIRMADO,EN_CAMINO,ENTREGADO,CANCELADO}
+	public enum EstadoPedido {PENDIENTE,CONFIRMADO,EN_CAMINO,ENTREGADO,CANCELADO}
 	
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)

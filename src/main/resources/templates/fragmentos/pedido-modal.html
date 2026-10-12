@@ -76,22 +76,7 @@
             </select>
         </section>
 
-        <!-- =============================== -->
-        <!-- PROPINA -->
-        <!-- =============================== -->
-        <section class="pedido-seccion">
-            <h3><i class="fa-solid fa-hand-holding-dollar"></i> Propina</h3>
-            <p style="margin-bottom: 12px; margin-top: -5px;">La propina es voluntaria.</p>
-            
-            <div class="opciones-propina">
-	            <!-- Por defecto marcamos 'Sin propina' como activo -->
-	            <button type="button" class="activo" onclick="seleccionarPropina(0, this)">Sin propina</button>
-	            <button type="button" onclick="seleccionarPropina(2, this)">S/ 2.00</button>
-	            <button type="button" onclick="seleccionarPropina(3, this)">S/ 3.00</button>
-	            <button type="button" onclick="seleccionarPropina(5, this)">S/ 5.00</button>
-	        </div>
-            <input type="hidden" id="propinaPedido" value="0">
-        </section>
+        
 
         <!-- =============================== -->
         <!-- PRODUCTOS -->
@@ -121,10 +106,7 @@
                 <span>Envío</span>
                 <strong>S/ <span th:text="${#numbers.formatDecimal(envio, 1, 2)}">0.00</span></strong>
             </div>
-            <div>
-                <span>Propina</span>
-                <strong>S/ <span id="propinaResumen">0.00</span></strong>
-            </div>
+            
             
             <hr>
             

@@ -397,34 +397,80 @@ function guardarNuevaDireccion() {
         ).value;
 
 
-    if (!alias) {
+		// ==============================
+		    // VALIDACIONES
+		    // ==============================
 
-        alert(
-            "Ingresa un nombre para la dirección."
-        );
+		    if (!alias) {
 
-        return;
-    }
+		        mostrarToast(
+		            "Campo obligatorio",
+		            "Ingresa un nombre para la dirección."
+		        );
+
+		        document.getElementById(
+		            "aliasDireccion"
+		        ).focus();
+
+		        return;
+		    }
 
 
-    if (!direccion) {
+		    if (!direccion) {
 
-        alert(
-            "Ingresa la dirección."
-        );
+		        mostrarToast(
+		            "Campo obligatorio",
+		            "Ingresa la dirección."
+		        );
 
-        return;
-    }
+		        document.getElementById(
+		            "direccionTexto"
+		        ).focus();
+
+		        return;
+		    }
 
 
     if (!latitud || !longitud) {
 
-        alert(
-            "No se pudo obtener la ubicación."
-        );
+		mostrarToast(
+		            "Ubicación requerida",
+		            "Primero debes detectar tu ubicación."
+		        );
 
         return;
     }
+	if (alias.length > 30) {
+
+	        mostrarToast(
+	            "Nombre demasiado largo",
+	            "El nombre de la dirección no puede superar 30 caracteres."
+	        );
+
+	        return;
+	    }
+
+
+	    if (direccion.length > 150) {
+
+	        mostrarToast(
+	            "Dirección demasiado larga",
+	            "La dirección no puede superar 150 caracteres."
+	        );
+
+	        return;
+	    }
+
+
+	    if (referencia.length > 150) {
+
+	        mostrarToast(
+	            "Referencia demasiado larga",
+	            "La referencia no puede superar 150 caracteres."
+	        );
+
+	        return;
+	    }
 
 
     const datos =
@@ -519,7 +565,11 @@ function guardarNuevaDireccion() {
 	        "direcciones"
 	    ) {
 
-	        abrirMisDirecciones();
+			setTimeout(() => {
+
+			        window.location.reload();
+
+			    }, 700);
 
 	    }
 
@@ -536,9 +586,10 @@ function guardarNuevaDireccion() {
             error
         );
 
-        alert(
-            "Ocurrió un error guardando la dirección."
-        );
+		mostrarToast(
+		            "No se pudo guardar",
+		            "Ocurrió un error al registrar la dirección."
+		        );
     });
 }
 function volverElegirDireccion() {
@@ -573,66 +624,7 @@ function mostrarFormularioManual() {
         "pasoDireccionManual"
     ).classList.remove("oculto");
 }
-function abrirMisDirecciones() {
 
-    const idUsuario =
-        obtenerIdUsuario();
-
-
-    fetch(
-        `/api/direcciones/vista` +
-        `?idUsuario=${idUsuario}`
-    )
-
-    .then(response => {
-
-        if (!response.ok) {
-
-            throw new Error(
-                "No se pudieron cargar las direcciones"
-            );
-        }
-
-
-        return response.text();
-    })
-
-    .then(html => {
-
-        const contenido =
-            document.getElementById(
-                "contenido-principal"
-            );
-
-
-        if (!contenido) {
-
-            console.error(
-                "No existe #contenido-principal"
-            );
-
-            return;
-        }
-
-
-        contenido.innerHTML =
-            html;
-
-
-        window.scrollTo(
-            0,
-            0
-        );
-    })
-
-    .catch(error => {
-
-        console.error(
-            "Error cargando direcciones:",
-            error
-        );
-    });
-}
 function eliminarDireccionUsuario(
     boton
 ) {
@@ -687,16 +679,31 @@ function eliminarDireccionUsuario(
 
     .then(resultado => {
 
+		mostrarToast(
+		        "Dirección eliminada",
+		        "La dirección se eliminó correctamente."
+		    );
 
-        mostrarToast(
-            "Dirección eliminada",
-            "La dirección se eliminó correctamente."
-        );
+
+		    const tarjeta =
+		        boton.closest(
+		            ".direccion-card"
+		        );
 
 
-        // Recargar lista
+		    if (tarjeta) {
 
-        abrirMisDirecciones();
+		        tarjeta.remove();
+
+		    }
+
+
+		    setTimeout(() => {
+
+		        window.location.reload();
+
+		    }, 700);
+        
     })
 
     .catch(error => {

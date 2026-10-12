@@ -78,55 +78,6 @@ function cerrarModalPedido() {
     document.body.style.overflow = "";
 }
 
-
-
-
-// ==========================================
-// PROPINA
-// ==========================================
-
-function seleccionarPropina(valor) {
-
-    const inputPropina =
-        document.getElementById(
-            "propinaPedido"
-        );
-
-
-    const propinaResumen =
-        document.getElementById(
-            "propinaResumen"
-        );
-
-
-    const totalElemento =
-        document.getElementById(
-            "totalPedido"
-        );
-
-
-    inputPropina.value = valor;
-
-
-    propinaResumen.textContent =
-        Number(valor).toFixed(2);
-
-
-    const totalBase =
-        Number(
-            totalElemento.dataset.base
-        );
-
-
-    totalElemento.textContent =
-        (
-            totalBase +
-            Number(valor)
-        ).toFixed(2);
-}
-
-
-
 // ==========================================
 // CONFIRMAR PEDIDO
 // ==========================================
@@ -167,12 +118,6 @@ function confirmarPedido(boton) {
 	        ).value;
 
 
-	    const propina =
-	        document.getElementById(
-	            "propinaPedido"
-	        ).value;
-
-
 	    const datos =
 	        new URLSearchParams();
 
@@ -196,12 +141,6 @@ function confirmarPedido(boton) {
 	        "metodoPago",
 	        metodoPago
 	    );
-
-	    datos.append(
-	        "propina",
-	        propina
-	    );
-
 
 	    boton.disabled = true;
 
@@ -285,55 +224,151 @@ function confirmarPedido(boton) {
 	            "Hacer pedido";
 	    });
 }
-function mostrarPedidoConfirmado(
-    idPedido
+function cancelarPedido(
+    idPedido,
+    boton
 ) {
 
-    return fetch(
-        `/api/pedido/confirmacion/${idPedido}`
+    const idUsuario =
+        obtenerIdUsuario();
+
+
+    const confirmar =
+        window.confirm(
+            "¿Estás seguro de cancelar este pedido?"
+        );
+
+
+    if (!confirmar) {
+        return;
+    }
+
+
+    boton.disabled = true;
+
+    boton.innerHTML =
+        "Cancelando...";
+
+
+    fetch(
+        `/api/pedido/${idPedido}/cancelar` +
+        `?idUsuario=${idUsuario}`,
+        {
+            method: "POST",
+
+            headers: {
+                "Accept":
+                    "application/json"
+            }
+        }
     )
 
-    .then(response => {
+    .then(async response => {
+
+        const resultado =
+            await response.json();
+
 
         if (!response.ok) {
 
             throw new Error(
-                "No se pudo cargar la confirmación"
+                resultado.mensaje ||
+                "No se pudo cancelar"
             );
         }
 
 
-        return response.text();
+        return resultado;
     })
 
-
-    .then(html => {
-
-
-        const contenedor =
-            document.getElementById(
-                "contenedor-modal-pedido"
-            );
+    .then(resultado => {
 
 
-        if (!contenedor) {
-
-            throw new Error(
-                "No existe el contenedor del modal"
-            );
-        }
+        mostrarToast(
+            "Pedido cancelado",
+            "La orden fue cancelada correctamente."
+        );
 
 
-        // REEMPLAZAMOS EL CHECKOUT
-        // POR EL SEGUIMIENTO
+        // Volvemos a consultar el modal
+        // para actualizar el estado visual
 
-        contenedor.innerHTML =
-            html;
+        return mostrarPedidoConfirmado(
+            idPedido
+        );
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Error cancelando pedido:",
+            error
+        );
 
 
-        document.body.style.overflow =
-            "hidden";
+        mostrarToast(
+            "No se pudo cancelar",
+            error.message
+        );
+
+
+        boton.disabled = false;
+
+        boton.innerHTML =
+            `<i class="fa-solid fa-ban"></i>
+             Cancelar orden`;
     });
+}
+function mostrarPedidoConfirmado(
+    idPedido
+) {
+
+	const contenedor =
+	        document.getElementById(
+	            "contenedor-modal-pedido"
+	        );
+
+
+	    if (!contenedor) {
+
+	        console.error(
+	            "No existe #contenedor-modal-pedido"
+	        );
+
+	        return Promise.reject(
+	            new Error(
+	                "Contenedor modal inexistente"
+	            )
+	        );
+	    }
+
+
+	    return fetch(
+	        `/api/pedido/confirmacion/${idPedido}`
+	    )
+
+	    .then(response => {
+
+	        if (!response.ok) {
+
+	            throw new Error(
+	                "No se pudo cargar la confirmación"
+	            );
+	        }
+
+
+	        return response.text();
+	    })
+
+	    .then(html => {
+
+	        contenedor.innerHTML =
+	            html;
+
+
+	        document.body.style.overflow =
+	            "hidden";
+	    });
 }
 function finalizarVistaPedido() {
 
@@ -431,3 +466,216 @@ function mostrarToast(
 
         }, 3000);
 }
+function filtrarPedidos(boton) {
+
+    const filtro =
+        boton.dataset.filtro;
+
+
+    // Cambiar botón activo
+
+    document
+        .querySelectorAll(
+            ".filtro-pedido"
+        )
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "activo"
+            );
+
+        });
+
+
+    boton.classList.add(
+        "activo"
+    );
+
+
+    const tarjetas =
+        document.querySelectorAll(
+            ".pedido-cliente-card"
+        );
+
+
+    let visibles = 0;
+
+
+    tarjetas.forEach(tarjeta => {
+
+        const estado =
+            tarjeta.dataset.estado;
+
+
+        let mostrar = false;
+
+
+        if (filtro === "TODOS") {
+
+            mostrar = true;
+
+        }
+
+        else if (filtro === "CURSO") {
+
+            mostrar =
+                estado ===
+                    "PENDIENTE_DE_WHATSAPP"
+
+                ||
+
+                estado ===
+                    "CONFIRMADO"
+
+                ||
+
+                estado ===
+                    "EN_CAMINO";
+
+        }
+
+        else {
+
+            mostrar =
+                estado === filtro;
+
+        }
+
+
+        tarjeta.style.display =
+            mostrar
+                ? ""
+                : "none";
+
+
+        if (mostrar) {
+            visibles++;
+        }
+    });
+
+
+    const vacio =
+        document.getElementById(
+            "sinPedidosFiltro"
+        );
+
+
+    if (vacio) {
+
+        vacio.style.display =
+            visibles === 0
+                ? "block"
+                : "none";
+    }
+	}
+	function cancelarPedidoDesdeLista(
+	    idPedido,
+	    boton
+	) {
+
+	    const idUsuario =
+	        obtenerIdUsuario();
+
+
+	    if (
+	        !window.confirm(
+	            "¿Deseas cancelar este pedido?"
+	        )
+	    ) {
+
+	        return;
+	    }
+
+
+	    boton.disabled = true;
+
+	    boton.textContent =
+	        "Cancelando...";
+
+
+	    fetch(
+	        `/api/pedido/${idPedido}/cancelar` +
+	        `?idUsuario=${idUsuario}`,
+	        {
+	            method: "POST",
+
+	            headers: {
+	                "Accept":
+	                    "application/json"
+	            }
+	        }
+	    )
+
+	    .then(response => {
+
+	        if (!response.ok) {
+
+	            throw new Error(
+	                "No se pudo cancelar el pedido"
+	            );
+	        }
+
+
+	        return response.json();
+	    })
+
+	    .then(resultado => {
+
+
+	        mostrarToast(
+	            "Pedido cancelado",
+	            "La orden fue cancelada correctamente."
+	        );
+
+
+	        setTimeout(() => {
+
+	            window.location.reload();
+
+	        }, 700);
+
+	    })
+
+	    .catch(error => {
+
+	        console.error(
+	            error
+	        );
+
+
+	        mostrarToast(
+	            "No se pudo cancelar",
+	            "Inténtalo nuevamente."
+	        );
+
+
+	        boton.disabled = false;
+
+	        boton.textContent =
+	            "Cancelar";
+	    });
+	}
+	
+	function cerrarDetallePedido() {
+
+	    const contenedor =
+	        document.getElementById(
+	            "contenedor-modal-pedido"
+	        );
+
+
+	    if (contenedor) {
+
+	        contenedor.innerHTML =
+	            "";
+	    }
+
+
+	    document.body.style.overflow =
+	        "";
+			// Como el carrito anterior quedó FINALIZADO,
+			    // recargamos para empezar limpio.
+
+			    location.reload();
+	}
+	

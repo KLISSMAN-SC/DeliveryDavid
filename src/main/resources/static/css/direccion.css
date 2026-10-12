@@ -773,3 +773,33 @@
 
     cursor: pointer;
 }
+.btn-cancelar-orden {
+    display: block;
+
+    width: calc(100% - 50px);
+
+    margin: 25px auto;
+
+    padding: 14px 20px;
+
+    border: 1px solid #ff4d4d;
+
+    border-radius: 12px;
+
+    background: rgba(255, 77, 77, 0.10);
+
+    color: #ff4d4d;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.btn-cancelar-orden:hover {
+    background: #ff4d4d;
+
+    color: #ffffff;
+}

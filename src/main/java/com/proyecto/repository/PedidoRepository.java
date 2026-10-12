@@ -2,6 +2,7 @@ package com.proyecto.repository;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,11 @@ public interface PedidoRepository extends JpaRepository<Pedido,Integer>{
     findByUsuarioIdUsuarioOrderByIdPedidoDesc(
         Integer idUsuario
     );
+	// PEDIDO ESPECÍFICO DE ESE USUARIO
+    Optional<Pedido>
+    findByIdPedidoAndUsuarioIdUsuario(
+            Integer idPedido,
+            Integer idUsuario
+    );
+	
 }

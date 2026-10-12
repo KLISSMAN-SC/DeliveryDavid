@@ -206,6 +206,58 @@ public class PedidoController {
                 )
                 .body(respuesta);
     }
+    @PostMapping(
+    	    value = "/{idPedido}/cancelar",
+    	    produces = MediaType.APPLICATION_JSON_VALUE
+    	)
+    	@ResponseBody
+    	public ResponseEntity<Map<String, Object>>
+    	cancelarPedido(
+
+    	        @PathVariable Integer idPedido,
+
+    	        @RequestParam Integer idUsuario) {
+
+
+    	    Pedido pedido =
+    	            pedidoService
+    	            .cancelarPedido(
+    	                    idPedido,
+    	                    idUsuario
+    	            );
+
+
+    	    Map<String, Object> respuesta =
+    	            new HashMap<>();
+
+
+    	    respuesta.put(
+    	            "ok",
+    	            true
+    	    );
+
+
+    	    respuesta.put(
+    	            "idPedido",
+    	            pedido.getIdPedido()
+    	    );
+
+
+    	    respuesta.put(
+    	            "estado",
+    	            pedido.getEstadoPedido()
+    	    );
+
+
+    	    respuesta.put(
+    	            "mensaje",
+    	            "Pedido cancelado correctamente"
+    	    );
+
+
+    	    return ResponseEntity
+    	            .ok(respuesta);
+    	}
 
 
     // ========================================
@@ -256,6 +308,35 @@ public class PedidoController {
 
         return
             "fragmentos/pedido-confirmado-modal :: modalPedidoConfirmado";
+    }
+    @GetMapping("/mis-pedidos")
+    public String mostrarMisPedidos(
+
+            @RequestParam Integer idUsuario,
+
+            Model model) {
+
+
+        List<Pedido> pedidos =
+                pedidoService
+                .listarPedidosUsuario(
+                        idUsuario
+                );
+
+
+        model.addAttribute(
+                "pedidos",
+                pedidos
+        );
+
+
+        model.addAttribute(
+                "idUsuarioValidado",
+                idUsuario
+        );
+
+
+        return "mis-pedidos";
     }
    
 	

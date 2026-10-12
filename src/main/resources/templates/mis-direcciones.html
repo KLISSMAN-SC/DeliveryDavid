@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html
+    lang="es"
+    xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" th:href="@{/css/estilos.css}">
+	<link rel="stylesheet" th:href="@{/css/direccion.css}">
+    <title>
+        Mis direcciones | Dablyn Delivery
+    </title>
+
+
+    <!-- Tus CSS generales -->
+
+    <link
+        rel="stylesheet"
+        th:href="@{/css/style.css}">
+
+    <link
+        rel="stylesheet"
+        th:href="@{/css/direcciones.css}">
+
+
+    <!-- Font Awesome -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+
+<body class="pagina-direcciones">
+
+
+    <!-- ===================================== -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ===================================== -->
+
+    <main class="vista-mis-direcciones">
+
+
+        <!-- CABECERA -->
+
+        <div class="direcciones-header">
+
+
+            <div class="direcciones-titulo-contenedor">
+
+
+                <!-- VOLVER AL CATÁLOGO -->
+
+                <a
+                    th:href="@{/}"
+                    class="btn-volver-direcciones">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                </a>
+
+
+                <div>
+
+                    <h1>
+                        Mis direcciones
+                    </h1>
+
+                    <p>
+                        Administra tus lugares de entrega.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- NUEVA DIRECCIÓN -->
+
+            <button
+                type="button"
+                class="btn-nueva-direccion"
+                onclick="abrirModalAgregarDireccion('direcciones')">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Nueva dirección
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- ================================= -->
+        <!-- LISTA -->
+        <!-- ================================= -->
+
+        <div
+            class="direcciones-lista"
+            th:if="${!#lists.isEmpty(direcciones)}">
+
+
+            <article
+                class="direccion-card"
+                th:each="direccion : ${direcciones}">
+
+
+                <div class="direccion-card-icono">
+
+                    <i class="fa-solid fa-house"></i>
+
+                </div>
+
+
+
+                <div class="direccion-card-info">
+
+
+                    <div class="direccion-card-titulo">
+
+                        <h3
+                            th:text="${direccion.alias}">
+
+                            Casa
+
+                        </h3>
+
+
+                        <span
+                            class="badge-principal"
+                            th:if="${direccion.principal}">
+
+                            Principal
+
+                        </span>
+
+                    </div>
+
+
+
+                    <p
+                        class="direccion-card-direccion"
+                        th:text="${direccion.direccion}">
+
+                        Dirección
+
+                    </p>
+
+
+
+                    <p
+                        class="direccion-card-referencia"
+                        th:if="${direccion.referencia != null
+                            and !direccion.referencia.isEmpty()}">
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        <span
+                            th:text="${direccion.referencia}">
+                        </span>
+
+                    </p>
+
+
+                </div>
+
+
+
+                <!-- ELIMINAR -->
+
+                <div class="direccion-card-acciones">
+
+                    <button
+                        type="button"
+                        class="btn-eliminar-direccion"
+
+                        th:data-direccion="${direccion.idDireccionUsuario}"
+
+                        onclick="eliminarDireccionUsuario(this)">
+
+                        <i class="fa-regular fa-trash-can"></i>
+
+                    </button>
+
+                </div>
+
+
+            </article>
+
+        </div>
+
+
+
+        <!-- ================================= -->
+        <!-- VACÍO -->
+        <!-- ================================= -->
+
+        <div
+            class="direcciones-vacio"
+            th:if="${#lists.isEmpty(direcciones)}">
+
+
+            <div class="direcciones-vacio-icono">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+            </div>
+
+
+            <h2>
+                No tienes direcciones guardadas
+            </h2>
+
+
+            <p>
+                Agrega una dirección para realizar
+                tus pedidos más rápido.
+            </p>
+
+
+            <button
+                type="button"
+                onclick="abrirModalAgregarDireccion('direcciones')">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Agregar dirección
+
+            </button>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- ===================================== -->
+    <!-- MODAL DIRECCIÓN -->
+    <!-- ===================================== -->
+
+    <div
+        th:replace="~{fragmentos/direccion-modal :: modalDireccion}">
+    </div>
+
+
+
+    <!-- ===================================== -->
+    <!-- TOAST -->
+    <!-- ===================================== -->
+
+    <div
+        id="toastNotificacion"
+        class="toast-notificacion">
+
+
+        <div class="toast-icono">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+        </div>
+
+
+        <div class="toast-contenido">
+
+            <strong id="toastTitulo">
+                Dirección guardada
+            </strong>
+
+            <span id="toastMensaje">
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- USUARIO -->
+
+    <script th:inline="javascript">
+
+        window.idUsuarioValidado =
+            /*[[${idUsuarioValidado}]]*/ null;
+
+    </script>
+
+
+    <script th:src="@{/js/main.js}"></script>
+
+    <script th:src="@{/js/direcciones.js}"></script>
+
+    <script th:src="@{/js/pedido.js}"></script>
+
+
+</body>
+
+</html>

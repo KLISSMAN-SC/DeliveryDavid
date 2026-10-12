@@ -29,33 +29,36 @@ public class DireccionUsuarioController {
     private DireccionUsuarioService direccionUsuarioService;
 
 	// ==========================================
-    // VISTA DE MIS DIRECCIONES
+    // MODULO DE MIS DIRECCIONES
     // ==========================================
 
-    @GetMapping("/vista")
-    public String mostrarDirecciones(
-
-            @RequestParam Integer idUsuario,
-
-            Model model) {
+	@GetMapping
+	public String paginaDirecciones(
+	        @RequestParam Integer idUsuario,
+	        Model model) {
 
 
-        List<DireccionUsuario> direcciones =
-                direccionUsuarioService
-                .listarPorUsuario(
-                        idUsuario
-                );
+	    List<DireccionUsuario> direcciones =
+	            direccionUsuarioService
+	            .listarPorUsuario(
+	                    idUsuario
+	            );
 
 
-        model.addAttribute(
-                "direcciones",
-                direcciones
-        );
+	    model.addAttribute(
+	            "direcciones",
+	            direcciones
+	    );
 
 
-        return
-            "fragmentos/mis-direcciones :: vistaDirecciones";
-    }
+	    model.addAttribute(
+	            "idUsuarioValidado",
+	            idUsuario
+	    );
+
+
+	    return "mis-direcciones";
+	}
 
 
     // ==========================================
