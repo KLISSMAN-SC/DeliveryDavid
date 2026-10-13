@@ -38,12 +38,12 @@ public class SecurityConfig {
             	.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/css/**", "/js/**", "/imagenes/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**", "/carta/**").permitAll()
                 .requestMatchers("/", "/login", "/registro/**", "/verificar/**", "/api/**").permitAll()
-                .requestMatchers("/pedido/mis-pedidos").denyAll()
+                //.requestMatchers("/pedido/mis-pedidos").denyAll()
                 .requestMatchers("/panel/**").hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
                 .anyRequest().authenticated()
             )
          // NUEVO: Atrapa el error de acceso denegado y redirige con un mensaje
-            .exceptionHandling(ex -> ex
+            /*.exceptionHandling(ex -> ex
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     
                     // Extraemos tu ruta base (context-path), que en tu caso es "/api"
@@ -57,7 +57,7 @@ public class SecurityConfig {
                         response.sendRedirect(contextPath + "/?alerta=denegado");
                     }
                 })
-            )
+            )*/
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
