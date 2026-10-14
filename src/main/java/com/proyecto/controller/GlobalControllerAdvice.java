@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class GlobalControllerAdvice {
 
     @Autowired
-    private ConfiguracionRepository configRepo;
+    private ConfiguracionRepository configuracionRepository;
 
     @ModelAttribute("configApp")
     public Configuracion globalConfig() {
         // Busca la configuración con ID 1. Si no existe, devuelve una en blanco.
-        return configRepo.findById(1).orElse(new Configuracion());
+    	return configuracionRepository
+                .findFirstByOrderByIdConfiguracionAsc()
+                .orElse(null);
     }
+    
+    
 }

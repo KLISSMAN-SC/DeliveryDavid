@@ -678,4 +678,211 @@ function filtrarPedidos(boton) {
 
 			    location.reload();
 	}
+	function enviarPedidoWhatsApp() {
+
+
+	    // ==========================================
+	    // MODAL ACTUAL
+	    // ==========================================
+
+	    const modal =
+	        document.getElementById(
+	            "modalPedidoConfirmado"
+	        );
+
+
+	    if (!modal) {
+
+	        console.error(
+	            "No existe el modal del pedido"
+	        );
+
+	        return;
+	    }
+
+
+	    // ==========================================
+	    // DATOS GENERALES
+	    // ==========================================
+
+	    const idPedido =
+	        modal.dataset.pedido;
+
+
+	    const negocio =
+	        modal.dataset.negocio || "";
+
+
+	    const direccion =
+	        modal.dataset.direccion || "";
+
+
+	    const referencia =
+	        modal.dataset.referencia || "";
+
+
+	    const metodoPago =
+	        modal.dataset.metodoPago || "";
+
+
+	    const subtotal =
+	        Number(
+	            modal.dataset.subtotal || 0
+	        );
+
+
+	    const envio =
+	        Number(
+	            modal.dataset.envio || 0
+	        );
+
+
+	    const total =
+	        Number(
+	            modal.dataset.total || 0
+	        );
+
+
+	    // ==========================================
+	    // TELÉFONO
+	    // ==========================================
+
+	    let telefono =
+	        modal.dataset.telefono || "";
+
+
+	    telefono =
+	        telefono.replace(
+	            /\D/g,
+	            ""
+	        );
+
+
+	    if (!telefono) {
+
+	        mostrarToast(
+	            "WhatsApp no disponible",
+	            "Este negocio no tiene un número de WhatsApp registrado."
+	        );
+
+	        return;
+	    }
+
+
+	    // Si en BD guardas:
+	    //
+	    // 987654321
+	    //
+	    // agregamos código Perú.
+
+	    if (telefono.length === 9) {
+
+	        telefono =
+	            "51" + telefono;
+	    }
+
+
+	    // ==========================================
+	    // PRODUCTOS
+	    // ==========================================
+
+	    const productos =
+	        modal.querySelectorAll(
+	            ".producto-pedido-wsp"
+	        );
+
+
+	    let productosTexto = "";
+
+
+	    productos.forEach(
+	        producto => {
+
+
+	            const nombre =
+	                producto.dataset.nombre;
+
+
+	            const cantidad =
+	                Number(
+	                    producto.dataset.cantidad
+	                );
+
+
+	            const precio =
+	                Number(
+	                    producto.dataset.precio
+	                );
+
+
+	            const subtotalProducto =
+	                cantidad * precio;
+
+
+	            productosTexto +=
+	                `• ${cantidad}x ${nombre}` +
+	                ` - S/ ${subtotalProducto.toFixed(2)}\n`;
+
+	        }
+	    );
+
+
+	    // ==========================================
+	    // MENSAJE
+	    // ==========================================
+
+	    let mensaje =
+
+	`Hola, acabo de realizar un pedido en Dablyn Delivery.
+
+	🧾 *PEDIDO #${idPedido}*
+
+	🏪 *Negocio:*
+	${negocio}
+
+	🍽️ *PRODUCTOS:*
+	${productosTexto}
+	💰 *RESUMEN:*
+	Productos: S/ ${subtotal.toFixed(2)}
+	Envío: S/ ${envio.toFixed(2)}
+	*Total: S/ ${total.toFixed(2)}*
+
+	📍 *DIRECCIÓN DE ENTREGA:*
+	${direccion}`;
+
+
+	    // Referencia opcional
+
+	    if (referencia) {
+
+	        mensaje +=
+	`\n
+	Referencia:
+	${referencia}`;
+	    }
+
+
+	    mensaje +=
+	`\n
+	💳 *MÉTODO DE PAGO:*
+	${metodoPago}
+
+	Quedo atento a la confirmación del pedido.`;
+
+
+	    // ==========================================
+	    // ABRIR WHATSAPP
+	    // ==========================================
+
+	    const urlWhatsApp =
+	        `https://wa.me/${telefono}` +
+	        `?text=${encodeURIComponent(mensaje)}`;
+
+
+	    window.open(
+	        urlWhatsApp,
+	        "_blank",
+	        "noopener,noreferrer"
+	    );
+	}
 	

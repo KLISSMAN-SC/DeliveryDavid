@@ -1,43 +1,83 @@
 <div
     th:fragment="modalPedidoConfirmado"
+
     id="modalPedidoConfirmado"
-    class="modal-pedido-overlay">
+
+    class="modal-pedido-overlay"
+
+    th:data-pedido="${pedido.idPedido}"
+    th:data-negocio="${pedido.negocio.nombre}"
+    th:data-telefono="${
+        configApp != null
+        ? configApp.telefonoSoporte
+        : ''
+    }"
+
+    th:data-direccion="${pedido.direccionEnvio}"
+
+    th:data-referencia="${
+        pedido.referencia != null
+        ? pedido.referencia
+        : ''
+    }"
+
+    th:data-metodo-pago="${pedido.metodoPago}"
+
+    th:data-subtotal="${
+        pedido.total - pedido.costoEnvio
+    }"
+
+    th:data-envio="${pedido.costoEnvio}"
+
+    th:data-total="${pedido.total}">
+
 
     <div class="modal-seguimiento">
-		<button
-    	type="button"
-    	class="btn-cerrar-detalle-pedido"
-    	onclick="cerrarDetallePedido()"
-    	title="Cerrar">
 
-    	<i class="fa-solid fa-xmark"></i>
 
-		</button>
+        <!-- =================================== -->
+        <!-- X CERRAR -->
+        <!-- =================================== -->
 
-        <!-- ========================= -->
+        <button
+            type="button"
+            class="btn-cerrar-detalle-pedido"
+            onclick="cerrarDetallePedido()"
+            title="Cerrar">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <!-- =================================== -->
         <!-- CABECERA -->
-        <!-- ========================= -->
-		
+        <!-- =================================== -->
+
         <div class="seguimiento-header">
-		
+
             <span>
                 Pedido realizado
             </span>
 
+
             <strong>
+
                 Orden #
+
                 <span
                     th:text="${pedido.idPedido}">
                     0
                 </span>
+
             </strong>
 
         </div>
 
 
-        <!-- ========================= -->
+        <!-- =================================== -->
         <!-- MAPA -->
-        <!-- ========================= -->
+        <!-- =================================== -->
 
         <div class="seguimiento-mapa">
 
@@ -49,119 +89,57 @@
                 allowfullscreen
 
                 th:src="|https://www.google.com/maps/embed/v1/place?key=${googleMapsKey}&q=${pedido.latitudEnvio},${pedido.longitudEnvio}|">
+
             </iframe>
 
         </div>
 
 
-        <!-- ========================= -->
-        <!-- ESTADO -->
-        <!-- ========================= -->
+        <!-- =================================== -->
+        <!-- CONFIRMACIÓN -->
+        <!-- =================================== -->
 
-        <div class="estado-pedido">
+        <section class="seguimiento-seccion">
 
+            <div class="pedido-registrado-box">
 
-            <div class="estado-linea">
+                <div class="pedido-registrado-icono">
 
-
-                <div class="estado-paso activo">
-
-                    <div class="estado-icono">
-
-                        <i class="fa-solid fa-receipt"></i>
-
-                    </div>
-
-                    <span>Pedido</span>
+                    <i class="fa-solid fa-circle-check"></i>
 
                 </div>
 
 
-                <div class="estado-barra"></div>
+                <h2>
+                    Tu pedido ha sido registrado
+                </h2>
 
 
-                <div class="estado-paso">
-
-                    <div class="estado-icono">
-
-                        <i class="fa-solid fa-motorcycle"></i>
-
-                    </div>
-
-                    <span>En camino</span>
-
-                </div>
+                <p>
+                    Envía el detalle por WhatsApp para
+                    continuar con la coordinación de tu pedido.
+                </p>
 
 
-                <div class="estado-barra"></div>
+                <span class="pedido-numero-confirmacion">
 
+                    Pedido #
 
-                <div class="estado-paso">
+                    <strong
+                        th:text="${pedido.idPedido}">
+                        0
+                    </strong>
 
-                    <div class="estado-icono">
-
-                        <i class="fa-solid fa-house"></i>
-
-                    </div>
-
-                    <span>Entregado</span>
-
-                </div>
-
+                </span>
 
             </div>
 
-
-            <h3>
-
-                Tu pedido ha sido registrado
-
-            </h3>
+        </section>
 
 
-            <p>
-
-                Estado:
-
-                <span th:switch="${pedido.estadoPedido}">
-
-    <span
-        th:case="'PENDIENTE'">
-        Pendiente de confirmación
-    </span>
-
-    <span th:case="'CONFIRMADO'">
-        Pedido confirmado
-    </span>
-
-    <span th:case="'EN_CAMINO'">
-        En camino
-    </span>
-
-    <span th:case="'ENTREGADO'">
-        Entregado
-    </span>
-
-    <span th:case="'CANCELADO'">
-        Cancelado
-    </span>
-
-    <span
-        th:case="*"
-        th:text="${pedido.estadoPedido}">
-    </span>
-
-</span>
-
-            </p>
-
-
-        </div>
-
-
-        <!-- ========================= -->
-        <!-- DIRECCIÓN -->
-        <!-- ========================= -->
+        <!-- =================================== -->
+        <!-- ENTREGA -->
+        <!-- =================================== -->
 
         <section class="seguimiento-seccion">
 
@@ -177,6 +155,7 @@
 
                 <i class="fa-solid fa-house"></i>
 
+
                 <span
                     th:text="${pedido.direccionEnvio}">
 
@@ -188,9 +167,11 @@
 
 
             <p
-                th:if="${pedido.referencia != null}">
+                th:if="${pedido.referencia != null
+                    and !pedido.referencia.isEmpty()}">
 
                 <i class="fa-solid fa-location-dot"></i>
+
 
                 <span
                     th:text="${pedido.referencia}">
@@ -206,6 +187,7 @@
 
                 <i class="fa-solid fa-wallet"></i>
 
+
                 <span
                     th:text="${pedido.metodoPago}">
 
@@ -219,9 +201,9 @@
         </section>
 
 
-        <!-- ========================= -->
+        <!-- =================================== -->
         <!-- COSTOS -->
-        <!-- ========================= -->
+        <!-- =================================== -->
 
         <section class="seguimiento-seccion">
 
@@ -232,6 +214,8 @@
 
             </div>
 
+
+            <!-- PRODUCTOS -->
 
             <div class="detalle-total-fila">
 
@@ -246,9 +230,7 @@
 
                     <span
                         th:text="${#numbers.formatDecimal(
-                            pedido.total
-                            - pedido.costoEnvio
-                            - pedido.propina,
+                            pedido.total - pedido.costoEnvio,
                             1,
                             2
                         )}">
@@ -262,11 +244,14 @@
             </div>
 
 
+            <!-- ENVÍO -->
+
             <div class="detalle-total-fila">
 
                 <span>
                     Costo de envío
                 </span>
+
 
                 <strong>
 
@@ -288,11 +273,14 @@
             </div>
 
 
+            <!-- TOTAL -->
+
             <div class="detalle-total-fila total">
 
                 <strong>
                     TOTAL
                 </strong>
+
 
                 <strong>
 
@@ -317,9 +305,9 @@
         </section>
 
 
-        <!-- ========================= -->
+        <!-- =================================== -->
         <!-- PRODUCTOS -->
-        <!-- ========================= -->
+        <!-- =================================== -->
 
         <section class="seguimiento-seccion">
 
@@ -343,8 +331,15 @@
 
 
             <div
-                class="producto-confirmado"
-                th:each="detalle : ${detalles}">
+                class="producto-confirmado producto-pedido-wsp"
+
+                th:each="detalle : ${detalles}"
+
+                th:data-nombre="${detalle.producto.nombre}"
+
+                th:data-cantidad="${detalle.cantidad}"
+
+                th:data-precio="${detalle.precioUnitario}">
 
 
                 <div class="producto-confirmado-info">
@@ -409,49 +404,26 @@
         </section>
 
 
-        <!-- ========================= -->
-        <!-- BOTÓN -->
-        <!-- ========================= -->
+        <!-- =================================== -->
+        <!-- WHATSAPP -->
+        <!-- =================================== -->
 
-        <button
-    	th:if="${pedido.estadoPedido != null
-        and (
-            pedido.estadoPedido.toString() == 'PENDIENTE'
-            or pedido.estadoPedido.toString() == 'CONFIRMADO'
-        )}"
+        <div class="acciones-pedido-confirmado">
 
-    	type="button"
-    	class="btn-cancelar-orden"
 
-    	th:data-pedido="${pedido.idPedido}"
+            <button
+                type="button"
+                class="btn-enviar-whatsapp"
+                onclick="enviarPedidoWhatsApp()">
 
-    	onclick="cancelarPedido(
-        this.dataset.pedido,
-        this
-   		 )">
+                <i class="fa-brands fa-whatsapp"></i>
 
-    	<i class="fa-solid fa-ban"></i>
+                Enviar pedido por WhatsApp
 
-    	Cancelar orden
+            </button>
 
-		</button>
-		
-		<button
-    	th:if="${pedido.estadoPedido != null
-        and (
-            pedido.estadoPedido.toString() == 'CANCELADO'
-            or pedido.estadoPedido.toString() == 'EN_CAMINO'
-            or pedido.estadoPedido.toString() == 'ENTREGADO'
-        )}"
 
-    	type="button"
-    	class="btn-cerrar-pedido-confirmado"
-
-    	onclick="cerrarDetallePedido()">
-
-    	Cerrar
-
-		</button>
+        </div>
 
 
     </div>

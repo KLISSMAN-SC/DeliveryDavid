@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,9 @@ public class DireccionUsuarioController {
 	// ==========================================
     // MODULO DE MIS DIRECCIONES
     // ==========================================
-
+	
+	@Value("${google.maps.api-key:}")
+    private String googleMapsApiKey;	
 	@GetMapping
 	public String paginaDirecciones(
 	        @RequestParam Integer idUsuario,
@@ -55,6 +58,10 @@ public class DireccionUsuarioController {
 	            "idUsuarioValidado",
 	            idUsuario
 	    );
+	    model.addAttribute(
+                "googleMapsKey",
+                googleMapsApiKey
+        );
 
 
 	    return "mis-direcciones";

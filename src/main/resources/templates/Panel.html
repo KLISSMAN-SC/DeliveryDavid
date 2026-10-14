@@ -32,9 +32,11 @@
             </div>
             
             <!-- OPERACIONES: Visible para Administradores y Repartidores -->
+            <!--DESACTIVAMOS EL MODULO DE GESTION DE PEDIDOS-->
+            <!--  
             <p class="menu-label">OPERACIONES</p>
             <a th:href="@{/panel?modulo=pedidos}" th:classappend="${modulo == 'pedidos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-motorcycle"></i> Pedidos Activos</a>
-            
+             -->
             <hr class="separador-sutil">
             <a th:href="@{/}" class="menu-item volver"><i class="fa-solid fa-arrow-left"></i> Salir al Catálogo</a>
         </nav>

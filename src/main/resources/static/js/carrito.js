@@ -1,20 +1,4 @@
-function obtenerIdUsuario() {
 
-    const idUsuario =
-        Number(window.idUsuarioValidado);
-
-    if (
-        !Number.isInteger(idUsuario) ||
-        idUsuario <= 0
-    ) {
-
-        throw new Error(
-            "No existe un usuario autenticado"
-        );
-    }
-
-    return idUsuario;
-}
 function abrirRestaurante(idNegocio) {
 
     fetch("/api/restaurante/" + idNegocio)
