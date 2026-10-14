@@ -34,6 +34,16 @@
                 <small style="color: var(--texto-secundario);">Inténtelo nuevamente en <span th:text="${param.horas}"></span> horas.</small>
             </div>
 			
+			<!-- ALERTA: ÉXITO AL RESETEAR CONTRASEÑA -->
+            <div th:if="${exitoReseteo}" style="background-color: rgba(37, 211, 102, 0.1); color: #25D366; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(37, 211, 102, 0.3);">
+                <i class="fa-solid fa-circle-check"></i> <span th:text="${exitoReseteo}"></span>
+            </div>
+
+            <!-- ALERTA: ENLACE CADUCADO O FALSO -->
+            <div th:if="${param.errorToken}" style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);">
+                <i class="fa-solid fa-triangle-exclamation"></i> El enlace de recuperación no es válido o ya fue utilizado.
+            </div>
+			
             <!-- Formulario -->
             <form th:action="@{/login}" method="POST">
                 
@@ -44,12 +54,13 @@
                 
                 <div class="input-group-login">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <input type="password" id="inputPassword" name="password" placeholder="Contraseña" required>
+                    <i class="fa-solid fa-eye-slash" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);" onclick="toggleVisibilidad()"></i>
                 </div>
                 
                 <div class="login-opciones">
                     
-                    <a href="#">¿Olvidaste tu contraseña?</a>
+                    <a th:href="@{/recuperar-password}">¿Olvidaste tu contraseña?</a>
                 </div>
 
                 <!-- Reutilizamos la clase del botón del modal para que tenga el mismo diseño ancho y naranja -->
@@ -69,6 +80,6 @@
             
         </div>
     </div>
-
+<script th:src="@{/js/sesion.js}"></script>
 </body>
 </html>

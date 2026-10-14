@@ -3,10 +3,11 @@ package com.proyecto.controller;
 import com.proyecto.model.Rol;
 import com.proyecto.model.Usuario;
 import com.proyecto.repository.UsuarioRepository;
+import com.proyecto.services.CustomUserDetailsService;
+import com.proyecto.services.EmailService; // IMPORTANTE: Importamos el servicio
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import com.proyecto.services.CustomUserDetailsService;	
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,8 +33,9 @@ public class RegistroController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // INYECTAMOS EL NUEVO SERVICIO (Reemplaza a JavaMailSender)
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailService emailService;
     
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -66,7 +67,7 @@ public class RegistroController {
         // Encriptar la contraseña introducida por el usuario
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         
-        // Asignar el Rol de Cliente (Asumiendo que el ID 2 en tu tabla ROL es 'Cliente')
+        // Asignar el Rol de Cliente
         Rol rolCliente = new Rol();
         rolCliente.setIdRol(2);
         rolCliente.setNombre("CLIENTE");
@@ -76,12 +77,9 @@ public class RegistroController {
         session.setAttribute("usuarioTemp", usuario);
         session.setAttribute("codigoVerificacion", codigo);
 
-        // Enviar el correo
-        SimpleMailMessage mensaje = new SimpleMailMessage();
-        mensaje.setTo(usuario.getCorreoElectronico());
-        mensaje.setSubject("Código de Verificación - RIDE MEAL");
-        mensaje.setText("Hola " + usuario.getNombres() + ",\n\nTu código de verificación es: " + codigo + "\n\nBienvenido a RIDE MEAL.");
-        mailSender.send(mensaje);
+        // EXTRAEMOS EL NOMBRE COMPLETO Y ENVIAMOS EL CORREO HTML
+        String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidos();
+        emailService.enviarCorreoVerificacion(usuario.getCorreoElectronico(), codigo, nombreCompleto);
 
         return "redirect:/verificar";
     }
@@ -95,7 +93,7 @@ public class RegistroController {
         return "Verificar";
     }
 
- // 4. Confirmar el código, guardar en BD e Iniciar Sesión automáticamente
+    // 4. Confirmar el código, guardar en BD e Iniciar Sesión automáticamente
     @PostMapping("/verificar/confirmar")
     public String confirmarCodigo(@RequestParam String codigoIngresado, HttpSession session, Model model) {
         String codigoReal = (String) session.getAttribute("codigoVerificacion");
@@ -107,17 +105,13 @@ public class RegistroController {
             usuarioRepository.save(usuario);
             
             // 2. INICIAR SESIÓN AUTOMÁTICAMENTE
-            // Cargamos los datos del usuario recién creado para Spring Security
             UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getCorreoElectronico());
             
-            // Creamos el token de autenticación
             UsernamePasswordAuthenticationToken authToken = 
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             
-            // Lo guardamos en el contexto de seguridad
             SecurityContextHolder.getContext().setAuthentication(authToken);
             
-            // Aseguramos que la sesión persista en el navegador
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
                                SecurityContextHolder.getContext());
             

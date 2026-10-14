@@ -38,7 +38,7 @@ public class SecurityConfig {
             	.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/css/**", "/js/**", "/imagenes/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**", "/carta/**").permitAll()
                 // AQUÍ AÑADIMOS EL PERMISO PARA LAS RUTAS DE FALLO DE LOGIN
-                .requestMatchers("/", "/login", "/login?error=true", "/login?bloqueado=true", "/registro/**", "/verificar/**", "/api/**").permitAll()
+                .requestMatchers("/", "/login", "/login?error=true", "/login?bloqueado=true", "/registro/**", "/verificar/**", "/api/**", "/recuperar-password/**").permitAll()
                 //.requestMatchers("/pedido/mis-pedidos").denyAll()
                 .requestMatchers("/panel/**").hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
                 .anyRequest().authenticated()

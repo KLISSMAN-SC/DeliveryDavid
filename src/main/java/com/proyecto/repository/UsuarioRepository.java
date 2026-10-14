@@ -19,4 +19,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Query("SELECT u FROM Usuario u WHERE u.nombres LIKE %:filtro% OR u.dni LIKE %:filtro%")
     List<Usuario> buscarPorFiltro(@Param("filtro") String filtro);
     
+    Optional<Usuario> findByTokenPassword(String tokenPassword);
 }

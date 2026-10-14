@@ -34,6 +34,9 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`USUARIO` (
   `correoElectronico` VARCHAR(45) NULL,
   `password` VARCHAR(200) NULL,
   `fechaCreacion` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `intentosFallidos` INT NULL DEFAULT 0,
+  `fechaBloqueo` DATETIME NULL,
+  `tokenPassword` VARCHAR(100) NULL,
   PRIMARY KEY (`idUsuario`),
   INDEX `fk_USUARIO_ROL1_idx` (`idRol` ASC) VISIBLE,
   CONSTRAINT `fk_USUARIO_ROL1`

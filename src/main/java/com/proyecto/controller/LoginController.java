@@ -36,8 +36,8 @@ public class LoginController {
         
         return "Login"; 
     }
-
-
+    
+  
     // ==========================================
     // USUARIO AUTENTICADO DISPONIBLE EN THYMELEAF
     // ==========================================

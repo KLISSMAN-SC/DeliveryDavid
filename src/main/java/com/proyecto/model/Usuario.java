@@ -49,5 +49,8 @@ public class Usuario {
 
     @Column(name = "fechaBloqueo")
     private LocalDateTime fechaBloqueo;
+    
+    @Column(name = "tokenPassword")
+    private String tokenPassword;
 
 }
