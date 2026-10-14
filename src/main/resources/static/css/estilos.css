@@ -2205,3 +2205,56 @@ footer {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.15);
 }
+/* =========================================================
+   VALIDACIÓN DE CONTRASEÑA EN REGISTRO
+   ========================================================= */
+.password-requisitos {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--borde-sutil);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas para los requisitos */
+    gap: 8px;
+    text-align: left;
+}
+
+.req-item {
+    font-size: 11px;
+    color: var(--texto-secundario);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.3s ease;
+}
+
+.req-item i {
+    font-size: 14px;
+    color: #ff5555; /* Rojo pálido por defecto (no cumplido) */
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Estado cumplido */
+.req-item.cumplido {
+    color: var(--texto-principal);
+}
+
+.req-item.cumplido i {
+    color: #00ff00; /* Verde neón/Dablyn (cumplido) */
+    transform: scale(1.1);
+}
+
+/* Botón deshabilitado */
+.btn-aceptar.btn-deshabilitado {
+    background-color: #333333;
+    color: #777777;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border: 1px solid #444;
+}
+
+.btn-aceptar.btn-deshabilitado:hover {
+    background-color: #333333; /* Evita el hover naranja */
+}

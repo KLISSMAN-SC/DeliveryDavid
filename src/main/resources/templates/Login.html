@@ -27,6 +27,12 @@
             <div th:if="${param.error}" style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);">
                 <i class="fa-solid fa-triangle-exclamation"></i> Correo electrónico o contraseña incorrectos.
             </div>
+
+            <!-- NUEVA ALERTA: CUENTA BLOQUEADA -->
+            <div th:if="${param.bloqueado}" style="background-color: rgba(255, 165, 0, 0.1); color: #ffaa00; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 165, 0, 0.3);">
+                <i class="fa-solid fa-lock"></i> Cuenta bloqueada por seguridad. <br>
+                <small style="color: var(--texto-secundario);">Inténtelo nuevamente en <span th:text="${param.horas}"></span> horas.</small>
+            </div>
 			
             <!-- Formulario -->
             <form th:action="@{/login}" method="POST">

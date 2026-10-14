@@ -13,6 +13,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     
 	Optional<Usuario> findByTelefono(String telefono);
     Optional<Usuario> findByCorreoElectronico(String correoElectronico);
+  
     Optional<Usuario> findByDni(String dni);
     
     @Query("SELECT u FROM Usuario u WHERE u.nombres LIKE %:filtro% OR u.dni LIKE %:filtro%")

@@ -37,34 +37,33 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             	.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/css/**", "/js/**", "/imagenes/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**", "/carta/**").permitAll()
-                .requestMatchers("/", "/login", "/registro/**", "/verificar/**", "/api/**").permitAll()
+                // AQUÍ AÑADIMOS EL PERMISO PARA LAS RUTAS DE FALLO DE LOGIN
+                .requestMatchers("/", "/login", "/login?error=true", "/login?bloqueado=true", "/registro/**", "/verificar/**", "/api/**").permitAll()
                 //.requestMatchers("/pedido/mis-pedidos").denyAll()
                 .requestMatchers("/panel/**").hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
                 .anyRequest().authenticated()
             )
-         // NUEVO: Atrapa el error de acceso denegado y redirige con un mensaje
-            /*.exceptionHandling(ex -> ex
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    
-                    // Extraemos tu ruta base (context-path), que en tu caso es "/api"
-                    String contextPath = request.getContextPath();
-                    
-                    // Si intentan entrar a mis pedidos, los mandamos al inicio de /api/ con la alerta
-                    if (request.getRequestURI().contains("/pedido/mis-pedidos")) {
-                        response.sendRedirect(contextPath + "/?alerta=mantenimiento");
-                    } else {
-                        // Para cualquier otro acceso denegado (ej. clientes queriendo entrar al panel)
-                        response.sendRedirect(contextPath + "/?alerta=denegado");
-                    }
-                })
-            )*/
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true) // Si el login es exitoso, redirige al Inicio
-                .failureUrl("/login?error=true") // Si falla, recarga el login con error
-                .permitAll()
-            )
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .defaultSuccessUrl("/", true) // Si el login es exitoso, redirige al Inicio
+                    
+                    // CAMBIO AQUÍ: Agregamos el Context Path para que respete el "/api"
+                    .failureHandler((request, response, exception) -> {
+                        // Extraemos la ruta base de tu proyecto (en tu caso "/api")
+                        String contextPath = request.getContextPath();
+                        
+                        if (exception.getMessage() != null && exception.getMessage().startsWith("CUENTA_BLOQUEADA:")) {
+                            String horasRestantes = exception.getMessage().split(":")[1];
+                            // Redirigimos sumando el contextPath
+                            response.sendRedirect(contextPath + "/login?bloqueado=true&horas=" + horasRestantes);
+                        } else {
+                            // Redirigimos sumando el contextPath
+                            response.sendRedirect(contextPath + "/login?error=true");
+                        }
+                    })
+                    .permitAll()
+                )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")

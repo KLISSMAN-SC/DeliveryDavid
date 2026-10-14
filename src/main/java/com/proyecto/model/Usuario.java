@@ -43,5 +43,11 @@ public class Usuario {
 	
 	@Column(name="fechaCreacion", insertable=false, updatable=false)
 	private LocalDateTime fechaCreacion;
+	
+	@Column(name = "intentosFallidos")
+    private Integer intentosFallidos;
+
+    @Column(name = "fechaBloqueo")
+    private LocalDateTime fechaBloqueo;
 
 }

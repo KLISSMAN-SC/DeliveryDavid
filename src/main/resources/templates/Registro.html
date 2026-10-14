@@ -39,9 +39,27 @@
                     <input type="email" name="correoElectronico" placeholder="Correo electrónico" required>
                 </div>
                 
-                <div class="input-group-login">
+                <div class="input-group-login" style="margin-bottom: 5px;">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" name="password" placeholder="Crea una contraseña" required>
+                    <input type="password" name="password" id="inputPassword" placeholder="Crea una contraseña" required onkeyup="validarPassword()">
+                    <!-- Opcional: Ojito para ver la contraseña -->
+                    <i class="fa-solid fa-eye-slash" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);" onclick="toggleVisibilidad()"></i>
+                </div>
+
+                <!-- Contenedor de validación visual -->
+                <div class="password-requisitos" id="passwordRequisitos">
+                    <div class="req-item" id="req-long">
+                        <i class="fa-solid fa-circle-xmark"></i> Mínimo 8 caracteres
+                    </div>
+                    <div class="req-item" id="req-mayus">
+                        <i class="fa-solid fa-circle-xmark"></i> Una mayúscula
+                    </div>
+                    <div class="req-item" id="req-minus">
+                        <i class="fa-solid fa-circle-xmark"></i> Una minúscula
+                    </div>
+                    <div class="req-item" id="req-especial">
+                        <i class="fa-solid fa-circle-xmark"></i> Un carácter especial
+                    </div>
                 </div>
 
                 <button type="submit" id="btnRegistrar" class="btn-aceptar" style="margin-top: 15px;">
@@ -68,5 +86,77 @@
             icono.style.display = 'inline-block';
         }
     </script>
-</body>
+    <script>
+        // Funciones originales
+        function mostrarCarga() {
+            const btn = document.getElementById('btnRegistrar');
+            const texto = document.getElementById('btnTexto');
+            const icono = document.getElementById('btnIcono');
+            
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+            texto.innerText = 'Enviando código...';
+            icono.style.display = 'inline-block';
+        }
+
+        // --- NUEVO: Validación de Contraseña ---
+        function validarPassword() {
+            const password = document.getElementById('inputPassword').value;
+            const btnRegistrar = document.getElementById('btnRegistrar');
+            
+            // Expresiones regulares para cada requisito
+            const tieneLongitud = password.length >= 8;
+            const tieneMayus = /[A-Z]/.test(password);
+            const tieneMinus = /[a-z]/.test(password);
+            const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            // Actualizar interfaz visual
+            actualizarRequisito('req-long', tieneLongitud);
+            actualizarRequisito('req-mayus', tieneMayus);
+            actualizarRequisito('req-minus', tieneMinus);
+            actualizarRequisito('req-especial', tieneEspecial);
+
+            // Habilitar o deshabilitar el botón de registro
+            if (tieneLongitud && tieneMayus && tieneMinus && tieneEspecial) {
+                btnRegistrar.disabled = false;
+                btnRegistrar.classList.remove('btn-deshabilitado');
+            } else {
+                btnRegistrar.disabled = true;
+                btnRegistrar.classList.add('btn-deshabilitado');
+            }
+        }
+
+        function actualizarRequisito(idElemento, cumple) {
+            const elemento = document.getElementById(idElemento);
+            const icono = elemento.querySelector('i');
+
+            if (cumple) {
+                elemento.classList.add('cumplido');
+                icono.className = 'fa-solid fa-circle-check';
+            } else {
+                elemento.classList.remove('cumplido');
+                icono.className = 'fa-solid fa-circle-xmark';
+            }
+        }
+
+        // --- NUEVO: Mostrar/Ocultar contraseña ---
+        function toggleVisibilidad() {
+            const input = document.getElementById('inputPassword');
+            const icon = document.getElementById('togglePassword');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye-slash';
+            }
+        }
+
+        // Inicializar el botón deshabilitado si el input está vacío al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            validarPassword(); 
+        });
+    </script>
+    </body>
 </html>
