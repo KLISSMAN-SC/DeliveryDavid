@@ -87,6 +87,10 @@ public class RegistroController {
     // 3. Mostrar pantalla de verificación
     @GetMapping("/verificar")
     public String mostrarVerificacion(HttpSession session) {
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/";
+        }
         if(session.getAttribute("usuarioTemp") == null) {
             return "redirect:/registro";
         }

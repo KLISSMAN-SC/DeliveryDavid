@@ -397,13 +397,30 @@
         
         <div class="footer-der">
             <div class="footer-enlaces">
-                <a href="#">Ayuda</a>
-                <a href="#">Afilia tu restaurante</a>
+                <!-- Enlace de Ayuda -->
+                <a th:if="${configApp != null and configApp.telefonoSoporte != null}" 
+                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=Hola,%20necesito%20ayuda%20con%20la%20plataforma%20Dablyn%20Delivery.'}" 
+                   target="_blank" rel="noopener noreferrer">
+                   Ayuda
+                </a>
+                <a th:unless="${configApp != null and configApp.telefonoSoporte != null}" href="#">
+                   Ayuda
+                </a>
+                
+                <!-- Enlace para Afiliar Restaurante -->
+                <a th:if="${configApp != null and configApp.telefonoSoporte != null}" 
+                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=Hola,%20estoy%20interesado%20en%20afiliar%20mi%20restaurante%20a%20Dablyn%20Delivery.'}" 
+                   target="_blank" rel="noopener noreferrer">
+                   Afilia tu restaurante
+                </a>
+                <a th:unless="${configApp != null and configApp.telefonoSoporte != null}" href="#">
+                   Afilia tu restaurante
+                </a>
             </div>
             
             <div class="footer-legal">
-                <a href="#">Términos y condiciones</a> · 
-                <a href="#">Privacidad</a>
+                <a th:href="@{/terminos-condiciones}">Términos y condiciones</a> · 
+                <a th:href="@{/politica-privacidad}">Privacidad</a>
             </div>
         </div>
         

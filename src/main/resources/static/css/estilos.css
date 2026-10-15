@@ -1230,20 +1230,24 @@ footer {
     background-color: var(--fondo-principal);
     color: var(--texto-principal);
     border: 1px solid var(--borde-sutil);
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+    padding: 8px 16px; /* Define el ancho dinámico y altura de la píldora */
+    border-radius: 20px; /* Bordes redondeados en forma de píldora */
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 8px; /* Separación entre el ícono + y la palabra Agregar */
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.2s ease;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .btn-add-carrito:hover {
     background-color: var(--naranja-marca);
     border-color: var(--naranja-marca);
     color: white;
+    transform: translateY(-2px); /* Pequeño efecto de elevación al pasar el mouse */
+    box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2); /* Sombra naranja sutil */
 }
 
 /* Columna Derecha (Carrito Flotante) */

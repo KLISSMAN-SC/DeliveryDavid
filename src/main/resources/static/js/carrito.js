@@ -35,60 +35,32 @@ function abrirRestaurante(idNegocio) {
         });
 }
 function agregarAlCarrito(boton) {
-
-    const idProducto =
-        boton.dataset.producto;
-
-    const idNegocio =
-        boton.dataset.negocio;
-
-
-    // TEMPORAL
-    // Después lo reemplazaremos por el usuario de sesión.
+    const idProducto = boton.dataset.producto;
+    const idNegocio = boton.dataset.negocio;
     const idUsuario = obtenerIdUsuario();
 
-
     fetch(
-        `/api/carrito/agregar` +
-        `?idUsuario=${idUsuario}` +
-        `&idNegocio=${idNegocio}` +
-        `&idProducto=${idProducto}`,
-        {
-            method: "POST"
-        }
+        `/api/carrito/agregar?idUsuario=${idUsuario}&idNegocio=${idNegocio}&idProducto=${idProducto}`,
+        { method: "POST" }
     )
-
     .then(response => {
-
         if (!response.ok) {
-            throw new Error(
-                "No se pudo agregar el producto"
-            );
+            throw new Error("No se pudo agregar el producto");
         }
-
         return response.json();
-
     })
-
     .then(carrito => {
-
-        console.log(
-            "Producto agregado:",
-            carrito
-        );
-
-        // Actualizar carrito inmediatamente
-        mostrarCarrito(carrito);
-
+        // SOLUCIÓN AL DOBLE CLIC:
+        // Si el backend devuelve el carrito "vacío" en el primer intento (problema de BD),
+        // forzamos a recargar los datos reales.
+        if (!carrito.detalles || carrito.detalles.length === 0) {
+            cargarCarrito(idNegocio);
+        } else {
+            mostrarCarrito(carrito);
+        }
     })
-
     .catch(error => {
-
-        console.error(
-            "Error:",
-            error
-        );
-
+        console.error("Error:", error);
     });
 }
 function cargarCarrito(idNegocio) {
@@ -176,14 +148,14 @@ function mostrarCarrito(carrito) {
     // Generar la lista de productos
     carrito.detalles.forEach(detalle => {
         const producto = detalle.producto;
-        const subtotal = Number(detalle.precioUnitario) * detalle.cantidad;
+        const subtotalProducto = Number(detalle.precioUnitario) * detalle.cantidad;
 
         html += `
             <div class="carrito-item">
                 <h4 class="carrito-item-titulo">${producto.nombre}</h4>
                 
                 <div class="carrito-item-body">
-                    <!-- Controles de Cantidad (Formato Píldora) -->
+                    <!-- Controles de Cantidad -->
                     <div class="carrito-controles">
                         <button class="btn-cantidad" onclick="disminuirProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})">
                             <i class="fa-solid fa-minus"></i>
@@ -196,7 +168,7 @@ function mostrarCarrito(carrito) {
                     
                     <!-- Precio y Botón Eliminar -->
                     <div class="carrito-item-precio">
-                        <span class="precio-subtotal">S/ ${subtotal.toFixed(2)}</span>
+                        <span class="precio-subtotal">S/ ${subtotalProducto.toFixed(2)}</span>
                         <button class="btn-eliminar" onclick="eliminarProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})" title="Eliminar producto">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
@@ -208,44 +180,33 @@ function mostrarCarrito(carrito) {
 
     html += '</div>';
 
-    // Calcular montos totales
-    let subtotal = 0;
+    // Calcular SOLO el subtotal de los productos (Se eliminó el envío)
+    let totalProductos = 0;
     carrito.detalles.forEach(detalle => {
-        subtotal += Number(detalle.precioUnitario) * detalle.cantidad;
+        totalProductos += Number(detalle.precioUnitario) * detalle.cantidad;
     });
 
-    const envio = carrito.negocio && carrito.negocio.zona ? Number(carrito.negocio.zona.costoEnvioBase) : 0;
-    const total = subtotal + envio;
-
-    // Generar la zona de resumen
+    // Generar la zona de resumen limpia
     html += `
         <div class="carrito-resumen">
             <div class="resumen-fila">
-                <span>Subtotal</span>
-                <span>S/ ${subtotal.toFixed(2)}</span>
-            </div>
-            <div class="resumen-fila">
-                <span>Envío</span>
-                <span>S/ ${envio.toFixed(2)}</span>
+                <span>Subtotal productos</span>
+                <span>S/ ${totalProductos.toFixed(2)}</span>
             </div>
             
             <hr class="separador-sutil">
             
             <div class="resumen-fila total">
-                <span>Total</span>
-                <span>S/ ${total.toFixed(2)}</span>
+                <span>Total (Sin envío)</span>
+                <span>S/ ${totalProductos.toFixed(2)}</span>
             </div>
             
-			<button
-			type="button"
-			    class="btn-continuar-carrito"
-			    onclick="abrirModalPedido(
-			        ${carrito.negocio.idNegocio}
-			    )">
-
-			    Continuar pedido
-
-			</button>
+            <button
+                type="button"
+                class="btn-continuar-carrito"
+                onclick="abrirModalPedido(${carrito.negocio.idNegocio})">
+                Continuar pedido
+            </button>
         </div>
     `;
 

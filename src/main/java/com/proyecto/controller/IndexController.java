@@ -101,4 +101,17 @@ public class IndexController {
 
         return "Index"; 
     }
+ // ==========================================
+    // RUTAS PARA PÁGINAS LEGALES E INFORMATIVAS
+    // ==========================================
+
+    @GetMapping("/terminos-condiciones")
+    public String mostrarTerminosCondiciones() {
+        return "terminos-condiciones"; // Carga el archivo terminos-condiciones.html
+    }
+
+    @GetMapping("/politica-privacidad")
+    public String mostrarPoliticaPrivacidad() {
+        return "politica-privacidad"; // Carga el archivo politica-privacidad.html
+    }
 }
