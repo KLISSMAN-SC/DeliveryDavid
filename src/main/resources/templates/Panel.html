@@ -329,10 +329,39 @@
                 
                 <!-- Fila 2 (Ocupa ambas columnas) -->
                 <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
-                
+                <!-- ======================================== -->
+				<!-- COORDENADAS COPIADAS DE GOOGLE MAPS -->
+				<!-- NO SE GUARDA DIRECTAMENTE EN BD -->
+				<!-- ======================================== -->
+				<div style=" grid-column: 1 / -1; display: flex; flex-direction: column;gap: 6px;">
+    			<label style="font-size: 11px;color: gray;">
+				Coordenadas de Google Maps
+    			</label>
+    			<input type="text" id="inputCoordenadasGoogle"class="search-input"style="border: 1px solid var(--borde-sutil);padding: 10px;border-radius: 8px;width: 100%;box-sizing: border-box;"placeholder="-8.407305, -74.559925"autocomplete="off">
+    			<small id="mensajeCoordenadas"style="font-size: 10px;color: gray;">
+        		Copia las coordenadas directamente desde Google Maps.
+    			</small>
+				</div>   
+				          
                 <!-- Fila 3 -->
                 <input type="number" step="any" id="inputLatitud" name="latitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Latitud (Opcional)">
                 <input type="number" step="any" id="inputLongitud" name="longitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Longitud (Opcional)">
+                <!-- ======================================== -->
+                
+				<!-- MAPA -->
+				<!-- ======================================== -->
+
+				<div id="contenedorMapaNegocio"th:data-google-key="${googleMapsKey}"style="grid-column: 1 / -1;width: 100%;height: 250px;border: 1px solid var(--borde-sutil);border-radius: 12px;overflow: hidden;background: #111; position: relative;">
+    			<div id="mapaNegocioVacio"style="height: 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;gap: 10px;color: #777;text-align: center;">
+        		<i class="fa-solid fa-location-dot"style="color: var(--naranja-marca);font-size: 28px;">
+        		</i>
+        		<span>
+            	Ingresa las coordenadas para visualizar el negocio
+        		</span>
+    			</div>
+    			<iframe id="mapaNegocio" width="100%" height="250" style="border: 0;display: none;" loading="lazy" allowfullscreen>
+    			</iframe>
+				</div>
                 
                 <!-- Fila 4: Horario (Ocupa ambas columnas) -->
                 <fieldset style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 12px; border-radius: 8px; margin: 0;">

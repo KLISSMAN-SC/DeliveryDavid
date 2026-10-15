@@ -30,7 +30,7 @@ public class Negocio {
 	@Column(precision=10, scale=8)
 	private BigDecimal latitud;
 	
-	@Column(precision=10, scale=8)
+	@Column(precision=11, scale=8)
 	private BigDecimal longitud;
 	
 	@Column(length=15)

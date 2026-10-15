@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.dto.ResultadoDelivery;
 import com.proyecto.model.Carrito;
 import com.proyecto.model.DetalleCarrito;
 import com.proyecto.model.DetallePedido;
@@ -28,7 +29,9 @@ public class PedidoService {
 	 
 		@Autowired
 	    private PedidoRepository pedidoRepository;
-
+		
+		@Autowired
+		private DeliveryService deliveryService;
 
 	    @Autowired
 	    private DetallePedidoRepository
@@ -141,16 +144,18 @@ public class PedidoService {
 	        // =====================================
 	        // 3. TOTALES
 	        // =====================================
-
+	        ResultadoDelivery resultado =
+	                deliveryService
+	                    .calcularDelivery(
+	                        carrito.getNegocio(),
+	                        direccion
+	                    );
 	        BigDecimal subtotal =
 	                calcularSubtotal(carrito);
 
 
-	        BigDecimal costoEnvio =
-	                carrito
-	                .getNegocio()
-	                .getZona()
-	                .getCostoEnvioBase();
+	        BigDecimal costoEnvio = resultado.costoEnvio();
+	                
 
 
 	        if (costoEnvio == null) {

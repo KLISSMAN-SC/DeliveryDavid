@@ -5,40 +5,44 @@
 
 function inicializarDireccionesPedido() {
 
-    const radios =
-        document.querySelectorAll(
-            'input[name="direccionPedido"]'
-        );
+	const radios =
+	        document.querySelectorAll(
+	            'input[name="direccionPedido"]'
+	        );
 
 
-    radios.forEach(radio => {
+	    radios.forEach(radio => {
 
-        radio.addEventListener(
-            "change",
-            function() {
+	        radio.addEventListener(
+	            "change",
+	            function() {
 
-                actualizarMapaDireccion(
-                    this
-                );
-
-            }
-        );
-
-    });
+	                actualizarMapaDireccion(
+	                    this
+	                );
 
 
-    const seleccionada =
-        document.querySelector(
-            'input[name="direccionPedido"]:checked'
-        );
+	                recalcularEnvioPedido(
+	                    this
+	                );
+	            }
+	        );
+
+	    });
 
 
-    if (seleccionada) {
+	    const seleccionada =
+	        document.querySelector(
+	            'input[name="direccionPedido"]:checked'
+	        );
 
-        actualizarMapaDireccion(
-            seleccionada
-        );
-    }
+
+	    if (seleccionada) {
+
+	        actualizarMapaDireccion(
+	            seleccionada
+	        );
+	    }
 }
 
 
@@ -48,90 +52,78 @@ function inicializarDireccionesPedido() {
 // ==========================================
 
 function actualizarMapaDireccion(radio) {
-
-    const modal =
-        document.getElementById(
-            "modalPedido"
-        );
-
-
-    if (!modal) {
-        return;
-    }
+	const modal =
+	        document.getElementById(
+	            "modalPedido"
+	        );
 
 
-    const googleKey =
-        modal.dataset.googleKey;
+	    const mapa =
+	        document.getElementById(
+	            "mapaPedido"
+	        );
 
 
-    const direccion =
-        radio.dataset.direccion;
+	    if (!modal || !mapa || !radio) {
+	        return;
+	    }
 
 
-    const referencia =
-        radio.dataset.referencia || "";
+	    const apiKey =
+	        modal.dataset.googleKey;
 
 
-    const latitud =
-        radio.dataset.latitud;
+	    const latNegocio =
+	        modal.dataset.negocioLat;
 
 
-    const longitud =
-        radio.dataset.longitud;
+	    const lngNegocio =
+	        modal.dataset.negocioLng;
 
 
-    // Actualizar textos
-
-    const direccionMapa =
-        document.getElementById(
-            "direccionMapa"
-        );
+	    const latCliente =
+	        radio.dataset.latitud;
 
 
-    const referenciaMapa =
-        document.getElementById(
-            "referenciaMapa"
-        );
+	    const lngCliente =
+	        radio.dataset.longitud;
 
 
-    if (direccionMapa) {
+	    if (
+	        !apiKey ||
+	        !latNegocio ||
+	        !lngNegocio ||
+	        !latCliente ||
+	        !lngCliente
+	    ) {
 
-        direccionMapa.textContent =
-            direccion;
-    }
+	        console.error(
+	            "Faltan coordenadas para mostrar la ruta."
+	        );
 
-
-    if (referenciaMapa) {
-
-        referenciaMapa.textContent =
-            referencia;
-    }
-
-
-    // Actualizar mapa
-
-    const mapa =
-        document.getElementById(
-            "mapaPedido"
-        );
+	        return;
+	    }
 
 
-    if (
-        mapa &&
-        googleKey &&
-        latitud &&
-        longitud
-    ) {
+	    mapa.src =
+	        "https://www.google.com/maps/embed/v1/directions" +
+	        "?key=" +
+	        encodeURIComponent(apiKey) +
 
-        const coordenadas =
-            `${latitud},${longitud}`;
+	        "&origin=" +
+	        encodeURIComponent(
+	            `${latNegocio},${lngNegocio}`
+	        ) +
 
+	        "&destination=" +
+	        encodeURIComponent(
+	            `${latCliente},${lngCliente}`
+	        ) +
 
-        mapa.src =
-            `https://www.google.com/maps/embed/v1/place` +
-            `?key=${encodeURIComponent(googleKey)}` +
-            `&q=${encodeURIComponent(coordenadas)}`;
-    }
+	        "&mode=driving" +
+
+	        "&units=metric";
+    
 }
 
 function abrirModalAgregarDireccion(
@@ -722,4 +714,15 @@ function eliminarDireccionUsuario(
 
         boton.disabled = false;
     });
+	
+}
+function alCambiarDireccionPedido(radio) {
+
+    actualizarMapaDireccion(
+        radio
+    );
+
+    recalcularEnvioPedido(
+        radio
+    );
 }

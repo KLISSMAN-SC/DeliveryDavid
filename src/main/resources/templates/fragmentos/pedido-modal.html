@@ -1,4 +1,9 @@
-<div th:fragment="modalPedido" id="modalPedido" class="modal-pedido-overlay" th:data-google-key="${googleMapsKey}">
+<div th:fragment="modalPedido" id="modalPedido" class="modal-pedido-overlay" 
+th:data-negocio="${carrito.negocio.idNegocio}"
+th:data-google-key="${googleMapsKey}"
+ th:data-negocio-lat="${carrito.negocio.latitud}"
+
+    th:data-negocio-lng="${carrito.negocio.longitud}">
     <div class="modal-pedido-contenido">
         
         <!-- CABECERA -->
@@ -19,7 +24,8 @@
             <div class="lista-direcciones" th:if="${!#lists.isEmpty(direcciones)}">
                 <label class="direccion-opcion" th:each="direccion : ${direcciones}">
                     <input type="radio" name="direccionPedido" th:value="${direccion.idDireccionUsuario}" th:data-direccion="${direccion.direccion}" th:data-referencia="${direccion.referencia}" th:data-latitud="${direccion.latitud}" th:data-longitud="${direccion.longitud}" 
-                    th:checked="${direccionSeleccionada != null and direccion.idDireccionUsuario == direccionSeleccionada.idDireccionUsuario}">
+                    th:checked="${direccionSeleccionada != null and direccion.idDireccionUsuario == direccionSeleccionada.idDireccionUsuario}"
+                     onchange="recalcularEnvioPedido(this)">
                     <div class="direccion-info">
                         <strong th:text="${direccion.alias}">Casa</strong>
                         <span th:text="${direccion.direccion}">Dirección</span>
@@ -60,7 +66,13 @@
 
             <!-- GOOGLE MAPS EMBED -->
             <div class="mapa-pedido-contenedor">
-                <iframe id="mapaPedido" class="mapa-pedido" width="100%" height="240" style="border:0;" loading="lazy" tabindex="-1" th:src="|https://www.google.com/maps/embed/v1/place?key=${googleMapsKey}&q=${direccionSeleccionada.latitud},${direccionSeleccionada.longitud}|"></iframe>
+                <iframe id="mapaPedido" class="mapa-pedido" width="100%" 
+                height="240" style="border:0;" loading="lazy" tabindex="-1" 
+                allowfullscreen
+				referrerpolicy="strict-origin-when-cross-origin"
+				 th:src="|https://www.google.com/maps/embed/v1/directions?key=${googleMapsKey}&origin=${carrito.negocio.latitud},${carrito.negocio.longitud}&destination=${direccionSeleccionada.latitud},${direccionSeleccionada.longitud}&mode=driving&units=metric|"
+                ></iframe>
+            
             </div>
         </section>
 
@@ -98,15 +110,27 @@
         <!-- =============================== -->
         <section class="pedido-resumen">
             <h3>Resumen del pedido</h3>
+            
             <div>
                 <span>Productos</span>
-                <strong>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">0.00</span></strong>
-            </div>
-            <div>
-                <span>Envío</span>
-                <strong>S/ <span th:text="${#numbers.formatDecimal(envio, 1, 2)}">0.00</span></strong>
+                <strong>S/ <span  id="subtotalPedido" th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">0.00</span></strong>
             </div>
             
+            <div>
+
+    		<div>
+
+        	<span>Envío</span>
+        	<!--  
+        	<small id="distanciaDeliveryPedido" th:text="${direccionSeleccionada != null ? '(' + #numbers.formatDecimal(distanciaKm,1, 2  ) + ' km)': ''}"></small>
+    		-->
+    		</div>
+    		<strong>
+        		S/
+        	<span id="costoEnvioPedido"th:text="${#numbers.formatDecimal(envio,1,2)}">0.00
+        	</span>
+    		</strong>
+			</div>
             
             <hr>
             

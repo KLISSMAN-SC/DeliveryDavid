@@ -885,4 +885,202 @@ function filtrarPedidos(boton) {
 	        "noopener,noreferrer"
 	    );
 	}
+	function recalcularEnvioPedido(radio) {
+
+
+	    if (!radio) {
+	        return;
+	    }
+
+
+	    const idUsuario =
+	        obtenerIdUsuario();
+
+
+	    const modal =
+	        document.getElementById(
+	            "modalPedido"
+	        );
+
+
+	    if (!modal) {
+
+	        console.error(
+	            "No existe #modalPedido"
+	        );
+
+	        return;
+	    }
+
+
+	    const idNegocio =
+	        modal.dataset.negocio;
+
+
+	    const idDireccionUsuario =
+	        radio.value;
+
+
+	    const envioElemento =
+	        document.getElementById(
+	            "costoEnvioPedido"
+	        );
+
+
+	    const totalElemento =
+	        document.getElementById(
+	            "totalPedido"
+	        );
+
+
+	    const distanciaElemento =
+	        document.getElementById(
+	            "distanciaDeliveryPedido"
+	        );
+
+
+	    const botonPedido =
+	        document.querySelector(
+	            ".btn-hacer-pedido"
+	        );
+
+
+	    // ==========================================
+	    // ESTADO CARGANDO
+	    // ==========================================
+
+	    if (botonPedido) {
+
+	        botonPedido.disabled = true;
+	    }
+
+
+	    if (envioElemento) {
+
+	        envioElemento.textContent =
+	            "...";
+	    }
+
+
+	    // ==========================================
+	    // BACKEND
+	    // ==========================================
+
+	    const parametros =
+	        new URLSearchParams({
+
+	            idUsuario:
+	                idUsuario,
+
+	            idNegocio:
+	                idNegocio,
+
+	            idDireccionUsuario:
+	                idDireccionUsuario
+	        });
+
+
+	    fetch(
+	        `/api/pedido/calcular-envio?${parametros}`
+	    )
+
+	    .then(async response => {
+
+
+	        const resultado =
+	            await response.json();
+
+
+	        if (!response.ok) {
+
+	            throw new Error(
+	                resultado.mensaje ||
+	                "No se pudo calcular el delivery."
+	            );
+	        }
+
+
+	        return resultado;
+	    })
+
+	    .then(resultado => {
+
+
+	        // ======================================
+	        // COSTO ENVÍO
+	        // ======================================
+
+	        if (envioElemento) {
+
+	            envioElemento.textContent =
+	                Number(
+	                    resultado.costoEnvio
+	                ).toFixed(2);
+	        }
+
+
+	        // ======================================
+	        // TOTAL
+	        // ======================================
+
+	        if (totalElemento) {
+
+	            totalElemento.textContent =
+	                Number(
+	                    resultado.total
+	                ).toFixed(2);
+	        }
+
+
+	        // ======================================
+	        // DISTANCIA
+	        // ======================================
+
+	        if (distanciaElemento) {
+
+	            distanciaElemento.textContent =
+	                `(${Number(
+	                    resultado.distanciaKm
+	                ).toFixed(2)} km)`;
+	        }
+
+
+	        // ======================================
+	        // HABILITAR PEDIDO
+	        // ======================================
+
+	        if (botonPedido) {
+
+	            botonPedido.disabled = false;
+	        }
+
+	    })
+
+	    .catch(error => {
+
+
+	        console.error(
+	            error
+	        );
+
+
+	        if (envioElemento) {
+
+	            envioElemento.textContent =
+	                "--";
+	        }
+
+
+	        if (botonPedido) {
+
+	            botonPedido.disabled = true;
+	        }
+
+
+	        mostrarToast(
+	            "No se pudo calcular el envío",
+	            error.message
+	        );
+	    });
+	}
 	

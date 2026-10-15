@@ -500,30 +500,56 @@ function toggleCargaCarta() {
         }
     }
 }
-
-
 // ==========================================
 // MODAL CRUD NEGOCIOS
 // ==========================================
-function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, estado, idTipo, idZona, idCentro, hInicio, hFin, modoWhatsapp) {
+
+function abrirModalNegocio(id,nombre,direccion,latitud,longitud,telefono,estado,idTipo,idZona,idCentro,hInicio,hFin,modoWhatsapp
+) {
+
+    const inputCoordenadas =document.getElementById('inputCoordenadasGoogle');
     if (id) {
+        // ======================================
+        // EDITAR NEGOCIO
+        // ======================================
         document.getElementById('tituloModalNegocio').innerText = 'Editar Negocio';
         document.getElementById('inputIdNegocio').value = id;
-        document.getElementById('inputNombreNegocio').value = nombre || '';
-        document.getElementById('inputDireccionNegocio').value = direccion || '';
-        document.getElementById('inputLatitud').value = latitud || '';
-        document.getElementById('inputLongitud').value = longitud || '';
-        document.getElementById('inputTelefonoNegocio').value = telefono || '';
-        document.getElementById('inputEstado').value = estado || 'ABIERTO';
-        document.getElementById('inputTipoNegocio').value = idTipo || '';
-        document.getElementById('inputZona').value = idZona || '';
-        document.getElementById('inputCentro').value = idCentro || '';
-        
-        // Manejo de tiempos
-        document.getElementById('inputHoraInicioNegocio').value = hInicio ? hInicio.substring(0, 5) : '';
-        document.getElementById('inputHoraFinNegocio').value = hFin ? hFin.substring(0, 5) : '';
-		document.getElementById('inputModoWhatsapp').value = (modoWhatsapp === true || modoWhatsapp === 'true') ? 'true' : 'false';
+        document.getElementById('inputNombreNegocio').value = nombre ?? '';
+        document.getElementById('inputDireccionNegocio').value = direccion ?? '';
+        document.getElementById('inputLatitud').value =latitud != null? latitud: '';
+        document.getElementById('inputLongitud').value =longitud != null? longitud: '';
+        document.getElementById('inputTelefonoNegocio').value = telefono ?? '';
+        document.getElementById('inputEstado').value = estado ?? 'ABIERTO';
+        document.getElementById('inputTipoNegocio').value = idTipo ?? '';
+        document.getElementById('inputZona').value = idZona ?? '';
+        document.getElementById('inputCentro').value = idCentro ?? '';
+
+        // ======================================
+        // HORARIOS
+        // ======================================
+        document.getElementById('inputHoraInicioNegocio').value =hInicio? hInicio.substring(0, 5): '';
+        document.getElementById('inputHoraFinNegocio').value =hFin? hFin.substring(0, 5): '';
+        document.getElementById('inputModoWhatsapp').value =(modoWhatsapp === true ||modoWhatsapp === 'true')? 'true': 'false';
+        //=======================================
+        // COORDENADAS + MAPA
+        // ======================================
+        if (latitud != null &&longitud != null) {
+            if (inputCoordenadas) {
+                inputCoordenadas.value =`${latitud}, ${longitud}`;
+            }
+            actualizarMapaNegocio(latitud,longitud);
+        } else {
+            if (inputCoordenadas) {
+                inputCoordenadas.value = '';
+            }
+            limpiarMapaNegocio();
+        }
     } else {
+
+        // ======================================
+        // NUEVO NEGOCIO
+        // ======================================
+
         document.getElementById('tituloModalNegocio').innerText = 'Nuevo Negocio';
         document.getElementById('inputIdNegocio').value = '';
         document.getElementById('inputNombreNegocio').value = '';
@@ -535,12 +561,38 @@ function abrirModalNegocio(id, nombre, direccion, latitud, longitud, telefono, e
         document.getElementById('inputTipoNegocio').value = '';
         document.getElementById('inputZona').value = '';
         document.getElementById('inputCentro').value = '';
-        
-        // Limpiar tiempos
+
+        // ======================================
+        // LIMPIAR HORARIOS
+        // ======================================
         document.getElementById('inputHoraInicioNegocio').value = '';
         document.getElementById('inputHoraFinNegocio').value = '';
-		document.getElementById('inputModoWhatsapp').value = 'false';
+        document.getElementById('inputModoWhatsapp').value = 'false';
+
+        // ======================================
+        // LIMPIAR COORDENADAS + MAPA
+        // ======================================
+        if (inputCoordenadas) {
+            inputCoordenadas.value = '';
+        }
+
+        const mensajeCoordenadas =document.getElementById('mensajeCoordenadas');
+        if (mensajeCoordenadas) {
+            mensajeCoordenadas.textContent ='Copia las coordenadas directamente desde Google Maps.';
+            mensajeCoordenadas.style.color ='gray';
+        }
+        limpiarMapaNegocio();
     }
+
+    // Si ya tienes esta función para habilitar
+    // o deshabilitar la carga de carta:
+    if (typeof toggleCargaCarta ==='function') {
+        toggleCargaCarta();
+    }
+    // ======================================
+    // MOSTRAR MODAL
+    // ======================================
+
     document.getElementById('modalNegocio').style.display = 'flex';
 }
 
@@ -920,4 +972,285 @@ function filtrarSeccionMenu(seccion, elementoPill) {
     } else {
         mensajeVacio.style.display = 'none';
     }
+	
 }
+function procesarCoordenadasNegocio() {
+
+    const inputCoordenadas =
+        document.getElementById(
+            "inputCoordenadasGoogle"
+        );
+
+    const inputLatitud =
+        document.getElementById(
+            "inputLatitud"
+        );
+
+    const inputLongitud =
+        document.getElementById(
+            "inputLongitud"
+        );
+
+    const mensaje =
+        document.getElementById(
+            "mensajeCoordenadas"
+        );
+
+
+    if (
+        !inputCoordenadas ||
+        !inputLatitud ||
+        !inputLongitud
+    ) {
+        return;
+    }
+
+
+    const texto =
+        inputCoordenadas.value.trim();
+
+
+    // Todavía está vacío
+    if (!texto) {
+
+        inputLatitud.value = "";
+        inputLongitud.value = "";
+
+        limpiarMapaNegocio();
+
+        return;
+    }
+
+
+    // Google Maps normalmente:
+    // -8.407305, -74.559925
+
+    const partes =
+        texto.split(",");
+
+
+    if (partes.length !== 2) {
+
+        if (mensaje) {
+
+            mensaje.textContent =
+                "Formato inválido. Ejemplo: -8.407305, -74.559925";
+
+            mensaje.style.color =
+                "#ff5555";
+        }
+
+        limpiarMapaNegocio();
+
+        return;
+    }
+
+
+    const latitud =
+        Number(
+            partes[0].trim()
+        );
+
+
+    const longitud =
+        Number(
+            partes[1].trim()
+        );
+
+
+    // ============================
+    // VALIDACIÓN
+    // ============================
+
+    if (
+        !Number.isFinite(latitud) ||
+        !Number.isFinite(longitud)
+    ) {
+
+        if (mensaje) {
+
+            mensaje.textContent =
+                "Las coordenadas ingresadas no son válidas.";
+
+            mensaje.style.color =
+                "#ff5555";
+        }
+
+        limpiarMapaNegocio();
+
+        return;
+    }
+
+
+    if (
+        latitud < -90 ||
+        latitud > 90
+    ) {
+
+        if (mensaje) {
+
+            mensaje.textContent =
+                "La latitud debe estar entre -90 y 90.";
+
+            mensaje.style.color =
+                "#ff5555";
+        }
+
+        limpiarMapaNegocio();
+
+        return;
+    }
+
+
+    if (
+        longitud < -180 ||
+        longitud > 180
+    ) {
+
+        if (mensaje) {
+
+            mensaje.textContent =
+                "La longitud debe estar entre -180 y 180.";
+
+            mensaje.style.color =
+                "#ff5555";
+        }
+
+        limpiarMapaNegocio();
+
+        return;
+    }
+
+
+    // ============================
+    // CORRECTO
+    // ============================
+
+    inputLatitud.value =
+        latitud;
+
+    inputLongitud.value =
+        longitud;
+
+
+    if (mensaje) {
+
+        mensaje.textContent =
+            "Coordenadas válidas.";
+
+        mensaje.style.color =
+            "#00cc66";
+    }
+
+
+    actualizarMapaNegocio(
+        latitud,
+        longitud
+    );
+}
+function actualizarMapaNegocio(
+    latitud,
+    longitud
+) {
+
+    const contenedor =
+        document.getElementById(
+            "contenedorMapaNegocio"
+        );
+
+    const mapa =
+        document.getElementById(
+            "mapaNegocio"
+        );
+
+    const mapaVacio =
+        document.getElementById(
+            "mapaNegocioVacio"
+        );
+
+
+    if (
+        !contenedor ||
+        !mapa
+    ) {
+        return;
+    }
+
+
+    const googleKey =
+        contenedor.dataset.googleKey;
+
+
+    if (!googleKey) {
+
+        console.error(
+            "No se encontró googleMapsKey en Gestión de Negocios."
+        );
+
+        return;
+    }
+
+
+    mapa.src =
+        "https://www.google.com/maps/embed/v1/place" +
+        "?key=" +
+        encodeURIComponent(googleKey) +
+        "&q=" +
+        encodeURIComponent(
+            `${latitud},${longitud}`
+        );
+
+
+    mapa.style.display =
+        "block";
+
+
+    if (mapaVacio) {
+
+        mapaVacio.style.display =
+            "none";
+    }
+}
+function limpiarMapaNegocio() {
+
+    const mapa =
+        document.getElementById(
+            "mapaNegocio"
+        );
+
+    const mapaVacio =
+        document.getElementById(
+            "mapaNegocioVacio"
+        );
+
+
+    if (mapa) {
+
+        mapa.removeAttribute(
+            "src"
+        );
+
+        mapa.style.display =
+            "none";
+    }
+
+
+    if (mapaVacio) {
+
+        mapaVacio.style.display =
+            "flex";
+    }
+}
+document.addEventListener(
+    "input",
+    function (event) {
+
+        if (
+            event.target.id ===
+            "inputCoordenadasGoogle"
+        ) {
+
+            procesarCoordenadasNegocio();
+        }
+    }
+);

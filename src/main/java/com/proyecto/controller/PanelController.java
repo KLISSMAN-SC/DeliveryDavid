@@ -9,6 +9,7 @@ import com.proyecto.model.TipoNegocio;
 import com.proyecto.model.Usuario;
 import com.proyecto.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +52,9 @@ public class PanelController {
     @Autowired private CentroComercialRepository centroRepo;
     
     @Autowired private ConfiguracionRepository configRepo;
-  
+    
+    @Value("${google.maps.api-key:}")
+    private String googleMapsApiKey;
 
     
     @GetMapping
@@ -94,6 +98,8 @@ public class PanelController {
                 model.addAttribute("listaTipos", tipoNegocioRepo.findAll());
                 model.addAttribute("listaZonas", zonaRepo.findAll());
                 model.addAttribute("listaCentros", centroRepo.findAll());
+             // Google Maps
+                model.addAttribute("googleMapsKey",googleMapsApiKey);
                 break;
             case "categorias":
             	model.addAttribute("listaCategorias", categoriaRepo.findAll());
@@ -195,7 +201,72 @@ public class PanelController {
             }
             
             // 3. Guardar en BD
-            
+         // ==========================================
+         // VALIDAR COORDENADAS
+         // ==========================================
+
+         if (
+             negocio.getLatitud() == null ||
+             negocio.getLongitud() == null
+         ) {
+
+             redirectAttributes.addFlashAttribute(
+                 "mensajeError",
+                 "Debe registrar las coordenadas del negocio."
+             );
+
+             return "redirect:/panel?modulo=negocios";
+         }
+
+
+         // ==========================================
+         // LATITUD: -90 hasta 90
+         // ==========================================
+
+         if (
+             negocio.getLatitud().compareTo(
+                 BigDecimal.valueOf(-90)
+             ) < 0
+
+             ||
+
+             negocio.getLatitud().compareTo(
+                 BigDecimal.valueOf(90)
+             ) > 0
+         ) {
+
+             redirectAttributes.addFlashAttribute(
+                 "mensajeError",
+                 "La latitud ingresada no es válida."
+             );
+
+             return "redirect:/panel?modulo=negocios";
+         }
+
+
+         // ==========================================
+         // LONGITUD: -180 hasta 180
+         // ==========================================
+
+         if (
+             negocio.getLongitud().compareTo(
+                 BigDecimal.valueOf(-180)
+             ) < 0
+
+             ||
+
+             negocio.getLongitud().compareTo(
+                 BigDecimal.valueOf(180)
+             ) > 0
+         ) {
+
+             redirectAttributes.addFlashAttribute(
+                 "mensajeError",
+                 "La longitud ingresada no es válida."
+             );
+
+             return "redirect:/panel?modulo=negocios";
+         }
             negocioRepo.save(negocio);
             redirectAttributes.addFlashAttribute("mensajeExito", esEdicion ? "Negocio actualizado correctamente." : "Nuevo negocio creado con éxito.");
             

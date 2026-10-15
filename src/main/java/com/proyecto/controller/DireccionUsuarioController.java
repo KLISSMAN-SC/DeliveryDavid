@@ -35,6 +35,7 @@ public class DireccionUsuarioController {
 	
 	@Value("${google.maps.api-key:}")
     private String googleMapsApiKey;	
+	
 	@GetMapping
 	public String paginaDirecciones(
 	        @RequestParam Integer idUsuario,

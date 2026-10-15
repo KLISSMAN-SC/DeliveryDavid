@@ -215,6 +215,22 @@ public class DireccionUsuarioService {
 	            }
 	        }
 	    }
+	    public DireccionUsuario obtenerPorIdYUsuario(
+	            Integer idDireccionUsuario,
+	            Integer idUsuario) {
+
+
+	        return direccionUsuarioRepository
+	                .findByIdDireccionUsuarioAndUsuarioIdUsuario(
+	                    idDireccionUsuario,
+	                    idUsuario
+	                )
+	                .orElseThrow(
+	                    () -> new RuntimeException(
+	                        "La dirección seleccionada no existe."
+	                    )
+	                );
+	    }
 	    
 	    
 	}
