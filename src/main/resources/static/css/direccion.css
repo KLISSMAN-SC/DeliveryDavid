@@ -1,3 +1,4 @@
+
 .menu-usuario-opcion {
     width: 100%;
 
@@ -803,3 +804,256 @@
 
     color: #ffffff;
 }
+/* =========================================================
+   DISEÑO PRO: MIS DIRECCIONES (TEMA OSCURO)
+   ========================================================= */
+
+/* Variables locales para modo oscuro */
+:root {
+    --bg-principal: #121212;     /* Fondo de página similar al main */
+    --bg-tarjeta: #1a1a1a;       /* Fondo de las cards */
+    --borde-tenue: #333333;      /* Bordes divisorios */
+    --texto-blanco: #ffffff;
+    --texto-gris: #a9a9a9;
+    --naranja-marca: #ff6500;
+}
+
+/* Contenedor Principal */
+.vista-mis-direcciones {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: Arial, sans-serif;
+    color: var(--texto-blanco);
+}
+
+/* Cabecera */
+.direcciones-header-pro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: var(--bg-tarjeta);
+    padding: 20px 25px;
+    border-radius: 12px;
+    border: 1px solid var(--borde-tenue);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.header-pro-texto {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-volver-pro {
+    background-color: #262626;
+    color: var(--texto-blanco) !important;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 18px;
+    transition: all 0.3s;
+    border: 1px solid var(--borde-tenue);
+}
+
+.btn-volver-pro:hover {
+    background-color: var(--naranja-marca);
+    border-color: var(--naranja-marca);
+}
+
+.header-pro-texto h1 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    color: var(--texto-blanco) !important;
+}
+
+.header-pro-texto p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--texto-gris) !important;
+}
+
+.btn-nueva-direccion-pro {
+    background-color: var(--naranja-marca);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-nueva-direccion-pro:hover {
+    background-color: #e55c00;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   GRILLA DE TARJETAS (GRID)
+   ========================================================= */
+.direcciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Tarjeta de Dirección */
+.direccion-card-pro {
+    background-color: var(--bg-tarjeta);
+    border-radius: 12px;
+    border: 1px solid var(--borde-tenue);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.direccion-card-pro:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 101, 0, 0.4);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
+
+.card-pro-cuerpo {
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.card-pro-icono {
+    background-color: rgba(255, 101, 0, 0.15);
+    color: var(--naranja-marca);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.card-pro-info {
+    flex-grow: 1;
+}
+
+.card-pro-titulo-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.card-pro-titulo-fila h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--texto-blanco) !important;
+}
+
+.badge-pro {
+    background-color: rgba(255, 101, 0, 0.16);
+    color: var(--naranja-marca);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-pro-texto-direccion {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #d4d4d4 !important;
+    line-height: 1.4;
+}
+
+.card-pro-referencia {
+    margin: 0;
+    font-size: 12px;
+    color: var(--texto-gris);
+    background-color: #222222;
+    padding: 8px 10px;
+    border-radius: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    border: 1px solid #2a2a2a;
+}
+
+.card-pro-footer {
+    background-color: #151515;
+    border-top: 1px solid var(--borde-tenue);
+    padding: 10px 20px;
+    text-align: right;
+}
+
+.btn-pro-eliminar {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.btn-pro-eliminar:hover {
+    background-color: rgba(255, 77, 77, 0.15);
+}
+
+/* =========================================================
+   ESTADO VACÍO (EMPTY STATE)
+   ========================================================= */
+.direcciones-vacio-pro {
+    background-color: var(--bg-tarjeta);
+    border-radius: 12px;
+    padding: 60px 20px;
+    text-align: center;
+    border: 1px solid var(--borde-tenue);
+}
+
+.vacio-pro-icono {
+    font-size: 60px;
+    color: #333333;
+    margin-bottom: 20px;
+}
+
+.direcciones-vacio-pro h2 {
+    margin: 0 0 10px 0;
+    color: var(--texto-blanco) !important;
+}
+
+.direcciones-vacio-pro p {
+    color: var(--texto-gris) !important;
+    margin: 0 auto 25px auto;
+    max-width: 400px;
+}
+
+/* Modo Responsive (Celulares) */
+@media (max-width: 768px) {
+    .direcciones-header-pro {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .btn-nueva-direccion-pro {
+        justify-content: center;
+    }
+}}
