@@ -14,7 +14,12 @@
 </head>
 <!-- Cambia el body a esto: -->
 <body class="pagina-direcciones" style="background-color: #121212;">
-
+	<!-- ===================================== -->
+    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+    <!-- ===================================== -->
+    <div id="pantalla-carga">
+        <div class="loader-circulo"></div>
+    </div>
     <main class="vista-mis-direcciones">
 
         <!-- ===================================== -->
@@ -111,5 +116,6 @@
     <script th:src="@{/js/direccion.js}"></script>
     <script th:src="@{/js/pedido.js}"></script>
     <script th:src="@{/js/carrito.js}"></script>
+    <script th:src="@{/js/carga.js}"></script>
 </body>
 </html>

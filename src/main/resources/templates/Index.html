@@ -16,7 +16,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
-
+<!-- ===================================== -->
+    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+    <!-- ===================================== -->
+    <div id="pantalla-carga">
+        <div class="loader-circulo"></div>
+    </div>
 <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
     <header class="header-principal">
         
@@ -446,6 +451,7 @@
 <script th:src="@{/js/productos.js}"></script>
 <script th:src="@{/js/pedido.js}"></script>
 <script th:src="@{/js/direccion.js}"></script>
+<script th:src="@{/js/carga.js}"></script>
 <script th:inline="javascript">
         window.idUsuarioValidado = /*[[${usuarioAutenticado != null ? usuarioAutenticado.idUsuario : null}]]*/ null;
 

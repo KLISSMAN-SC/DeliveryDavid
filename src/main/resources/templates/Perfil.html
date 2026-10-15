@@ -11,7 +11,12 @@
 
 <!-- Usamos la clase body-login para heredar el fondo oscuro centrado y el degradado sutil -->
 <body class="body-login cargado">
-
+<!-- ===================================== -->
+    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+    <!-- ===================================== -->
+    <div id="pantalla-carga">
+        <div class="loader-circulo"></div>
+    </div>
     <!-- Ampliamos un poco el wrapper para que las dos columnas respiren bien -->
     <div class="login-wrapper" style="max-width: 650px; width: 100%; margin: 20px;">
         
@@ -92,5 +97,6 @@
     </div>
     
     <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/carga.js}"></script>
 </body>
 </html>
