@@ -1,481 +1,143 @@
 package com.proyecto.controller;
 
+import com.proyecto.model.*;
+import com.proyecto.security.*;
+import com.proyecto.services.*;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.time.Duration;
+import java.util.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.proyecto.dto.ResultadoDelivery;
-import com.proyecto.model.Carrito;
-import com.proyecto.model.DetallePedido;
-import com.proyecto.model.DireccionUsuario;
-import com.proyecto.model.Pedido;
-import com.proyecto.model.Usuario;
-import com.proyecto.services.DeliveryService;
-import com.proyecto.services.DireccionUsuarioService;
-import com.proyecto.services.PedidoService;
-import com.proyecto.services.UsuarioService;
-
-
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/pedido")
 public class PedidoController {
-	@Autowired
-    private PedidoService pedidoService;
-	@Autowired 
-	private UsuarioService usuarioService;
+  private final PedidoService pedidos;
+  private final UsuarioService users;
+  private final DireccionUsuarioService addresses;
+  private final DeliveryService delivery;
+  private final RateLimits limits;
 
-    @Autowired
-    private DireccionUsuarioService
-            direccionUsuarioService;
-    @Autowired
-    private DeliveryService deliveryService;
+  @Value("${google.maps.api-key:}")
+  private String mapsKey;
 
+  public PedidoController(
+      PedidoService pedidos,
+      UsuarioService users,
+      DireccionUsuarioService addresses,
+      DeliveryService delivery,
+      RateLimits limits) {
+    this.pedidos = pedidos;
+    this.users = users;
+    this.addresses = addresses;
+    this.delivery = delivery;
+    this.limits = limits;
+  }
 
-    @Value("${google.maps.api-key:}")
-    private String googleMapsApiKey;
-
-
-    // =======================================
-    // ABRIR MODAL
-    // =======================================
-    // ========================================
-    // CHECKOUT
-    // ========================================
-
-    @GetMapping("/resumen")
-    public String mostrarResumen(
-
-            
-            @RequestParam Integer idNegocio,
-            Authentication authentication,
-            Model model) {
-
-    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
-        Carrito carrito =
-                pedidoService
-                .obtenerCarritoCheckout(
-                        usuario.getIdUsuario(),
-                        idNegocio
-                );
-
-
-        List<DireccionUsuario> direcciones =
-                direccionUsuarioService
-                .listarPorUsuario(
-                        usuario.getIdUsuario()
-                );
-
-
-        DireccionUsuario direccionSeleccionada =
-                direccionUsuarioService
-                .obtenerPrincipalOPrimera(
-                        usuario.getIdUsuario()
-                );
-
-
-        BigDecimal subtotal =
-                pedidoService
-                .calcularSubtotal(
-                        carrito
-                );
-
-        BigDecimal envio =
-                BigDecimal.ZERO;
-
-
-        BigDecimal distanciaKm =
-                BigDecimal.ZERO;
-
-     // ==========================================
-        // DELIVERY
-        // ==========================================
-
-        if (direccionSeleccionada != null) {
-
-            ResultadoDelivery resultado =
-                    deliveryService
-                        .calcularDelivery(
-                            carrito.getNegocio(),
-                            direccionSeleccionada
-                        );
-
-
-            envio =
-                    resultado.costoEnvio();
-
-
-            distanciaKm =
-                    resultado.distanciaKm();
-        }
-
-
-        BigDecimal total =
-                subtotal.add(
-                    envio
-                );
-
-
-        model.addAttribute(
-                "carrito",
-                carrito
-        );
-
-        model.addAttribute(
-                "direcciones",
-                direcciones
-        );
-
-        model.addAttribute(
-                "direccionSeleccionada",
-                direccionSeleccionada
-        );
-
-        model.addAttribute(
-                "subtotal",
-                subtotal
-        );
-
-        model.addAttribute(
-                "envio",
-                envio
-        );
-        model.addAttribute(
-                "distanciaKm",
-                distanciaKm
-            );
-
-        model.addAttribute(
-                "total",
-                total
-        );
-
-        model.addAttribute(
-                "googleMapsKey",
-                googleMapsApiKey
-        );
-
-
-        return
-            "fragmentos/pedido-modal :: modalPedido";
+  @GetMapping("/resumen")
+  public String mostrarResumen(@RequestParam Integer idNegocio, Authentication auth, Model m) {
+    var u = users.obtenerUsuarioAutenticado(auth);
+    var c = pedidos.obtenerCarritoCheckout(u.getIdUsuario(), idNegocio);
+    var a = addresses.obtenerPrincipalOPrimera(u.getIdUsuario());
+    var subtotal = pedidos.calcularSubtotal(c);
+    var env = BigDecimal.ZERO;
+    var km = BigDecimal.ZERO;
+    if (a != null) {
+      var r = delivery.calcularDelivery(c.getNegocio(), a);
+      env = r.costoEnvio();
+      km = r.distanciaKm();
     }
-
-
-    // ========================================
-    // CREAR PEDIDO
-    // ========================================
-
-    @PostMapping(
-    		 value = "/confirmar",
-    		  consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-    		  produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>>
-    confirmarPedido(
-
-    		Authentication authentication,
-            @RequestParam Integer idNegocio,
-            @RequestParam Integer idDireccion,
-            @RequestParam String metodoPago,
-
-            @RequestParam(
-                defaultValue = "0"
-            )
-            BigDecimal propina) {
-
-    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
-        Pedido pedido =
-                pedidoService
-                .confirmarPedido(
-                        usuario.getIdUsuario(),
-                        idNegocio,
-                        idDireccion,
-                        metodoPago,
-                        propina
-                );
-
-
-        Map<String, Object> respuesta =
-                new HashMap<>();
-
-
-        respuesta.put(
-                "ok",
-                true
-        );
-
-        respuesta.put(
-                "idPedido",
-                pedido.getIdPedido()
-        );
-
-        respuesta.put(
-                "mensaje",
-                "Pedido registrado correctamente"
-        );
-
-
-        return ResponseEntity
-                .ok()
-                .contentType(
-                    MediaType.APPLICATION_JSON
-                )
-                .body(respuesta);
-    }
-    @PostMapping(
-    	    value = "/{idPedido}/cancelar",
-    	    produces = MediaType.APPLICATION_JSON_VALUE
-    	)
-    	@ResponseBody
-    	public ResponseEntity<Map<String, Object>>
-    	cancelarPedido(
-    			
-    	        @PathVariable Integer idPedido,
-    	        Authentication authentication
-    	        ) {
-    	
-    		Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
-    	    Pedido pedido =
-    	            pedidoService
-    	            .cancelarPedido(
-    	                    idPedido,
-    	                    usuario.getIdUsuario()
-    	            );
-
-
-    	    Map<String, Object> respuesta =
-    	            new HashMap<>();
-
-
-    	    respuesta.put(
-    	            "ok",
-    	            true
-    	    );
-
-
-    	    respuesta.put(
-    	            "idPedido",
-    	            pedido.getIdPedido()
-    	    );
-
-
-    	    respuesta.put(
-    	            "estado",
-    	            pedido.getEstadoPedido()
-    	    );
-
-
-    	    respuesta.put(
-    	            "mensaje",
-    	            "Pedido cancelado correctamente"
-    	    );
-
-
-    	    return ResponseEntity
-    	            .ok(respuesta);
-    	}
-
-
-    // ========================================
-    // MODAL PEDIDO CREADO
-    // ========================================
-
-    @GetMapping(
-        "/confirmacion/{idPedido}"
-    )
-    public String mostrarConfirmacion(
-
-            @PathVariable Integer idPedido,
-
-            Model model) {
-
-
-        Pedido pedido =
-                pedidoService
-                .obtenerPedido(
-                        idPedido
-                );
-
-
-        List<DetallePedido> detalles =
-                pedidoService
-                .obtenerDetallesPedido(
-                        idPedido
-                );
-
-
-        model.addAttribute(
-                "pedido",
-                pedido
-        );
-
-
-        model.addAttribute(
-                "detalles",
-                detalles
-        );
-
-
-        model.addAttribute(
-                "googleMapsKey",
-                googleMapsApiKey
-        );
-
-
-        return
-            "fragmentos/pedido-confirmado-modal :: modalPedidoConfirmado";
-    }
-    
-    @GetMapping("/mis-pedidos")
-    public String mostrarMisPedidos(
-
-    		Authentication authentication,
-
-            Model model) {
-
-    	Usuario usuario =usuarioService.obtenerUsuarioAutenticado(authentication);
-    	
-        List<Pedido> pedidos =
-                pedidoService
-                .listarPedidosUsuario(
-                        usuario.getIdUsuario()
-                );
-
-
-        model.addAttribute(
-                "pedidos",
-                pedidos
-        );
-
-        return "mis-pedidos";
-    }
-    
-    @GetMapping(
-    	    value = "/calcular-envio",
-    	    produces = MediaType.APPLICATION_JSON_VALUE
-    	)
-    	@ResponseBody
-    	public ResponseEntity<Map<String, Object>>
-    	calcularEnvio(
-
-    	        	
-    			Authentication authentication,
-    	        @RequestParam Integer idNegocio,
-
-    	        @RequestParam Integer idDireccionUsuario) {
-
-
-    	    try {
-    	    	
-    	    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
-    	        Carrito carrito =
-    	                pedidoService
-    	                    .obtenerCarritoCheckout(
-    	                        usuario.getIdUsuario(),
-    	                        idNegocio
-    	                    );
-
-
-    	        DireccionUsuario direccion =
-    	                direccionUsuarioService
-    	                    .obtenerPorIdYUsuario(
-    	                        idDireccionUsuario,
-    	                        usuario.getIdUsuario()
-    	                    );
-
-
-    	        BigDecimal subtotal =
-    	                pedidoService
-    	                    .calcularSubtotal(
-    	                        carrito
-    	                    );
-
-
-    	        ResultadoDelivery resultado =
-    	                deliveryService
-    	                    .calcularDelivery(
-    	                        carrito.getNegocio(),
-    	                        direccion
-    	                    );
-
-
-    	        BigDecimal total =
-    	                subtotal.add(
-    	                    resultado.costoEnvio()
-    	                );
-
-
-    	        Map<String, Object> respuesta =
-    	                new HashMap<>();
-
-
-    	        respuesta.put(
-    	            "ok",
-    	            true
-    	        );
-
-
-    	        respuesta.put(
-    	            "distanciaKm",
-    	            resultado.distanciaKm()
-    	        );
-
-
-    	        respuesta.put(
-    	            "costoEnvio",
-    	            resultado.costoEnvio()
-    	        );
-
-
-    	        respuesta.put(
-    	            "subtotal",
-    	            subtotal
-    	        );
-
-
-    	        respuesta.put(
-    	            "total",
-    	            total
-    	        );
-
-
-    	        return ResponseEntity.ok(
-    	            respuesta
-    	        );
-
-
-    	    } catch (Exception e) {
-
-
-    	        return ResponseEntity
-    	                .badRequest()
-    	                .body(
-    	                    Map.of(
-    	                        "ok",
-    	                        false,
-    	                        "mensaje",
-    	                        e.getMessage()
-    	                    )
-    	                );
-    	    }
-    	}
-   
-	
-	}
-
+    m.addAttribute("carrito", c);
+    m.addAttribute("direcciones", addresses.listarPorUsuario(u.getIdUsuario()));
+    m.addAttribute("direccionSeleccionada", a);
+    m.addAttribute("subtotal", subtotal);
+    m.addAttribute("envio", env);
+    m.addAttribute("distanciaKm", km);
+    m.addAttribute("total", subtotal.add(env));
+    m.addAttribute("googleMapsKey", mapsKey);
+    return "fragmentos/pedido-modal :: modalPedido";
+  }
+
+  @PostMapping(
+      value = "/confirmar",
+      consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public Map<String, Object> confirmarPedido(
+      Authentication auth,
+      @RequestParam Integer idNegocio,
+      @RequestParam Integer idDireccion,
+      @RequestParam String metodoPago,
+      @RequestParam(defaultValue = "0") BigDecimal propina,
+      @RequestParam(required = false) Integer idCarrito) {
+    var u = users.obtenerUsuarioAutenticado(auth);
+    limits.check("order-account", u.getIdUsuario().toString(), 20, Duration.ofMinutes(1));
+    var p =
+        pedidos.confirmarPedido(
+            u.getIdUsuario(), idNegocio, idDireccion, metodoPago, propina, idCarrito);
+    return Map.of(
+        "ok", true, "idPedido", p.getIdPedido(), "mensaje", "Pedido registrado correctamente");
+  }
+
+  @PostMapping(value = "/{idPedido}/cancelar", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public Map<String, Object> cancelarPedido(@PathVariable Integer idPedido, Authentication auth) {
+    var p = pedidos.cancelarPedido(idPedido, users.obtenerUsuarioAutenticado(auth).getIdUsuario());
+    return Map.of(
+        "ok",
+        true,
+        "idPedido",
+        p.getIdPedido(),
+        "estado",
+        p.getEstadoPedido(),
+        "mensaje",
+        "Pedido cancelado correctamente");
+  }
+
+  @GetMapping("/confirmacion/{idPedido}")
+  public String mostrarConfirmacion(@PathVariable Integer idPedido, Authentication auth, Model m) {
+    var p =
+        pedidos.obtenerPedidoUsuario(
+            idPedido, users.obtenerUsuarioAutenticado(auth).getIdUsuario());
+    m.addAttribute("pedido", p);
+    m.addAttribute("detalles", pedidos.obtenerDetallesPedido(p.getIdPedido()));
+    m.addAttribute("googleMapsKey", mapsKey);
+    return "fragmentos/pedido-confirmado-modal :: modalPedidoConfirmado";
+  }
+
+  @GetMapping("/mis-pedidos")
+  public String mostrarMisPedidos(Authentication auth, Model m) {
+    m.addAttribute(
+        "pedidos",
+        pedidos.listarPedidosUsuario(users.obtenerUsuarioAutenticado(auth).getIdUsuario()));
+    return "mis-pedidos";
+  }
+
+  @GetMapping(value = "/calcular-envio", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public Map<String, Object> calcularEnvio(
+      Authentication auth,
+      @RequestParam Integer idNegocio,
+      @RequestParam Integer idDireccionUsuario) {
+    var u = users.obtenerUsuarioAutenticado(auth);
+    var c = pedidos.obtenerCarritoCheckout(u.getIdUsuario(), idNegocio);
+    var a = addresses.obtenerPorIdYUsuario(idDireccionUsuario, u.getIdUsuario());
+    var r = delivery.calcularDelivery(c.getNegocio(), a);
+    var subtotal = pedidos.calcularSubtotal(c);
+    return Map.of(
+        "ok",
+        true,
+        "distanciaKm",
+        r.distanciaKm(),
+        "costoEnvio",
+        r.costoEnvio(),
+        "subtotal",
+        subtotal,
+        "total",
+        subtotal.add(r.costoEnvio()));
+  }
+}

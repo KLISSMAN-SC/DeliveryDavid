@@ -1,34 +1,32 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Verificar Correo - RIDE MEAL</title>
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
+<meta charset="utf-8"/>
+<title>Verificar Correo - RIDE MEAL</title>
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body class="body-login">
-    <div class="login-wrapper">
-        <div class="login-card">
-            <h2 style="margin-bottom: 15px;">Verifica tu correo</h2>
-            <p class="login-subtitulo">Hemos enviado un código de 6 dígitos a tu correo electrónico. Ingrésalo para activar tu cuenta.</p>
-
-            <div th:if="${error}" style="color: #ff5555; font-size: 13px; margin-bottom: 15px;" th:text="${error}"></div>
-
-            <form th:action="@{/verificar/confirmar}" method="POST">
-                <div class="input-group-login" style="justify-content: center;">
-                    <i class="fa-solid fa-hashtag"></i>
-                    <input type="text" name="codigoIngresado" placeholder="Ej: 123456" maxlength="6" style="text-align: center; font-size: 20px; letter-spacing: 5px;" required>
-                </div>
-                
-                <button type="submit" id="btnRegistrar" class="btn-aceptar" style="margin-top: 15px;">
-                    <span id="btnTexto">Confirmar código</span>
-                    <i id="btnIcono" class="fa-solid fa-spinner fa-spin" style="display: none; margin-left: 8px;"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-    <script>
+<div class="login-wrapper">
+<div class="login-card">
+<h2 style="margin-bottom: 15px;">Verifica tu correo</h2>
+<p class="login-subtitulo">Hemos enviado un código de 6 dígitos a tu correo electrónico. Ingrésalo para activar tu cuenta.</p>
+<div style="color: #ff5555; font-size: 13px; margin-bottom: 15px;" th:if="${error}" th:text="${error}"></div>
+<form method="POST" th:action="@{/verificar/confirmar}">
+<div class="input-group-login" style="justify-content: center;">
+<i class="fa-solid fa-hashtag"></i>
+<input maxlength="6" name="codigoIngresado" placeholder="Ej: 123456" required="" style="text-align: center; font-size: 20px; letter-spacing: 5px;" type="text"/>
+</div>
+<button class="btn-aceptar" id="btnRegistrar" style="margin-top: 15px;" type="submit">
+<span id="btnTexto">Confirmar código</span>
+<i class="fa-solid fa-spinner fa-spin" id="btnIcono" style="display: none; margin-left: 8px;"></i>
+</button>
+</form>
+<a th:href="@{/registro}">Volver al registro y solicitar otro código</a></div>
+</div>
+<script th:attr="nonce=${cspNonce}">
         function mostrarCarga() {
             const btn = document.getElementById('btnRegistrar');
             const texto = document.getElementById('btnTexto');

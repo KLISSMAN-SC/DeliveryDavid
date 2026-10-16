@@ -1,0 +1,38 @@
+# Incluir en el contexto http{} de Nginx. Adaptar dominio y certificados.
+# Registrar la ruta sin argumentos: no guardar tokens de recuperación en access.log.
+log_format delivery_safe '$remote_addr [$time_local] "$request_method $uri $server_protocol" $status $body_bytes_sent';
+server {
+ listen 80;
+ server_name TU_DOMINIO;
+ access_log /var/log/nginx/delivery-access.log delivery_safe;
+ return 301 https://$host$request_uri;
+}
+server {
+ listen 443 ssl;
+ server_name TU_DOMINIO;
+ ssl_certificate /etc/letsencrypt/live/TU_DOMINIO/fullchain.pem;
+ ssl_certificate_key /etc/letsencrypt/live/TU_DOMINIO/privkey.pem;
+ ssl_protocols TLSv1.2 TLSv1.3;
+ client_max_body_size 22m;
+ access_log /var/log/nginx/delivery-access.log delivery_safe;
+ proxy_set_header Forwarded "";
+ proxy_set_header X-Forwarded-Prefix "";
+ proxy_set_header Host $host;
+ proxy_set_header X-Forwarded-Proto https;
+ proxy_set_header X-Forwarded-For $remote_addr;
+ proxy_set_header X-Forwarded-Host $host;
+ proxy_read_timeout 30s;
+ location = /api/recuperar-password/reset {
+  # Nginx puede incluir la URL completa en errores de upstream: proteger esta ruta.
+  access_log off;
+  error_log /dev/null;
+  proxy_pass http://127.0.0.1:8080;
+ }
+ location /api/ {
+  proxy_pass http://127.0.0.1:8080;
+ }
+}
+# Solo detrás de este proxy confiable:
+# server.address=127.0.0.1 y SERVER_FORWARD_HEADERS_STRATEGY=framework.
+# No aceptar tráfico público directo en 8080 ni publicar MySQL en 3306.
+# Validar sintaxis con nginx -t y conectar los registros/alertas al monitor elegido.

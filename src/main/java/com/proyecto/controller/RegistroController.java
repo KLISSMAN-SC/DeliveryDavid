@@ -1,134 +1,164 @@
 package com.proyecto.controller;
 
-import com.proyecto.model.Rol;
-import com.proyecto.model.Usuario;
-import com.proyecto.repository.UsuarioRepository;
-import com.proyecto.services.CustomUserDetailsService;
-import com.proyecto.services.EmailService; // IMPORTANTE: Importamos el servicio
-
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import com.proyecto.dto.RegistroRequest;
+import com.proyecto.security.*;
+import com.proyecto.services.*;
+import jakarta.servlet.http.*;
+import jakarta.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import java.util.Random;
+import org.springframework.security.web.csrf.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class RegistroController {
+  private record Pending(
+      String nombres,
+      String apellidos,
+      String telefono,
+      String correo,
+      String passwordHash,
+      String codeHash,
+      Instant expires,
+      int attempts)
+      implements java.io.Serializable {}
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+  private final PasswordEncoder encoder;
+  private final PasswordPolicy policy;
+  private final EmailService email;
+  private final UserAccountService accounts;
+  private final CustomUserDetailsService details;
+  private final RateLimits limits;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+  public RegistroController(
+      PasswordEncoder encoder,
+      PasswordPolicy policy,
+      EmailService email,
+      UserAccountService accounts,
+      CustomUserDetailsService details,
+      RateLimits limits) {
+    this.encoder = encoder;
+    this.policy = policy;
+    this.email = email;
+    this.accounts = accounts;
+    this.details = details;
+    this.limits = limits;
+  }
 
-    // INYECTAMOS EL NUEVO SERVICIO (Reemplaza a JavaMailSender)
-    @Autowired
-    private EmailService emailService;
-    
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+  private boolean signedIn() {
+    var a = SecurityContextHolder.getContext().getAuthentication();
+    return a != null && a.isAuthenticated() && !(a instanceof AnonymousAuthenticationToken);
+  }
 
-    // 1. Mostrar formulario de registro (Protegido)
-    @GetMapping("/registro")
-    public String mostrarRegistro() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/"; // Lo expulsamos de vuelta al inicio
-        }
-        
-        return "Registro";
+  @GetMapping("/registro")
+  public String mostrarRegistro() {
+    return signedIn() ? "redirect:/" : "Registro";
+  }
+
+  @PostMapping("/registro/enviar")
+  public String procesarRegistro(
+      @Valid @ModelAttribute("registro") RegistroRequest form,
+      BindingResult errors,
+      HttpServletRequest req,
+      RedirectAttributes flash) {
+    if (signedIn()) return "redirect:/";
+    if (errors.hasErrors()) {
+      flash.addFlashAttribute("error", "Revisa los datos del formulario.");
+      return "redirect:/registro";
     }
-
-    // 2. Procesar datos, generar código y enviar correo
-    @PostMapping("/registro/enviar")
-    public String procesarRegistro(Usuario usuario, HttpSession session) {
-        
-        // Comprobar si el correo ya existe en BD
-        if(usuarioRepository.findByCorreoElectronico(usuario.getCorreoElectronico()).isPresent()){
-            return "redirect:/registro?error=CorreoYaExiste";
-        }
-
-        // Generar código de 6 dígitos
-        String codigo = String.format("%06d", new Random().nextInt(999999));
-        
-        // Encriptar la contraseña introducida por el usuario
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        
-        // Asignar el Rol de Cliente
-        Rol rolCliente = new Rol();
-        rolCliente.setIdRol(2);
-        rolCliente.setNombre("CLIENTE");
-        usuario.setRol(rolCliente);
-
-        // Guardar temporalmente en sesión
-        session.setAttribute("usuarioTemp", usuario);
-        session.setAttribute("codigoVerificacion", codigo);
-
-        // EXTRAEMOS EL NOMBRE COMPLETO Y ENVIAMOS EL CORREO HTML
-        String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidos();
-        emailService.enviarCorreoVerificacion(usuario.getCorreoElectronico(), codigo, nombreCompleto);
-
-        return "redirect:/verificar";
+    try {
+      limits.check("register-ip", req.getRemoteAddr(), 5, Duration.ofMinutes(15));
+      String correo = UserAccountService.normalizeEmail(form.correoElectronico());
+      limits.check("register-account", correo, 3, Duration.ofMinutes(15));
+      policy.validate(form.password());
+      String code = TokenTools.code();
+      Pending pending =
+          new Pending(
+              form.nombres(),
+              form.apellidos(),
+              form.telefono(),
+              correo,
+              encoder.encode(form.password()),
+              TokenTools.hash(code),
+              Instant.now().plus(Duration.ofMinutes(10)),
+              0);
+      email.enviarCorreoVerificacion(correo, code, form.nombres() + " " + form.apellidos());
+      req.getSession().setAttribute("pendingRegistration", pending);
+      return "redirect:/verificar";
+    } catch (BusinessException e) {
+      flash.addFlashAttribute("error", e.getMessage());
+      return "redirect:/registro";
     }
+  }
 
-    // 3. Mostrar pantalla de verificación
-    @GetMapping("/verificar")
-    public String mostrarVerificacion(HttpSession session) {
-    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/";
-        }
-        if(session.getAttribute("usuarioTemp") == null) {
-            return "redirect:/registro";
-        }
+  @GetMapping("/verificar")
+  public String mostrarVerificacion(HttpSession session) {
+    return signedIn()
+        ? "redirect:/"
+        : session.getAttribute("pendingRegistration") == null ? "redirect:/registro" : "Verificar";
+  }
+
+  @PostMapping("/verificar/confirmar")
+  public String confirmarCodigo(
+      @RequestParam String codigoIngresado,
+      HttpServletRequest req,
+      HttpServletResponse res,
+      Model model) {
+    if (signedIn()) return "redirect:/";
+    limits.check("verify-ip", req.getRemoteAddr(), 30, Duration.ofMinutes(15));
+    HttpSession session = req.getSession();
+    synchronized (session) {
+      Pending p = (Pending) session.getAttribute("pendingRegistration");
+      if (p == null || p.expires().isBefore(Instant.now()) || p.attempts() >= 5) {
+        session.removeAttribute("pendingRegistration");
+        model.addAttribute(
+            "error", "El código venció o agotó sus intentos. Inicia el registro nuevamente.");
         return "Verificar";
+      }
+      session.setAttribute(
+          "pendingRegistration",
+          new Pending(
+              p.nombres(),
+              p.apellidos(),
+              p.telefono(),
+              p.correo(),
+              p.passwordHash(),
+              p.codeHash(),
+              p.expires(),
+              p.attempts() + 1));
+      if (!codigoIngresado.matches("[0-9]{6}")
+          || !TokenTools.matches(codigoIngresado, p.codeHash())) {
+        model.addAttribute("error", "Código incorrecto.");
+        return "Verificar";
+      }
+      try {
+        accounts.createClient(
+            p.nombres(), p.apellidos(), p.telefono(), p.correo(), p.passwordHash());
+      } catch (BusinessException | org.springframework.dao.DataIntegrityViolationException e) {
+        session.removeAttribute("pendingRegistration");
+        model.addAttribute("error", "No se pudo completar el registro con esos datos.");
+        return "Verificar";
+      }
+      session.removeAttribute("pendingRegistration");
+      req.changeSessionId();
+      var user = details.loadUserByUsername(p.correo());
+      var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+      new CsrfAuthenticationStrategy(new HttpSessionCsrfTokenRepository())
+          .onAuthentication(auth, req, res);
+      var context = SecurityContextHolder.createEmptyContext();
+      context.setAuthentication(auth);
+      SecurityContextHolder.setContext(context);
+      new HttpSessionSecurityContextRepository().saveContext(context, req, res);
+      return "redirect:/";
     }
-
-    // 4. Confirmar el código, guardar en BD e Iniciar Sesión automáticamente
-    @PostMapping("/verificar/confirmar")
-    public String confirmarCodigo(@RequestParam String codigoIngresado, HttpSession session, Model model) {
-        String codigoReal = (String) session.getAttribute("codigoVerificacion");
-        Usuario usuario = (Usuario) session.getAttribute("usuarioTemp");
-
-        if(codigoReal != null && codigoReal.equals(codigoIngresado)) {
-            
-            // 1. Guardar usuario en BD definitivamente
-            usuarioRepository.save(usuario);
-            
-            // 2. INICIAR SESIÓN AUTOMÁTICAMENTE
-            UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getCorreoElectronico());
-            
-            UsernamePasswordAuthenticationToken authToken = 
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-            
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
-                               SecurityContextHolder.getContext());
-            
-            // 3. Limpiar las variables temporales
-            session.removeAttribute("usuarioTemp");
-            session.removeAttribute("codigoVerificacion");
-            
-            // 4. Redirigir a la pantalla principal
-            return "redirect:/";
-            
-        } else {
-            model.addAttribute("error", "Código incorrecto. Inténtalo de nuevo.");
-            return "Verificar";
-        }
-    }
+  }
 }

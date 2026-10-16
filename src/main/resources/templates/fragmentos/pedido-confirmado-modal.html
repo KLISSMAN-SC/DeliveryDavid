@@ -1,137 +1,98 @@
-<div
-    th:fragment="modalPedidoConfirmado"
-    id="modalPedidoConfirmado"
-    class="modal-pedido-overlay"
-    th:data-pedido="${pedido.idPedido}"
-    th:data-negocio="${pedido.negocio.nombre}"
-    th:data-negocio-id="${pedido.negocio.idNegocio}"
-    th:data-negocio-lat="${pedido.negocio.latitud}"
-    th:data-negocio-lng="${pedido.negocio.longitud}"
-    th:data-telefono="${configApp != null ? configApp.telefonoSoporte : ''}"
-    th:data-direccion="${pedido.direccionEnvio}"
-    th:data-referencia="${pedido.referencia != null ? pedido.referencia : ''}"
-    th:data-metodo-pago="${pedido.metodoPago}"
-    th:data-subtotal="${pedido.total - pedido.costoEnvio}"
-    th:data-envio="${pedido.costoEnvio}"
-    th:data-total="${pedido.total}">
-
-    <div class="modal-pedido-contenido modal-confirmado-especial">
-
-        <!-- =================================== -->
-        <!-- CABECERA (Sticky) -->
-        <!-- =================================== -->
-        <div class="pedido-modal-header" style="justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fa-solid fa-receipt" style="color: var(--naranja-marca); font-size: 20px;"></i>
-                <h2>Orden #<span th:text="${pedido.idPedido}">0</span></h2>
-            </div>
-            
-            <button type="button" class="btn-cerrar-pedido" onclick="cerrarDetallePedido()" title="Cerrar">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- =================================== -->
-        <!-- MENSAJE DE ÉXITO -->
-        <!-- =================================== -->
-        <section class="pedido-seccion" style="text-align: center; border-bottom: none; padding-top: 30px;">
-            <div style="background-color: rgba(37, 211, 102, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto;">
-                <i class="fa-solid fa-check" style="font-size: 40px; color: #25D366;"></i>
-            </div>
-            <h2 style="font-size: 22px; margin-bottom: 10px;">¡Pedido Registrado!</h2>
-            <p style="font-size: 14px; max-width: 400px; margin: 0 auto;">
+<div class="modal-pedido-overlay" id="modalPedidoConfirmado" th:data-direccion="${pedido.direccionEnvio}" th:data-envio="${pedido.costoEnvio}" th:data-metodo-pago="${pedido.metodoPago}" th:data-negocio="${pedido.negocio.nombre}" th:data-negocio-id="${pedido.negocio.idNegocio}" th:data-negocio-lat="${pedido.negocio.latitud}" th:data-negocio-lng="${pedido.negocio.longitud}" th:data-pedido="${pedido.idPedido}" th:data-referencia="${pedido.referencia != null ? pedido.referencia : ''}" th:data-subtotal="${pedido.total - pedido.costoEnvio}" th:data-telefono="${configApp != null ? configApp.telefonoSoporte : ''}" th:data-total="${pedido.total}" th:fragment="modalPedidoConfirmado">
+<div class="modal-pedido-contenido modal-confirmado-especial">
+<!-- =================================== -->
+<!-- CABECERA (Sticky) -->
+<!-- =================================== -->
+<div class="pedido-modal-header" style="justify-content: space-between;">
+<div style="display: flex; align-items: center; gap: 10px;">
+<i class="fa-solid fa-receipt" style="color: var(--naranja-marca); font-size: 20px;"></i>
+<h2>Orden #<span th:text="${pedido.idPedido}">0</span></h2>
+</div>
+<button class="btn-cerrar-pedido" data-argc="0" data-click="cerrarDetallePedido" title="Cerrar" type="button">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+<!-- =================================== -->
+<!-- MENSAJE DE ÉXITO -->
+<!-- =================================== -->
+<section class="pedido-seccion" style="text-align: center; border-bottom: none; padding-top: 30px;">
+<div style="background-color: rgba(37, 211, 102, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto;">
+<i class="fa-solid fa-check" style="font-size: 40px; color: #25D366;"></i>
+</div>
+<h2 style="font-size: 22px; margin-bottom: 10px;">¡Pedido Registrado!</h2>
+<p style="font-size: 14px; max-width: 400px; margin: 0 auto;">
                 Tu orden ha sido guardada. Por favor, <strong>envía el detalle por WhatsApp</strong> para coordinar la preparación y envío.
             </p>
-        </section>
-
-        <!-- =================================== -->
-        <!-- MAPA NEGOCIO → CLIENTE -->
-        <!-- =================================== -->
-        <div class="pedido-mapa-seccion" th:if="${pedido.negocio != null and pedido.negocio.latitud != null and pedido.negocio.longitud != null and pedido.latitudEnvio != null and pedido.longitudEnvio != null}" style="padding-top: 0;">
-            <div class="mapa-pedido-contenedor" style="height: 200px;">
-                <iframe
-                    width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
-                    th:src="|https://www.google.com/maps/embed/v1/directions?key=${googleMapsKey}&amp;origin=${pedido.negocio.latitud},${pedido.negocio.longitud}&amp;destination=${pedido.latitudEnvio},${pedido.longitudEnvio}&amp;mode=driving&amp;units=metric|">
-                </iframe>
-            </div>
-        </div>
-
-        <!-- =================================== -->
-        <!-- DETALLES DE ENTREGA -->
-        <!-- =================================== -->
-        <section class="pedido-seccion">
-            <h3><i class="fa-solid fa-truck-fast"></i> Detalles de Entrega</h3>
-            
-            <div class="direccion-seleccionada-texto" style="margin-bottom: 0;">
-                <i class="fa-solid fa-location-dot"></i>
-                <div class="direccion-info">
-                    <strong th:text="${pedido.direccionEnvio}">Dirección</strong>
-                    <span th:if="${pedido.referencia != null and !pedido.referencia.isEmpty()}" th:text="${pedido.referencia}">Referencia</span>
-                    <small style="color: #25D366; font-weight: bold; margin-top: 5px;">
-                        <i class="fa-solid fa-wallet"></i> Pago con <span th:text="${pedido.metodoPago}">Método</span>
-                    </small>
-                </div>
-            </div>
-        </section>
-
-        <!-- =================================== -->
-        <!-- LISTA DE PRODUCTOS -->
-        <!-- =================================== -->
-        <section class="pedido-seccion">
-            <h3><i class="fa-solid fa-bag-shopping"></i> Tu Pedido (<span th:text="${#lists.size(detalles)}">0</span>)</h3>
-            
-            <div class="lista-direcciones">
-                <div class="pedido-producto producto-pedido-wsp" 
-                     th:each="detalle : ${detalles}"
-                     th:data-nombre="${detalle.producto.nombre}"
-                     th:data-cantidad="${detalle.cantidad}"
-                     th:data-precio="${detalle.precioUnitario}">
-                    
-                    <div style="flex: 1;">
-                        <strong>
-                            <span style="color: var(--naranja-marca);" th:text="${detalle.cantidad} + 'x'">1x</span> 
-                            <span th:text="${detalle.producto.nombre}">Producto</span>
-                        </strong>
-                        
-                    </div>
-                    
-                    <div style="text-align: right; min-width: 80px;">
-                        <strong style="color: var(--texto-principal);">
+</section>
+<!-- =================================== -->
+<!-- MAPA NEGOCIO → CLIENTE -->
+<!-- =================================== -->
+<div class="pedido-mapa-seccion" style="padding-top: 0;" th:if="${pedido.negocio != null and pedido.negocio.latitud != null and pedido.negocio.longitud != null and pedido.latitudEnvio != null and pedido.longitudEnvio != null}">
+<div class="mapa-pedido-contenedor" style="height: 200px;">
+<iframe allowfullscreen="" height="100%" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="border:0;" th:src="|https://www.google.com/maps/embed/v1/directions?key=${googleMapsKey}&amp;origin=${pedido.negocio.latitud},${pedido.negocio.longitud}&amp;destination=${pedido.latitudEnvio},${pedido.longitudEnvio}&amp;mode=driving&amp;units=metric|" width="100%">
+</iframe>
+</div>
+</div>
+<!-- =================================== -->
+<!-- DETALLES DE ENTREGA -->
+<!-- =================================== -->
+<section class="pedido-seccion">
+<h3><i class="fa-solid fa-truck-fast"></i> Detalles de Entrega</h3>
+<div class="direccion-seleccionada-texto" style="margin-bottom: 0;">
+<i class="fa-solid fa-location-dot"></i>
+<div class="direccion-info">
+<strong th:text="${pedido.direccionEnvio}">Dirección</strong>
+<span th:if="${pedido.referencia != null and !pedido.referencia.isEmpty()}" th:text="${pedido.referencia}">Referencia</span>
+<small style="color: #25D366; font-weight: bold; margin-top: 5px;">
+<i class="fa-solid fa-wallet"></i> Pago con <span th:text="${pedido.metodoPago}">Método</span>
+</small>
+</div>
+</div>
+</section>
+<!-- =================================== -->
+<!-- LISTA DE PRODUCTOS -->
+<!-- =================================== -->
+<section class="pedido-seccion">
+<h3><i class="fa-solid fa-bag-shopping"></i> Tu Pedido (<span th:text="${#lists.size(detalles)}">0</span>)</h3>
+<div class="lista-direcciones">
+<div class="pedido-producto producto-pedido-wsp" th:data-cantidad="${detalle.cantidad}" th:data-nombre="${detalle.producto.nombre}" th:data-precio="${detalle.precioUnitario}" th:each="detalle : ${detalles}">
+<div style="flex: 1;">
+<strong>
+<span style="color: var(--naranja-marca);" th:text="${detalle.cantidad} + 'x'">1x</span>
+<span th:text="${detalle.producto.nombre}">Producto</span>
+</strong>
+</div>
+<div style="text-align: right; min-width: 80px;">
+<strong style="color: var(--texto-principal);">
                             S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario * detalle.cantidad, 1, 2)}">0.00</span>
-                        </strong>
-                        <span style="font-size: 10px;">(S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}"></span> c/u)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- =================================== -->
-        <!-- RESUMEN DE COSTOS -->
-        <!-- =================================== -->
-        <section class="pedido-resumen">
-            <div>
-                <span>Costo de productos</span>
-                <span>S/ <span th:text="${#numbers.formatDecimal(pedido.total - pedido.costoEnvio, 1, 2)}">0.00</span></span>
-            </div>
-            
-            <div>
-                <span>Costo de envío</span>
-                <span>S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 2)}">0.00</span></span>
-            </div>
-            
-            <hr>
-            
-            <div class="pedido-total">
-                <span>Total a Pagar</span>
-                <span style="color: var(--naranja-marca);">S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></span>
-            </div>
-            
-            <!-- BOTÓN WHATSAPP -->
-            <button type="button" class="btn-continuar-carrito" onclick="enviarPedidoWhatsApp()" style="background-color: #25D366; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 25px;">
-                <i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i>
+</strong>
+<span style="font-size: 10px;">(S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}"></span> c/u)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- =================================== -->
+<!-- RESUMEN DE COSTOS -->
+<!-- =================================== -->
+<section class="pedido-resumen">
+<div>
+<span>Costo de productos</span>
+<span>S/ <span th:text="${#numbers.formatDecimal(pedido.total - pedido.costoEnvio, 1, 2)}">0.00</span></span>
+</div>
+<div>
+<span>Costo de envío</span>
+<span>S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 2)}">0.00</span></span>
+</div>
+<hr/>
+<div class="pedido-total">
+<span>Total a Pagar</span>
+<span style="color: var(--naranja-marca);">S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></span>
+</div>
+<!-- BOTÓN WHATSAPP -->
+<button class="btn-continuar-carrito" data-argc="0" data-click="enviarPedidoWhatsApp" style="background-color: #25D366; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 25px;" type="button">
+<i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i>
                 Confirmar por WhatsApp
             </button>
-        </section>
-
-    </div>
+</section>
+</div>
 </div>

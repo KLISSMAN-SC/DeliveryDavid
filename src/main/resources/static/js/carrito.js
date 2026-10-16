@@ -1,7 +1,7 @@
 
 function abrirRestaurante(idNegocio) {
 
-    fetch("/api/restaurante/" + idNegocio)
+    secureFetch("/api/restaurante/" + idNegocio)
         .then(response => {
             // Spring Security redirigió la petición al login
             if (response.redirected && response.url.includes("/login")) {
@@ -33,7 +33,7 @@ function agregarAlCarrito(boton) {
     const idProducto = boton.dataset.producto;
     const idNegocio = boton.dataset.negocio;
     
-    fetch(`/api/carrito/agregar?idNegocio=${idNegocio}&idProducto=${idProducto}`,{ method: "POST" })
+    secureFetch(`/api/carrito/agregar?idNegocio=${idNegocio}&idProducto=${idProducto}`,{ method: "POST" })
     .then(response => {
         if (!response.ok) {
             throw new Error("No se pudo agregar el producto");
@@ -56,7 +56,7 @@ function cargarCarrito(idNegocio) {
 
     console.log("Consultando carrito del negocio:", idNegocio);
 
-    fetch(`/api/carrito/actual?` +`&idNegocio=${idNegocio}`)
+    secureFetch(`/api/carrito/actual?` +`&idNegocio=${idNegocio}`)
     .then(response => {
         console.log("Respuesta GET carrito:",response.status);
         if (!response.ok) {
@@ -85,94 +85,31 @@ function cargarCarrito(idNegocio) {
 }
 
 function mostrarCarrito(carrito) {
-    const contenedor = document.getElementById("contenido-carrito");
-    
-    if (!contenedor) {
-        return;
-    }
-
-    // Carrito sin productos
-    if (!carrito.detalles || carrito.detalles.length === 0) {
-        contenedor.innerHTML = `
-            <div class="carrito-vacio">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <p>Tu pedido está vacío</p>
-            </div>
-        `;
-        return;
-    }
-    let html = '<div class="carrito-items-lista">';
-
-    // Generar la lista de productos
-    carrito.detalles.forEach(detalle => {
-        const producto = detalle.producto;
-        const subtotalProducto = Number(detalle.precioUnitario) * detalle.cantidad;
-
-        html += `
-            <div class="carrito-item">
-                <h4 class="carrito-item-titulo">${producto.nombre}</h4>
-                
-                <div class="carrito-item-body">
-                    <!-- Controles de Cantidad -->
-                    <div class="carrito-controles">
-                        <button class="btn-cantidad" onclick="disminuirProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <span class="cantidad-numero">${detalle.cantidad}</span>
-                        <button class="btn-cantidad" onclick="aumentarProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Precio y Botón Eliminar -->
-                    <div class="carrito-item-precio">
-                        <span class="precio-subtotal">S/ ${subtotalProducto.toFixed(2)}</span>
-                        <button class="btn-eliminar" onclick="eliminarProducto(${producto.idProducto}, ${carrito.negocio.idNegocio})" title="Eliminar producto">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-
-    html += '</div>';
-
-    // Calcular SOLO el subtotal de los productos (Se eliminó el envío)
-    let totalProductos = 0;
-    carrito.detalles.forEach(detalle => {totalProductos += Number(detalle.precioUnitario) * detalle.cantidad;});
-
-    // Generar la zona de resumen limpia
-    html += `
-        <div class="carrito-resumen">
-            <div class="resumen-fila">
-                <span>Subtotal productos</span>
-                <span>S/ ${totalProductos.toFixed(2)}</span>
-            </div>
-            
-            <hr class="separador-sutil">
-            
-            <div class="resumen-fila total">
-                <span>Total (Sin envío)</span>
-                <span>S/ ${totalProductos.toFixed(2)}</span>
-            </div>
-            
-            <button
-                type="button"
-                class="btn-continuar-carrito"
-                onclick="abrirModalPedido(${carrito.negocio.idNegocio})">
-                Continuar pedido
-            </button>
-        </div>
-    `;
-
-    contenedor.innerHTML = html;
+ const container=document.getElementById('contenido-carrito');if(!container)return;
+ container.replaceChildren();
+ const node=(tag,css,text)=>{const e=document.createElement(tag);e.className=css;if(text!==undefined)e.textContent=String(text);return e;};
+ if(!carrito.detalles?.length){const empty=node('div','carrito-vacio');empty.append(node('i','fa-solid fa-bag-shopping'),node('p','','Tu pedido está vacío'));container.append(empty);return;}
+ const business=Number(carrito.negocio.idNegocio);if(!Number.isSafeInteger(business)||business<1)throw new Error('Carrito no válido.');
+ const list=node('div','carrito-items-lista');let total=0;
+ for(const d of carrito.detalles){
+  const product=Number(d.producto.idProducto),quantity=Number(d.cantidad),price=Number(d.precioUnitario);
+  if(!Number.isSafeInteger(product)||!Number.isSafeInteger(quantity)||quantity<1||!Number.isFinite(price))throw new Error('Producto no válido.');
+  const item=node('div','carrito-item');item.append(node('h4','carrito-item-titulo',d.producto.nombre));
+  const body=node('div','carrito-item-body'),controls=node('div','carrito-controles');
+  const button=(css,icon,action)=>{const b=node('button',css);b.type='button';b.append(node('i',icon));b.addEventListener('click',action);return b;};
+  controls.append(button('btn-cantidad','fa-solid fa-minus',()=>disminuirProducto(product,business)),node('span','cantidad-numero',quantity),button('btn-cantidad','fa-solid fa-plus',()=>aumentarProducto(product,business)));
+  const costs=node('div','carrito-item-precio');costs.append(node('span','precio-subtotal','S/ '+(price*quantity).toFixed(2)),button('btn-eliminar','fa-regular fa-trash-can',()=>eliminarProducto(product,business)));
+  body.append(controls,costs);item.append(body);list.append(item);total+=price*quantity;
+ }
+ const summary=node('div','carrito-resumen');
+ for(const [label,css] of [['Subtotal productos','resumen-fila'],['Total (Sin envío)','resumen-fila total']]){const row=node('div',css);row.append(node('span','',label),node('span','','S/ '+total.toFixed(2)));summary.append(row);}
+ const next=node('button','btn-continuar-carrito','Continuar pedido');next.type='button';next.addEventListener('click',()=>abrirModalPedido(business));summary.append(next);container.append(list,summary);
 }
 function aumentarProducto(idProducto, idNegocio) {
 
     
 
-    fetch(`/api/carrito/agregar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+    secureFetch(`/api/carrito/agregar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
         {method: "POST"}
     )
     .then(response => {
@@ -198,7 +135,7 @@ function disminuirProducto(
     idNegocio
 ) {
 
-    fetch(`/api/carrito/disminuir?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+    secureFetch(`/api/carrito/disminuir?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
         {method: "POST"}
     )
     .then(response => {
@@ -215,7 +152,7 @@ function disminuirProducto(
 }
 function eliminarProducto(idProducto, idNegocio) {
 
-    fetch(`/api/carrito/eliminar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+    secureFetch(`/api/carrito/eliminar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
         {method: "DELETE"}
     )
     .then(response => {

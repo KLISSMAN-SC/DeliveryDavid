@@ -1,987 +1,850 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel de Gestión - Dablyn Delivery</title>
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" th:href="@{/css/panel.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
-<body class="body-panel">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <aside class="panel-sidebar">
-        <div class="panel-logo">
-            <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
-            <span class="badge-rol" sec:authorize="hasRole('ADMINISTRADOR')">Módulo Admin</span>
-            <span class="badge-rol" sec:authorize="hasRole('REPARTIDOR')" style="background: rgba(0, 150, 255, 0.2); color: #0096ff;">Módulo Repartidor</span>
-        </div>
-        
-        <nav class="panel-menu">
-            
-            <!-- MANTENIMIENTO: Bloqueado solo para Administradores -->
-            <div sec:authorize="hasRole('ADMINISTRADOR')">
-                <p class="menu-label">MANTENIMIENTO</p>
-                <a th:href="@{/panel?modulo=usuarios}" th:classappend="${modulo == 'usuarios'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-users"></i> Usuarios</a>
-                <a th:href="@{/panel?modulo=tipos_negocio}" th:classappend="${modulo == 'tipos_negocio'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
-                <a th:href="@{/panel?modulo=negocios}" th:classappend="${modulo == 'negocios'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-store"></i> Negocios</a>
-                <a th:href="@{/panel?modulo=categorias}" th:classappend="${modulo == 'categorias'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-list"></i> Categorías de Prod.</a>
-                <a th:href="@{/panel?modulo=productos}" th:classappend="${modulo == 'productos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-box-open"></i> Productos</a>
-                <a th:href="@{/panel?modulo=promociones}" th:classappend="${modulo == 'promociones'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-star"></i> Promociones</a>
-            	<a th:href="@{/panel?modulo=configuracion}" th:classappend="${modulo == 'configuracion'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración Global</a>
-            </div>
-            
-            <!-- OPERACIONES: Visible para Administradores y Repartidores -->
-            <!--DESACTIVAMOS EL MODULO DE GESTION DE PEDIDOS-->
-            <!--  
+<html lang="es" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Panel de Gestión - Dablyn Delivery</title>
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/css/panel.css}"/>
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
+<body class="body-panel">
+<!-- BARRA LATERAL (SIDEBAR) -->
+<aside class="panel-sidebar">
+<div class="panel-logo">
+<strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
+<span class="badge-rol" sec:authorize="hasRole('ADMINISTRADOR')">Módulo Admin</span>
+<span class="badge-rol" sec:authorize="hasRole('REPARTIDOR')" style="background: rgba(0, 150, 255, 0.2); color: #0096ff;">Módulo Repartidor</span>
+</div>
+<nav class="panel-menu">
+<!-- MANTENIMIENTO: Bloqueado solo para Administradores -->
+<div sec:authorize="hasRole('ADMINISTRADOR')">
+<p class="menu-label">MANTENIMIENTO</p>
+<a class="menu-item" th:classappend="${modulo == 'usuarios'} ? 'activo' : ''" th:href="@{/panel?modulo=usuarios}"><i class="fa-solid fa-users"></i> Usuarios</a>
+<a class="menu-item" th:classappend="${modulo == 'tipos_negocio'} ? 'activo' : ''" th:href="@{/panel?modulo=tipos_negocio}"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
+<a class="menu-item" th:classappend="${modulo == 'negocios'} ? 'activo' : ''" th:href="@{/panel?modulo=negocios}"><i class="fa-solid fa-store"></i> Negocios</a>
+<a class="menu-item" th:classappend="${modulo == 'categorias'} ? 'activo' : ''" th:href="@{/panel?modulo=categorias}"><i class="fa-solid fa-list"></i> Categorías de Prod.</a>
+<a class="menu-item" th:classappend="${modulo == 'productos'} ? 'activo' : ''" th:href="@{/panel?modulo=productos}"><i class="fa-solid fa-box-open"></i> Productos</a>
+<a class="menu-item" th:classappend="${modulo == 'promociones'} ? 'activo' : ''" th:href="@{/panel?modulo=promociones}"><i class="fa-solid fa-star"></i> Promociones</a>
+<a class="menu-item" th:classappend="${modulo == 'configuracion'} ? 'activo' : ''" th:href="@{/panel?modulo=configuracion}"><i class="fa-solid fa-gear"></i> Configuración Global</a>
+</div>
+<!-- OPERACIONES: Visible para Administradores y Repartidores -->
+<!--DESACTIVAMOS EL MODULO DE GESTION DE PEDIDOS-->
+<!--  
             <p class="menu-label">OPERACIONES</p>
             <a th:href="@{/panel?modulo=pedidos}" th:classappend="${modulo == 'pedidos'} ? 'activo' : ''" class="menu-item"><i class="fa-solid fa-motorcycle"></i> Pedidos Activos</a>
              -->
-            <hr class="separador-sutil">
-            <a th:href="@{/}" class="menu-item volver"><i class="fa-solid fa-arrow-left"></i> Salir al Catálogo</a>
-        </nav>
-    </aside>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="panel-main">
-        
-        <!-- ==========================================
+<hr class="separador-sutil"/>
+<a class="menu-item volver" th:href="@{/}"><i class="fa-solid fa-arrow-left"></i> Salir al Catálogo</a>
+</nav>
+</aside>
+<!-- CONTENIDO PRINCIPAL -->
+<main class="panel-main">
+<!-- ==========================================
              1. CRUD DE USUARIOS 
              ========================================== -->
-        <div th:if="${modulo == 'usuarios'}">
-            <header class="panel-header">
-                <h2>Gestión de Usuarios</h2>
-                
-                <div class="panel-acciones-top">
-                    <!-- BUSCADOR DINÁMICO (Sin form, manejado por JS visualmente) -->
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="buscadorUsuarios" class="search-input" placeholder="Buscar por DNI o nombre..." autocomplete="off">
-                    </div>
-                    
-                    <button type="button" class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalUsuario()">
-                        <i class="fa-solid fa-plus"></i> Nuevo Usuario
+<div th:if="${modulo == 'usuarios'}">
+<header class="panel-header">
+<h2>Gestión de Usuarios</h2>
+<div class="panel-acciones-top">
+<!-- BUSCADOR DINÁMICO (Sin form, manejado por JS visualmente) -->
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="buscadorUsuarios" placeholder="Buscar por DNI o nombre..." type="text"/>
+</div>
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalUsuario" style="width: auto; padding: 10px 20px;" type="button">
+<i class="fa-solid fa-plus"></i> Nuevo Usuario
                     </button>
-                </div>
-            </header>
-            
-            <!-- Alertas de Éxito o Error al eliminar -->
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;">
-                <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span>
-            </div>
-            
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;">
-                <i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span>
-            </div>
-            
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>ID</th><th>Nombres</th><th>DNI</th><th>Rol</th><th>Acciones</th></tr>
-                        </thead>
-                        <!-- ID AGREGADO AL TBODY -->
-                        <tbody id="tablaUsuariosBody">
-                            <tr th:each="usuario : ${listaUsuarios}">
-                                <!-- ... (El contenido de tus <td> se mantiene exactamente igual) ... -->
-                                <td th:text="'#' + ${usuario.idUsuario}"></td>
-                                <td th:text="${usuario.nombres + ' ' + (usuario.apellidos != null ? usuario.apellidos : '')}"></td>
-                                <td th:text="${usuario.dni}"></td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${usuario.rol.idRol == 1 ? 'admin' : (usuario.rol.idRol == 3 ? 'repartidor' : 'cliente')}" 
-                                          th:text="${usuario.rol.nombre}"></span>
-                                </td>
-                                <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar" th:onclick="abrirModalUsuario([[${usuario.idUsuario}]], [[${usuario.nombres}]], [[${usuario.apellidos}]], [[${usuario.dni}]], [[${usuario.telefono}]], [[${usuario.correoElectronico}]], [[${usuario.rol.idRol}]])"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <form th:action="@{/panel/usuarios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este usuario?');">
-                                        <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
-                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- MODAL HTML (Renderizado pero oculto por CSS) -->
-            <div id="modalUsuario" class="modal-overlay">
-                <div class="modal-content" style="width: 450px;">
-                    <form th:action="@{/panel/usuarios/guardar}" method="POST">
-                        
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalUsuario">Nuevo Usuario</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalUsuario').style.display='none'" style="text-align: right; cursor: pointer;">
-                                <i class="fa-solid fa-xmark" style="font-size: 20px;"></i>
-                            </span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 15px;">
-                            <!-- ID Oculto (Si tiene valor, Java lo actualizará; si está vacío, creará uno nuevo) -->
-                            <input type="hidden" id="inputIdUsuario" name="idUsuario">
-
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="inputNombres" name="nombres" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombres" required>
-                                <input type="text" id="inputApellidos" name="apellidos" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Apellidos" required>
-                            </div>
-                            
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="inputDni" name="dni" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="DNI" required maxlength="8">
-                                <input type="text" id="inputTelefono" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Teléfono" required maxlength="9">
-                            </div>
-
-                            <input type="email" id="inputCorreo" name="correoElectronico" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Correo Electrónico" required>
-                            
-                            <input type="password" id="inputPassword" name="password" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Contraseña (Deja en blanco para no cambiar)">
-                            
-                            <select id="inputRol" name="rol.idRol" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal); cursor: pointer;" required>
-                                <option value="" disabled selected>Selecciona un Rol</option>
-                                <!-- Se llena dinámicamente desde Java -->
-                                <option th:each="r : ${listaRoles}" th:value="${r.idRol}" th:text="${r.nombre}"></option>
-                            </select>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-aceptar">Guardar Usuario</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-        </div>
-
-        <!-- ==========================================
+</div>
+</header>
+<!-- Alertas de Éxito o Error al eliminar -->
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}">
+<i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span>
+</div>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}">
+<i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span>
+</div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Nombres</th><th>DNI</th><th>Rol</th><th>Acciones</th></tr>
+</thead>
+<!-- ID AGREGADO AL TBODY -->
+<tbody id="tablaUsuariosBody">
+<tr th:each="usuario : ${listaUsuarios}">
+<!-- ... (El contenido de tus <td> se mantiene exactamente igual) ... -->
+<td th:text="'#' + ${usuario.idUsuario}"></td>
+<td th:text="${usuario.nombres + ' ' + (usuario.apellidos != null ? usuario.apellidos : '')}"></td>
+<td th:text="${usuario.dni}"></td>
+<td>
+<span class="badge" th:classappend="${usuario.rol.idRol == 1 ? 'admin' : (usuario.rol.idRol == 3 ? 'repartidor' : 'cliente')}" th:text="${usuario.rol.nombre}"></span>
+</td>
+<td class="acciones-celda">
+<button class="btn-icon editar" data-argc="7" data-click="abrirModalUsuario" data-kind0="number" data-kind6="number" th:data-arg0="${usuario.idUsuario}" th:data-arg1="${usuario.nombres}" th:data-arg2="${usuario.apellidos}" th:data-arg3="${usuario.dni}" th:data-arg4="${usuario.telefono}" th:data-arg5="${usuario.correoElectronico}" th:data-arg6="${usuario.rol.idRol}" title="Modificar"><i class="fa-solid fa-pen-to-square"></i></button>
+<form data-confirm="¿Estás seguro de que deseas eliminar a este usuario?" method="POST" style="display:inline;" th:action="@{/panel/usuarios/eliminar}">
+<input name="idUsuario" th:value="${usuario.idUsuario}" type="hidden"/>
+<button class="btn-icon eliminar" title="Eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- MODAL HTML (Renderizado pero oculto por CSS) -->
+<div class="modal-overlay" id="modalUsuario">
+<div class="modal-content" style="width: 450px;">
+<form method="POST" th:action="@{/panel/usuarios/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalUsuario">Nuevo Usuario</h3>
+<span class="btn-text" data-close-target="modalUsuario" style="text-align: right; cursor: pointer;">
+<i class="fa-solid fa-xmark" style="font-size: 20px;"></i>
+</span>
+</div>
+<div class="modal-body" style="flex-direction: column; gap: 15px;">
+<!-- ID Oculto (Si tiene valor, Java lo actualizará; si está vacío, creará uno nuevo) -->
+<input id="inputIdUsuario" name="idUsuario" type="hidden"/>
+<div style="display: flex; gap: 10px;">
+<input class="search-input" id="inputNombres" name="nombres" placeholder="Nombres" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="text"/>
+<input class="search-input" id="inputApellidos" name="apellidos" placeholder="Apellidos" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="text"/>
+</div>
+<div style="display: flex; gap: 10px;">
+<input class="search-input" id="inputDni" maxlength="8" name="dni" placeholder="DNI" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="text"/>
+<input class="search-input" id="inputTelefono" maxlength="9" name="telefono" placeholder="Teléfono" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="text"/>
+</div>
+<input class="search-input" id="inputCorreo" name="correoElectronico" placeholder="Correo Electrónico" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="email"/>
+<input autocomplete="new-password" class="search-input" id="inputPassword" minlength="12" name="password" placeholder="Contraseña (Deja en blanco para no cambiar)" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="password"/>
+<select class="search-input" id="inputRol" name="rol.idRol" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal); cursor: pointer;">
+<option disabled="" selected="" value="">Selecciona un Rol</option>
+<!-- Se llena dinámicamente desde Java -->
+<option th:each="r : ${listaRoles}" th:text="${r.nombre}" th:value="${r.idRol}"></option>
+</select>
+</div>
+<div class="modal-footer">
+<button class="btn-aceptar" type="submit">Guardar Usuario</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              2. CRUD DE TIPOS DE NEGOCIO 
              ========================================== -->
-        <div th:if="${modulo == 'tipos_negocio'}">
-            <header class="panel-header">
-                <h2>Tipos de Negocio</h2>
-                <div class="panel-acciones-top">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <!-- SE AGREGÓ ID AL BUSCADOR -->
-                        <input type="text" id="buscadorTipos" class="search-input" placeholder="Buscar tipo..." autocomplete="off">
-                    </div>
-                    <!-- SE AGREGÓ ONCLICK AL BOTÓN -->
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalTipoNegocio()">
-                        <i class="fa-solid fa-plus"></i> Nuevo Tipo
+<div th:if="${modulo == 'tipos_negocio'}">
+<header class="panel-header">
+<h2>Tipos de Negocio</h2>
+<div class="panel-acciones-top">
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<!-- SE AGREGÓ ID AL BUSCADOR -->
+<input autocomplete="off" class="search-input" id="buscadorTipos" placeholder="Buscar tipo..." type="text"/>
+</div>
+<!-- SE AGREGÓ ONCLICK AL BOTÓN -->
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalTipoNegocio" style="width: auto; padding: 10px 20px;">
+<i class="fa-solid fa-plus"></i> Nuevo Tipo
                     </button>
-                </div>
-            </header>
-            
-            <!-- Alertas -->
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
-
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead> 
-                            <tr><th>ID</th><th>Nombre</th><!--  <th>Icono</th>--><th>Estado</th><th>Acciones</th></tr>
-                        </thead>
-                        <!-- SE AGREGÓ ID AL TBODY -->
-                        <tbody id="tablaTiposBody">
-                            <tr th:each="tipo : ${listaTipos}">
-                                <td th:text="'#' + ${tipo.idTipoNegocio}"></td>
-                                <td th:text="${tipo.nombre}"></td>
-                              <!--  <td><i th:class="${tipo.icono}"></i> <span th:text="${tipo.icono}" style="font-size: 11px; margin-left: 5px; color: gray;"></span></td>-->
-                                
-                                <td>
-                                    <span class="badge" th:style="${tipo.estado != null and tipo.estado} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
-                                          th:text="${tipo.estado != null and tipo.estado} ? 'Visible' : 'Oculto'"></span>
-                                </td>
-                                
-                                <td class="acciones-celda">
-                                    <!-- BOTÓN EDITAR ENLAZADO -->
-                                    <button class="btn-icon editar" title="Modificar" 
-                                            th:onclick="abrirModalTipoNegocio([[${tipo.idTipoNegocio}]], [[${tipo.nombre}]], [[${tipo.icono}]], [[${tipo.estado}]])">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    
-                                    <form th:action="@{/panel/tipos_negocio/ocultar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Ocultar este tipo del catálogo principal?');">
-                                        <input type="hidden" name="idTipoNegocio" th:value="${tipo.idTipoNegocio}">
-                                        <button type="submit" class="btn-icon eliminar" title="Ocultar del Index"><i class="fa-solid fa-eye-slash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- NUEVO MODAL HTML: TIPOS DE NEGOCIO -->
-            <div id="modalTipoNegocio" class="modal-overlay">
-                <div class="modal-content" style="width: 450px;">
-                    <form th:action="@{/panel/tipos_negocio/guardar}" method="POST">
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalTipo">Nuevo Tipo de Negocio</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalTipoNegocio').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 15px;">
-                            <input type="hidden" id="inputIdTipo" name="idTipoNegocio">
-
-                            <input type="text" id="inputNombreTipo" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre (Ej: Hamburguesas)" required>
-                            
-                           <!--  <input type="text" id="inputIconoTipo" name="icono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Ruta imagen (ej: hamburguesas.png) o ícono FA" required>-->
-                            
-                            
-                            
-                            <select id="inputEstadoTipo" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                <option value="true">Estado: Visible en Catálogo</option>
-                                <option value="false">Estado: Oculto</option>
-                            </select>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-aceptar">Guardar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==========================================
+</div>
+</header>
+<!-- Alertas -->
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555;" th:if="${mensajeError}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Nombre</th><!--  <th>Icono</th>--><th>Estado</th><th>Acciones</th></tr>
+</thead>
+<!-- SE AGREGÓ ID AL TBODY -->
+<tbody id="tablaTiposBody">
+<tr th:each="tipo : ${listaTipos}">
+<td th:text="'#' + ${tipo.idTipoNegocio}"></td>
+<td th:text="${tipo.nombre}"></td>
+<!--  <td><i th:class="${tipo.icono}"></i> <span th:text="${tipo.icono}" style="font-size: 11px; margin-left: 5px; color: gray;"></span></td>-->
+<td>
+<span class="badge" th:style="${tipo.estado != null and tipo.estado} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${tipo.estado != null and tipo.estado} ? 'Visible' : 'Oculto'"></span>
+</td>
+<td class="acciones-celda">
+<!-- BOTÓN EDITAR ENLAZADO -->
+<button class="btn-icon editar" data-argc="4" data-click="abrirModalTipoNegocio" data-kind0="number" data-kind3="boolean" th:data-arg0="${tipo.idTipoNegocio}" th:data-arg1="${tipo.nombre}" th:data-arg2="${tipo.icono}" th:data-arg3="${tipo.estado}" title="Modificar">
+<i class="fa-solid fa-pen-to-square"></i>
+</button>
+<form data-confirm="¿Ocultar este tipo del catálogo principal?" method="POST" style="display:inline;" th:action="@{/panel/tipos_negocio/ocultar}">
+<input name="idTipoNegocio" th:value="${tipo.idTipoNegocio}" type="hidden"/>
+<button class="btn-icon eliminar" title="Ocultar del Index" type="submit"><i class="fa-solid fa-eye-slash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- NUEVO MODAL HTML: TIPOS DE NEGOCIO -->
+<div class="modal-overlay" id="modalTipoNegocio">
+<div class="modal-content" style="width: 450px;">
+<form method="POST" th:action="@{/panel/tipos_negocio/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalTipo">Nuevo Tipo de Negocio</h3>
+<span class="btn-text" data-close-target="modalTipoNegocio" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+</div>
+<div class="modal-body" style="flex-direction: column; gap: 15px;">
+<input id="inputIdTipo" name="idTipoNegocio" type="hidden"/>
+<input class="search-input" id="inputNombreTipo" name="nombre" placeholder="Nombre (Ej: Hamburguesas)" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="text"/>
+<!--  <input type="text" id="inputIconoTipo" name="icono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Ruta imagen (ej: hamburguesas.png) o ícono FA" required>-->
+<select class="search-input" id="inputEstadoTipo" name="estado" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option value="true">Estado: Visible en Catálogo</option>
+<option value="false">Estado: Oculto</option>
+</select>
+</div>
+<div class="modal-footer">
+<button class="btn-aceptar" type="submit">Guardar</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              3. CRUD DE NEGOCIOS 
              ========================================== -->
-        <div th:if="${modulo == 'negocios'}">
-            <header class="panel-header">
-                <h2>Gestión de Negocios</h2>
-                <div class="panel-acciones-top">
-                    <!-- Buscador Dinámico JS -->
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="buscadorNegocios" class="search-input" placeholder="Buscar negocio..." autocomplete="off">
-                    </div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalNegocio()">
-                        <i class="fa-solid fa-plus"></i> Nuevo Negocio
+<div th:if="${modulo == 'negocios'}">
+<header class="panel-header">
+<h2>Gestión de Negocios</h2>
+<div class="panel-acciones-top">
+<!-- Buscador Dinámico JS -->
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="buscadorNegocios" placeholder="Buscar negocio..." type="text"/>
+</div>
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalNegocio" style="width: auto; padding: 10px 20px;">
+<i class="fa-solid fa-plus"></i> Nuevo Negocio
                     </button>
-                </div>
-            </header>
-            
-            <!-- Alertas -->
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
-
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="tablaNegociosBody">
-                            <tr th:each="negocio : ${listaNegocios}">
-                                <td th:text="'#' + ${negocio.idNegocio}"></td>
-                                
-                                <!-- Renderizado de Imagen y Nombre -->
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
-                                        <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
-                                            <i class="fa-solid fa-store"></i>
-                                        </div>
-                                        <span th:text="${negocio.nombre}"></span>
-                                    </div>
-                                </td>
-                                
-                                <td th:text="${negocio.direccion}"></td>
-                                <td th:text="${negocio.telefono}"></td>
-                                <td>
-    <!-- Reemplazamos negocio.estado por negocio.obtenerEstadoReal() -->
-								    <span class="badge" 
-								          th:style="${negocio.obtenerEstadoReal() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
-								          th:text="${negocio.obtenerEstadoReal()}">
-								    </span>
-								</td>
-                                <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar" 
-									        th:onclick="abrirModalNegocio([[${negocio.idNegocio}]], [[${negocio.nombre}]], [[${negocio.direccion}]], [[${negocio.latitud}]], [[${negocio.longitud}]], [[${negocio.telefono}]], [[${negocio.estado}]], [[${negocio.tipoNegocio?.idTipoNegocio}]], [[${negocio.zona?.idZona}]], [[${negocio.centroComercial?.idCentroComercial}]], [[${negocio.horaInicio}]], [[${negocio.horaFin}]], [[${negocio.modoWhatsapp}]])">
-									        <i class="fa-solid fa-pen-to-square"></i>
-									</button>
-                                    <form th:action="@{/panel/negocios/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este negocio?');">
-                                        <input type="hidden" name="idNegocio" th:value="${negocio.idNegocio}">
-                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- MODAL HTML NEGOCIOS (Rediseñado) -->
-<div id="modalNegocio" class="modal-overlay">
-    <div class="modal-content" style="width: 580px;"> <!-- Ligeramente más ancho para 2 columnas -->
-        <form th:action="@{/panel/negocios/guardar}" method="POST" enctype="multipart/form-data">
-            <div class="modal-header">
-                <h3 class="modal-titulo" id="tituloModalNegocio">Nuevo Negocio</h3>
-                <span class="btn-text" onclick="document.getElementById('modalNegocio').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-            </div>
-            
-            <!-- Usamos CSS Grid de 2 columnas para organizar los inputs -->
-            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-height: 65vh; overflow-y: auto; padding-right: 10px;">
-                <input type="hidden" id="inputIdNegocio" name="idNegocio">
-
-                <!-- Fila 1 -->
-                <input type="text" id="inputNombreNegocio" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre del Negocio" required>
-                <input type="text" id="inputTelefonoNegocio" name="telefono" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Teléfono" required maxlength="9">
-                
-                <!-- Fila 2 (Ocupa ambas columnas) -->
-                <input type="text" id="inputDireccionNegocio" name="direccion" class="search-input" style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Dirección" required>
-                <!-- ======================================== -->
-				<!-- COORDENADAS COPIADAS DE GOOGLE MAPS -->
-				<!-- NO SE GUARDA DIRECTAMENTE EN BD -->
-				<!-- ======================================== -->
-				<div style=" grid-column: 1 / -1; display: flex; flex-direction: column;gap: 6px;">
-    			<label style="font-size: 11px;color: gray;">
+</div>
+</header>
+<!-- Alertas -->
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
+</thead>
+<tbody id="tablaNegociosBody">
+<tr th:each="negocio : ${listaNegocios}">
+<td th:text="'#' + ${negocio.idNegocio}"></td>
+<!-- Renderizado de Imagen y Nombre -->
+<td>
+<div style="display: flex; align-items: center; gap: 12px;">
+<img style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" th:src="@{'/imagenes/' + ${negocio.imagenLogo}}"/>
+<div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;" th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}">
+<i class="fa-solid fa-store"></i>
+</div>
+<span th:text="${negocio.nombre}"></span>
+</div>
+</td>
+<td th:text="${negocio.direccion}"></td>
+<td th:text="${negocio.telefono}"></td>
+<td>
+<!-- Reemplazamos negocio.estado por negocio.obtenerEstadoReal() -->
+<span class="badge" th:style="${negocio.obtenerEstadoReal() == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${negocio.obtenerEstadoReal()}">
+</span>
+</td>
+<td class="acciones-celda">
+<button class="btn-icon editar" data-argc="13" data-click="abrirModalNegocio" data-kind0="number" data-kind12="boolean" data-kind7="number" data-kind8="number" data-kind9="number" th:data-arg0="${negocio.idNegocio}" th:data-arg1="${negocio.nombre}" th:data-arg10="${negocio.horaInicio}" th:data-arg11="${negocio.horaFin}" th:data-arg12="${negocio.modoWhatsapp}" th:data-arg2="${negocio.direccion}" th:data-arg3="${negocio.latitud}" th:data-arg4="${negocio.longitud}" th:data-arg5="${negocio.telefono}" th:data-arg6="${negocio.estado}" th:data-arg7="${negocio.tipoNegocio?.idTipoNegocio}" th:data-arg8="${negocio.zona?.idZona}" th:data-arg9="${negocio.centroComercial?.idCentroComercial}" title="Modificar">
+<i class="fa-solid fa-pen-to-square"></i>
+</button>
+<form data-confirm="¿Eliminar este negocio?" method="POST" style="display:inline;" th:action="@{/panel/negocios/eliminar}">
+<input name="idNegocio" th:value="${negocio.idNegocio}" type="hidden"/>
+<button class="btn-icon eliminar" title="Eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- MODAL HTML NEGOCIOS (Rediseñado) -->
+<div class="modal-overlay" id="modalNegocio">
+<div class="modal-content" style="width: 580px;"> <!-- Ligeramente más ancho para 2 columnas -->
+<form enctype="multipart/form-data" method="POST" th:action="@{/panel/negocios/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalNegocio">Nuevo Negocio</h3>
+<span class="btn-text" data-close-target="modalNegocio" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+</div>
+<!-- Usamos CSS Grid de 2 columnas para organizar los inputs -->
+<div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-height: 65vh; overflow-y: auto; padding-right: 10px;">
+<input id="inputIdNegocio" name="idNegocio" type="hidden"/>
+<!-- Fila 1 -->
+<input class="search-input" id="inputNombreNegocio" name="nombre" placeholder="Nombre del Negocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="text"/>
+<input class="search-input" id="inputTelefonoNegocio" maxlength="9" name="telefono" placeholder="Teléfono" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="text"/>
+<!-- Fila 2 (Ocupa ambas columnas) -->
+<input class="search-input" id="inputDireccionNegocio" name="direccion" placeholder="Dirección" required="" style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="text"/>
+<!-- ======================================== -->
+<!-- COORDENADAS COPIADAS DE GOOGLE MAPS -->
+<!-- NO SE GUARDA DIRECTAMENTE EN BD -->
+<!-- ======================================== -->
+<div style=" grid-column: 1 / -1; display: flex; flex-direction: column;gap: 6px;">
+<label style="font-size: 11px;color: gray;">
 				Coordenadas de Google Maps
     			</label>
-    			<input type="text" id="inputCoordenadasGoogle"class="search-input"style="border: 1px solid var(--borde-sutil);padding: 10px;border-radius: 8px;width: 100%;box-sizing: border-box;"placeholder="-8.407305, -74.559925"autocomplete="off">
-    			<small id="mensajeCoordenadas"style="font-size: 10px;color: gray;">
+<input autocomplete="off" class="search-input" id="inputCoordenadasGoogle" placeholder="-8.407305, -74.559925" style="border: 1px solid var(--borde-sutil);padding: 10px;border-radius: 8px;width: 100%;box-sizing: border-box;" type="text"/>
+<small id="mensajeCoordenadas" style="font-size: 10px;color: gray;">
         		Copia las coordenadas directamente desde Google Maps.
     			</small>
-				</div>   
-				          
-                <!-- Fila 3 -->
-                <input type="number" step="any" id="inputLatitud" name="latitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Latitud (Opcional)">
-                <input type="number" step="any" id="inputLongitud" name="longitud" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Longitud (Opcional)">
-                <!-- ======================================== -->
-                
-				<!-- MAPA -->
-				<!-- ======================================== -->
-
-				<div id="contenedorMapaNegocio"th:data-google-key="${googleMapsKey}"style="grid-column: 1 / -1;width: 100%;height: 250px;border: 1px solid var(--borde-sutil);border-radius: 12px;overflow: hidden;background: #111; position: relative;">
-    			<div id="mapaNegocioVacio"style="height: 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;gap: 10px;color: #777;text-align: center;">
-        		<i class="fa-solid fa-location-dot"style="color: var(--naranja-marca);font-size: 28px;">
-        		</i>
-        		<span>
+</div>
+<!-- Fila 3 -->
+<input class="search-input" id="inputLatitud" name="latitud" placeholder="Latitud (Opcional)" step="any" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="number"/>
+<input class="search-input" id="inputLongitud" name="longitud" placeholder="Longitud (Opcional)" step="any" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="number"/>
+<!-- ======================================== -->
+<!-- MAPA -->
+<!-- ======================================== -->
+<div id="contenedorMapaNegocio" style="grid-column: 1 / -1;width: 100%;height: 250px;border: 1px solid var(--borde-sutil);border-radius: 12px;overflow: hidden;background: #111; position: relative;" th:data-google-key="${googleMapsKey}">
+<div id="mapaNegocioVacio" style="height: 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;gap: 10px;color: #777;text-align: center;">
+<i class="fa-solid fa-location-dot" style="color: var(--naranja-marca);font-size: 28px;">
+</i>
+<span>
             	Ingresa las coordenadas para visualizar el negocio
         		</span>
-    			</div>
-    			<iframe id="mapaNegocio" width="100%" height="250" style="border: 0;display: none;" loading="lazy" allowfullscreen>
-    			</iframe>
-				</div>
-                
-                <!-- Fila 4: Horario (Ocupa ambas columnas) -->
-                <fieldset style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 12px; border-radius: 8px; margin: 0;">
-                    <legend style="font-size: 11px; color: gray; padding: 0 5px;">Horario de Atención (Opcional)</legend>
-                    <div style="display: flex; gap: 15px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Apertura</label>
-                            <input type="time" id="inputHoraInicioNegocio" name="horaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Cierre</label>
-                            <input type="time" id="inputHoraFinNegocio" name="horaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;">
-                        </div>
-                    </div>
-                    <small style="font-size: 10px; color: var(--naranja-marca); margin-top: 8px; display: block;">* Si configuras el horario, el estado (Abierto/Cerrado) cambiará automáticamente.</small>
-                </fieldset>
-
-                <!-- Fila 5 -->
-                <select id="inputEstado" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);" required>
-                    <option value="ABIERTO">ABIERTO</option>
-                    <option value="CERRADO">CERRADO</option>
-                </select>
-                <select id="inputTipoNegocio" name="tipoNegocio.idTipoNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);" required>
-                    <option value="" disabled selected>Categoría...</option>
-                    <option th:each="t : ${listaTipos}" th:value="${t.idTipoNegocio}" th:text="${t.nombre}"></option>
-                </select>
-                
-                <!-- Fila 6 -->
-                <select id="inputZona" name="zona.idZona" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
-                    <option value="">Sin Zona Específica</option>
-                    <option th:each="z : ${listaZonas}" th:value="${z.idZona}" th:text="${z.nombre}"></option>
-                </select>
-                <select id="inputCentro" name="centroComercial.idCentroComercial" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
-                    <option value="">Sin Centro Comercial</option>
-                    <option th:each="c : ${listaCentros}" th:value="${c.idCentroComercial}" th:text="${c.nombre}"></option>
-                </select>
-
-                <!-- Fila 7 (Ocupa ambas columnas) -->
-                <div style="grid-column: 1 / -1; border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
-                    <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Logo del negocio (Opcional si editas)</label>
-                    <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
-                </div>
-
-                <!-- Fila 8: Configuración de Modo de Venta y Carta -->
-                <div style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.15); margin-top: 5px;">
-                    <label style="font-size: 13px; color: var(--naranja-marca); display: block; margin-bottom: 12px; font-weight: bold;"><i class="fa-solid fa-shop"></i> Configuración de Venta</label>
-                    
-                    <div style="display: flex; gap: 15px; align-items: flex-start;">
-                        
-                        <!-- Select de Modo -->
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Tipo de Menú</label>
-                            <select id="inputModoWhatsapp" name="modoWhatsapp" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 100%; cursor: pointer;" onchange="toggleCargaCarta()" required>
-                                <option value="false">Modo E-commerce (Carrito, Productos y Buscador)</option>
-                                <option value="true">Modo Catálogo (Solo Carta y botón WhatsApp)</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Contenedor Dinámico de la Carta -->
-                        <div id="contenedorCarta" style="flex: 1; border: 1px dashed var(--borde-sutil); padding: 8px 12px; border-radius: 8px; background: var(--fondo-principal); opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
-                            <label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Imagen de la Carta</label>
-                            <input type="file" id="inputArchivoCarta" name="archivoCarta" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 11px; width: 100%;" disabled>
-                            <small id="textoAyudaCarta" style="font-size: 10px; color: gray; margin-top: 4px; display: block;">Requiere Modo Catálogo</small>
-                        </div>
-
-                    </div>
-                </div>
-                
-            </div> <!-- AQUÍ CIERRA EL MODAL-BODY -->
-            
-            <div class="modal-footer" style="margin-top: 15px;">
-                <button type="submit" class="btn-aceptar" style="width: 100%; padding: 12px; font-weight: bold; font-size: 14px;">Guardar Negocio</button>
-            </div>
-
-        </form>
-    </div>
 </div>
-        </div>
-
-        <!-- ==========================================
+<iframe allowfullscreen="" height="250" id="mapaNegocio" loading="lazy" style="border: 0;display: none;" width="100%">
+</iframe>
+</div>
+<!-- Fila 4: Horario (Ocupa ambas columnas) -->
+<fieldset style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 12px; border-radius: 8px; margin: 0;">
+<legend style="font-size: 11px; color: gray; padding: 0 5px;">Horario de Atención (Opcional)</legend>
+<div style="display: flex; gap: 15px;">
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Apertura</label>
+<input class="search-input" id="inputHoraInicioNegocio" name="horaInicio" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;" type="time"/>
+</div>
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Hora Cierre</label>
+<input class="search-input" id="inputHoraFinNegocio" name="horaFin" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: transparent; color-scheme: dark;" type="time"/>
+</div>
+</div>
+<small style="font-size: 10px; color: var(--naranja-marca); margin-top: 8px; display: block;">* Si configuras el horario, el estado (Abierto/Cerrado) cambiará automáticamente.</small>
+</fieldset>
+<!-- Fila 5 -->
+<select class="search-input" id="inputEstado" name="estado" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+<option value="ABIERTO">ABIERTO</option>
+<option value="CERRADO">CERRADO</option>
+</select>
+<select class="search-input" id="inputTipoNegocio" name="tipoNegocio.idTipoNegocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+<option disabled="" selected="" value="">Categoría...</option>
+<option th:each="t : ${listaTipos}" th:text="${t.nombre}" th:value="${t.idTipoNegocio}"></option>
+</select>
+<!-- Fila 6 -->
+<select class="search-input" id="inputZona" name="zona.idZona" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+<option value="">Sin Zona Específica</option>
+<option th:each="z : ${listaZonas}" th:text="${z.nombre}" th:value="${z.idZona}"></option>
+</select>
+<select class="search-input" id="inputCentro" name="centroComercial.idCentroComercial" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--fondo-principal);">
+<option value="">Sin Centro Comercial</option>
+<option th:each="c : ${listaCentros}" th:text="${c.nombre}" th:value="${c.idCentroComercial}"></option>
+</select>
+<!-- Fila 7 (Ocupa ambas columnas) -->
+<div style="grid-column: 1 / -1; border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+<label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Logo del negocio (Opcional si editas)</label>
+<input accept="image/png, image/jpeg" name="archivoLogo" style="color: var(--texto-principal); font-size: 13px;" type="file"/>
+</div>
+<!-- Fila 8: Configuración de Modo de Venta y Carta -->
+<div style="grid-column: 1 / -1; border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.15); margin-top: 5px;">
+<label style="font-size: 13px; color: var(--naranja-marca); display: block; margin-bottom: 12px; font-weight: bold;"><i class="fa-solid fa-shop"></i> Configuración de Venta</label>
+<div style="display: flex; gap: 15px; align-items: flex-start;">
+<!-- Select de Modo -->
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Tipo de Menú</label>
+<select class="search-input" data-argc="0" data-change="toggleCargaCarta" id="inputModoWhatsapp" name="modoWhatsapp" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 100%; cursor: pointer;">
+<option value="false">Modo E-commerce (Carrito, Productos y Buscador)</option>
+<option value="true">Modo Catálogo (Solo Carta y botón WhatsApp)</option>
+</select>
+</div>
+<!-- Contenedor Dinámico de la Carta -->
+<div id="contenedorCarta" style="flex: 1; border: 1px dashed var(--borde-sutil); padding: 8px 12px; border-radius: 8px; background: var(--fondo-principal); opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
+<label style="font-size: 11px; color: gray; display: block; margin-bottom: 5px;">Imagen de la Carta</label>
+<input accept="image/png, image/jpeg" disabled="" id="inputArchivoCarta" name="archivoCarta" style="color: var(--texto-principal); font-size: 11px; width: 100%;" type="file"/>
+<small id="textoAyudaCarta" style="font-size: 10px; color: gray; margin-top: 4px; display: block;">Requiere Modo Catálogo</small>
+</div>
+</div>
+</div>
+</div> <!-- AQUÍ CIERRA EL MODAL-BODY -->
+<div class="modal-footer" style="margin-top: 15px;">
+<button class="btn-aceptar" style="width: 100%; padding: 12px; font-weight: bold; font-size: 14px;" type="submit">Guardar Negocio</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              4. CRUD DE CATEGORÍAS DE PRODUCTOS 
              ========================================== -->
-        <div th:if="${modulo == 'categorias'}">
-            <header class="panel-header">
-                <h2>Categorías de Productos</h2>
-                <div class="panel-acciones-top">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="buscadorCategorias" class="search-input" placeholder="Buscar categoría..." autocomplete="off">
-                    </div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalCategoria()">
-                        <i class="fa-solid fa-plus"></i> Nueva Categoría
+<div th:if="${modulo == 'categorias'}">
+<header class="panel-header">
+<h2>Categorías de Productos</h2>
+<div class="panel-acciones-top">
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="buscadorCategorias" placeholder="Buscar categoría..." type="text"/>
+</div>
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalCategoria" style="width: auto; padding: 10px 20px;">
+<i class="fa-solid fa-plus"></i> Nueva Categoría
                     </button>
-                </div>
-            </header>
-            
-            <!-- Alertas -->
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
-
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>ID</th><th>Categoría</th><th>Negocio Asociado</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="tablaCategoriasBody">
-                            <tr th:each="categoria : ${listaCategorias}">
-                                <td th:text="'#' + ${categoria.idCategoriaProducto}"></td>
-                                
-                                <!-- Renderizado de Imagen y Nombre -->
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <img th:if="${categoria.logo != null and !categoria.logo.isEmpty()}" th:src="@{'/categorias_comidas/' + ${categoria.logo}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
-                                        <div th:unless="${categoria.logo != null and !categoria.logo.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
-                                            <i class="fa-solid fa-layer-group"></i>
-                                        </div>
-                                        <span th:text="${categoria.nombre}"></span>
-                                    </div>
-                                </td>
-                                
-                                <td th:text="${categoria.negocio?.nombre}"></td>
-                                
-                                <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar" 
-                                            th:onclick="abrirModalCategoria([[${categoria.idCategoriaProducto}]], [[${categoria.nombre}]], [[${categoria.negocio?.idNegocio}]])">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <form th:action="@{/panel/categorias/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar esta categoría?');">
-                                        <input type="hidden" name="idCategoriaProducto" th:value="${categoria.idCategoriaProducto}">
-                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- MODAL HTML CATEGORÍAS -->
-            <div id="modalCategoria" class="modal-overlay">
-                <div class="modal-content" style="width: 450px;">
-                    <form th:action="@{/panel/categorias/guardar}" method="POST" enctype="multipart/form-data">
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalCategoria">Nueva Categoría</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalCategoria').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 15px;">
-                            <input type="hidden" id="inputIdCategoria" name="idCategoriaProducto">
-
-                            <input type="text" id="inputNombreCategoria" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="Nombre de la Categoría" required>
-                            
-                            <select id="inputNegocioCategoria" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                <option value="" disabled selected>Selecciona un Negocio...</option>
-                                <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
-                            </select>
-
-                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
-                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Imagen de la categoría (Opcional si editas)</label>
-                                <input type="file" name="archivoLogo" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-aceptar">Guardar Categoría</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-		<!-- ==========================================
+</div>
+</header>
+<!-- Alertas -->
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Categoría</th><th>Negocio Asociado</th><th>Acciones</th></tr>
+</thead>
+<tbody id="tablaCategoriasBody">
+<tr th:each="categoria : ${listaCategorias}">
+<td th:text="'#' + ${categoria.idCategoriaProducto}"></td>
+<!-- Renderizado de Imagen y Nombre -->
+<td>
+<div style="display: flex; align-items: center; gap: 12px;">
+<img style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" th:if="${categoria.logo != null and !categoria.logo.isEmpty()}" th:src="@{'/categorias_comidas/' + ${categoria.logo}}"/>
+<div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;" th:unless="${categoria.logo != null and !categoria.logo.isEmpty()}">
+<i class="fa-solid fa-layer-group"></i>
+</div>
+<span th:text="${categoria.nombre}"></span>
+</div>
+</td>
+<td th:text="${categoria.negocio?.nombre}"></td>
+<td class="acciones-celda">
+<button class="btn-icon editar" data-argc="3" data-click="abrirModalCategoria" data-kind0="number" data-kind2="number" th:data-arg0="${categoria.idCategoriaProducto}" th:data-arg1="${categoria.nombre}" th:data-arg2="${categoria.negocio?.idNegocio}" title="Modificar">
+<i class="fa-solid fa-pen-to-square"></i>
+</button>
+<form data-confirm="¿Eliminar esta categoría?" method="POST" style="display:inline;" th:action="@{/panel/categorias/eliminar}">
+<input name="idCategoriaProducto" th:value="${categoria.idCategoriaProducto}" type="hidden"/>
+<button class="btn-icon eliminar" title="Eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- MODAL HTML CATEGORÍAS -->
+<div class="modal-overlay" id="modalCategoria">
+<div class="modal-content" style="width: 450px;">
+<form enctype="multipart/form-data" method="POST" th:action="@{/panel/categorias/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalCategoria">Nueva Categoría</h3>
+<span class="btn-text" data-close-target="modalCategoria" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+</div>
+<div class="modal-body" style="flex-direction: column; gap: 15px;">
+<input id="inputIdCategoria" name="idCategoriaProducto" type="hidden"/>
+<input class="search-input" id="inputNombreCategoria" name="nombre" placeholder="Nombre de la Categoría" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;" type="text"/>
+<select class="search-input" id="inputNegocioCategoria" name="negocio.idNegocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option disabled="" selected="" value="">Selecciona un Negocio...</option>
+<option th:each="n : ${listaNegocios}" th:text="${n.nombre}" th:value="${n.idNegocio}"></option>
+</select>
+<div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+<label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Imagen de la categoría (Opcional si editas)</label>
+<input accept="image/png, image/jpeg" name="archivoLogo" style="color: var(--texto-principal); font-size: 13px;" type="file"/>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-aceptar" type="submit">Guardar Categoría</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              7. CRUD DE PRODUCTOS 
              ========================================== -->
-        <div th:if="${modulo == 'productos'}">
-            <header class="panel-header">
-                <h2>Gestión de Productos</h2>
-                <div class="panel-acciones-top">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="buscadorProductos" class="search-input" placeholder="Buscar por producto o negocio..." autocomplete="off">
-                    </div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalProducto()">
-                        <i class="fa-solid fa-plus"></i> Nuevo Producto
+<div th:if="${modulo == 'productos'}">
+<header class="panel-header">
+<h2>Gestión de Productos</h2>
+<div class="panel-acciones-top">
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="buscadorProductos" placeholder="Buscar por producto o negocio..." type="text"/>
+</div>
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalProducto" style="width: auto; padding: 10px 20px;">
+<i class="fa-solid fa-plus"></i> Nuevo Producto
                     </button>
-                </div>
-            </header>
-            
-            <!-- Alertas -->
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
-
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Negocio</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="tablaProductosBody">
-                            <tr th:each="producto : ${listaProductos}">
-                                <td th:text="'#' + ${producto.idProducto}"></td>
-                                
-                                <!-- Renderizado de Imagen y Nombre -->
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" th:src="@{'/productos/' + ${producto.imagen}}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
-                                        <div th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;">
-                                            <i class="fa-solid fa-box"></i>
-                                        </div>
-                                        <span th:text="${producto.nombre}"></span>
-                                    </div>
-                                </td>
-                                
-                                <td th:text="|S/ ${producto.precio != null ? producto.precio : '0.00'}|"></td>
-                                <td th:text="${producto.negocio?.nombre}"></td>
-                                <td th:text="${producto.categoriaProducto?.nombre}"></td>
-                                
-                                <td>
-                                    <span class="badge" th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
-                                </td>
-                                
-                                <td class="acciones-celda">
-                                    <button class="btn-icon editar" title="Modificar" 
-                                            th:onclick="abrirModalProducto([[${producto.idProducto}]], [[${producto.nombre}]], [[${producto.descripcion}]], [[${producto.precio}]], [[${producto.disponible}]], [[${producto.negocio?.idNegocio}]], [[${producto.categoriaProducto?.idCategoriaProducto}]])">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <form th:action="@{/panel/productos/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?');">
-                                        <input type="hidden" name="idProducto" th:value="${producto.idProducto}">
-                                        <button type="submit" class="btn-icon eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- MODAL HTML PRODUCTOS -->
-            <div id="modalProducto" class="modal-overlay">
-                <div class="modal-content" style="width: 500px;">
-                    <form th:action="@{/panel/productos/guardar}" method="POST" enctype="multipart/form-data">
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalProducto">Nuevo Producto</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalProducto').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 12px; max-height: 65vh;">
-                            <input type="hidden" id="inputIdProducto" name="idProducto">
-
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="inputNombreProducto" name="nombre" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Nombre del Producto" required>
-                                <input type="number" step="0.01" id="inputPrecioProducto" name="precio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" placeholder="Precio (S/)" required>
-                            </div>
-
-                            <textarea id="inputDescripcionProducto" name="descripcion" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; resize: none; height: 60px;" placeholder="Descripción corta..."></textarea>
-                            
-                            <div style="display: flex; gap: 10px;">
-                                <select id="inputNegocioProducto" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                    <option value="" disabled selected>Negocio...</option>
-                                    <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
-                                </select>
-                                <select id="inputCategoriaProducto" name="categoriaProducto.idCategoriaProducto" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                    <option value="" disabled selected>Categoría...</option>
-                                    <option th:each="c : ${listaCategorias}" th:value="${c.idCategoriaProducto}" th:text="${c.nombre}"></option>
-                                </select>
-                            </div>
-                            
-                            <select id="inputDisponibleProducto" name="disponible" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                <option value="true">Disponible</option>
-                                <option value="false">Agotado</option>
-                            </select>
-							<div style="display: flex; gap: 10px;">
-                                <select id="inputSeccionMenu" name="seccionMenu" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);" required>
-                                    <option value="" disabled selected>Sección en el Menú...</option>
-                                    <option value="RECOMENDADO">Platos Recomendados</option>
-                                    <option value="PRINCIPAL">Platos Principales</option>
-                                    <option value="BEBIDA">Bebidas</option>
-                                    <option value="COMPLEMENTO">Complementos / Postres</option>
-                                </select>
-                            </div>
-                            <div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
-                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Foto del producto (Opcional si editas)</label>
-                                <input type="file" name="archivoImagen" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-aceptar">Guardar Producto</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- ==========================================
+</div>
+</header>
+<!-- Alertas -->
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Negocio</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr>
+</thead>
+<tbody id="tablaProductosBody">
+<tr th:each="producto : ${listaProductos}">
+<td th:text="'#' + ${producto.idProducto}"></td>
+<!-- Renderizado de Imagen y Nombre -->
+<td>
+<div style="display: flex; align-items: center; gap: 12px;">
+<img style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" th:if="${producto.imagen != null and !producto.imagen.isEmpty()}" th:src="@{'/productos/' + ${producto.imagen}}"/>
+<div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; color: #888;" th:unless="${producto.imagen != null and !producto.imagen.isEmpty()}">
+<i class="fa-solid fa-box"></i>
+</div>
+<span th:text="${producto.nombre}"></span>
+</div>
+</td>
+<td th:text="|S/ ${producto.precio != null ? producto.precio : '0.00'}|"></td>
+<td th:text="${producto.negocio?.nombre}"></td>
+<td th:text="${producto.categoriaProducto?.nombre}"></td>
+<td>
+<span class="badge" th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
+</td>
+<td class="acciones-celda">
+<button class="btn-icon editar" data-argc="8" data-click="abrirModalProducto" data-kind0="number" data-kind3="number" data-kind4="boolean" data-kind5="number" data-kind6="number" th:data-arg0="${producto.idProducto}" th:data-arg1="${producto.nombre}" th:data-arg2="${producto.descripcion}" th:data-arg3="${producto.precio}" th:data-arg4="${producto.disponible}" th:data-arg5="${producto.negocio?.idNegocio}" th:data-arg6="${producto.categoriaProducto?.idCategoriaProducto}" th:data-arg7="${producto.seccionMenu}" title="Modificar">
+<i class="fa-solid fa-pen-to-square"></i>
+</button>
+<form data-confirm="¿Eliminar este producto?" method="POST" style="display:inline;" th:action="@{/panel/productos/eliminar}">
+<input name="idProducto" th:value="${producto.idProducto}" type="hidden"/>
+<button class="btn-icon eliminar" title="Eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- MODAL HTML PRODUCTOS -->
+<div class="modal-overlay" id="modalProducto">
+<div class="modal-content" style="width: 500px;">
+<form enctype="multipart/form-data" method="POST" th:action="@{/panel/productos/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalProducto">Nuevo Producto</h3>
+<span class="btn-text" data-close-target="modalProducto" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+</div>
+<div class="modal-body" style="flex-direction: column; gap: 12px; max-height: 65vh;">
+<input id="inputIdProducto" name="idProducto" type="hidden"/>
+<div style="display: flex; gap: 10px;">
+<input class="search-input" id="inputNombreProducto" name="nombre" placeholder="Nombre del Producto" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="text"/>
+<input class="search-input" id="inputPrecioProducto" name="precio" placeholder="Precio (S/)" required="" step="0.01" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="number"/>
+</div>
+<textarea class="search-input" id="inputDescripcionProducto" name="descripcion" placeholder="Descripción corta..." style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; resize: none; height: 60px;"></textarea>
+<div style="display: flex; gap: 10px;">
+<select class="search-input" id="inputNegocioProducto" name="negocio.idNegocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option disabled="" selected="" value="">Negocio...</option>
+<option th:each="n : ${listaNegocios}" th:text="${n.nombre}" th:value="${n.idNegocio}"></option>
+</select>
+<select class="search-input" id="inputCategoriaProducto" name="categoriaProducto.idCategoriaProducto" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option disabled="" selected="" value="">Categoría...</option>
+<option th:each="c : ${listaCategorias}" th:text="${c.nombre}" th:value="${c.idCategoriaProducto}"></option>
+</select>
+</div>
+<select class="search-input" id="inputDisponibleProducto" name="disponible" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option value="true">Disponible</option>
+<option value="false">Agotado</option>
+</select>
+<div style="display: flex; gap: 10px;">
+<select class="search-input" id="inputSeccionMenu" name="seccionMenu" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
+<option disabled="" selected="" value="">Sección en el Menú...</option>
+<option value="RECOMENDADO">Platos Recomendados</option>
+<option value="PRINCIPAL">Platos Principales</option>
+<option value="BEBIDA">Bebidas</option>
+<option value="COMPLEMENTO">Complementos / Postres</option>
+</select>
+</div>
+<div style="border: 1px dashed var(--borde-sutil); padding: 12px; border-radius: 8px;">
+<label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 5px;">Foto del producto (Opcional si editas)</label>
+<input accept="image/png, image/jpeg" name="archivoImagen" style="color: var(--texto-principal); font-size: 13px;" type="file"/>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-aceptar" type="submit">Guardar Producto</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              5. CRUD DE PROMOCIONES 
              ========================================== -->
-        <div th:if="${modulo == 'promociones'}">
-            <header class="panel-header">
-                <h2>Gestión de Promociones</h2>
-                <div class="panel-acciones-top">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="buscadorPromociones" class="search-input" placeholder="Buscar por negocio..." autocomplete="off">
-                    </div>
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" onclick="abrirModalPromo()">
-                        <i class="fa-solid fa-plus"></i> Nueva Promoción
+<div th:if="${modulo == 'promociones'}">
+<header class="panel-header">
+<h2>Gestión de Promociones</h2>
+<div class="panel-acciones-top">
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="buscadorPromociones" placeholder="Buscar por negocio..." type="text"/>
+</div>
+<button class="btn-aceptar" data-argc="0" data-click="abrirModalPromo" style="width: auto; padding: 10px 20px;">
+<i class="fa-solid fa-plus"></i> Nueva Promoción
                     </button>
-                </div>
-            </header>
-            
-            <div th:if="${mensajeError}" class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;"><span th:text="${mensajeError}"></span></div>
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;"><span th:text="${mensajeExito}"></span></div>
-
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>ID</th><th>Promoción</th><th>Fechas</th><th>Negocio</th><th>Index</th><th>Estado Real</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody id="tablaPromocionesBody">
-                            <tr th:each="promo : ${listaPromociones}">
-                                <td th:text="'#' + ${promo.idPromocion}"></td>
-                                
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <img th:if="${promo.imagenBanner != null}" th:src="@{'/promociones/' + ${promo.imagenBanner}}" style="width: 60px; height: 35px; border-radius: 5px; object-fit: cover;">
-                                        <div>
-                                            <strong th:text="${promo.titulo}" style="display: block;"></strong>
-                                            <small th:if="${promo.horaInicio != null}" style="color: gray;" th:text="${promo.horaInicio + ' a ' + promo.horaFin}"></small>
-                                        </div>
-                                    </div>
-                                </td>
-                                
-                                <td th:text="${#temporals.format(promo.fechaInicio, 'dd/MM/yyyy') + ' al ' + #temporals.format(promo.fechaFin, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${promo.negocio?.nombre}"></td>
-                                
-                                <td><i class="fa-solid fa-star" th:style="${promo.mostrarEnIndex != null and promo.mostrarEnIndex ? 'color: #ffaa00;' : 'color: #444;'}"></i></td>
-                                
-                                <td>
-                                    <!-- Llama al método Java para saber si AHORA está activa -->
-                                    <span class="badge" th:style="${promo.isActivaHoy()} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" 
-                                          th:text="${promo.isActivaHoy()} ? 'Activa AHORA' : 'Inactiva'"></span>
-                                </td>
-                                
-                                <td class="acciones-celda">
-                                    <button class="btn-icon editar" th:onclick="abrirModalPromo([[${promo.idPromocion}]], [[${promo.titulo}]], [[${promo.descripcion}]], [[${promo.fechaInicio}]], [[${promo.fechaFin}]], [[${promo.horaInicio}]], [[${promo.horaFin}]], [[${promo.diasActivos}]], [[${promo.mostrarEnIndex}]], [[${promo.estado}]], [[${promo.negocio?.idNegocio}]])"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <form th:action="@{/panel/promociones/eliminar}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar promoción?');">
-                                        <input type="hidden" name="idPromocion" th:value="${promo.idPromocion}">
-                                        <button type="submit" class="btn-icon eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- MODAL HTML PROMOCIONES -->
-            <div id="modalPromo" class="modal-overlay">
-                <div class="modal-content" style="width: 600px;">
-                    <form th:action="@{/panel/promociones/guardar}" method="POST" enctype="multipart/form-data">
-                        <div class="modal-header">
-                            <h3 class="modal-titulo" id="tituloModalPromo">Nueva Promoción</h3>
-                            <span class="btn-text" onclick="document.getElementById('modalPromo').style.display='none'" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
-                        </div>
-                        
-                        <div class="modal-body" style="flex-direction: column; gap: 15px; max-height: 75vh; overflow-y: auto; padding-right: 10px;">
-                            <input type="hidden" id="inputIdPromo" name="idPromocion">
-                            
-                            <!-- SECCIÓN 1: Datos Generales -->
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="inputTituloPromo" name="titulo" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; flex: 1;" placeholder="Título de la promoción" required>
-                                <select id="inputNegocioPromo" name="negocio.idNegocio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 200px;" required>
-                                    <option value="" disabled selected>Negocio...</option>
-                                    <option th:each="n : ${listaNegocios}" th:value="${n.idNegocio}" th:text="${n.nombre}"></option>
-                                </select>
-                            </div>
-
-                            <!-- SECCIÓN 2: Configuración de Tiempo (Agrupada y Opcional) -->
-                            <fieldset style="border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; margin: 0;">
-                                <legend style="font-size: 12px; color: var(--naranja-marca); font-weight: bold; padding: 0 5px;">Vigencia (Opcional - Dejar vacío para siempre activo)</legend>
-                                
-                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 11px; color: gray;">Fecha Inicio</label>
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <input type="datetime-local" id="inputFechaInicio" name="fechaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
-                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputFechaInicio').value=''" title="Limpiar Fecha" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
-                                        </div>
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 11px; color: gray;">Fecha Fin</label>
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <input type="datetime-local" id="inputFechaFin" name="fechaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
-                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputFechaFin').value=''" title="Limpiar Fecha" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 11px; color: gray;">Hora Inicio Diaria</label>
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <input type="time" id="inputHoraInicio" name="horaInicio" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
-                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputHoraInicio').value=''" title="Limpiar Hora" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
-                                        </div>
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 11px; color: gray;">Hora Fin Diaria</label>
-                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                            <input type="time" id="inputHoraFin" name="horaFin" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;">
-                                            <button type="button" class="btn-icon" onclick="document.getElementById('inputHoraFin').value=''" title="Limpiar Hora" style="padding: 10px;"><i class="fa-solid fa-eraser"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label style="font-size: 11px; color: gray; margin-bottom: 5px; display: block;">Días Activos (Dejar vacío para todos los días)</label>
-                                    <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 5px 0;">
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="1" class="check-dia"> Lun</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="2" class="check-dia"> Mar</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="3" class="check-dia"> Mié</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="4" class="check-dia"> Jue</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="5" class="check-dia"> Vie</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="6" class="check-dia"> Sáb</label>
-                                        <label style="cursor: pointer;"><input type="checkbox" name="dias" value="7" class="check-dia"> Dom</label>
-                                    </div>
-                                </div>
-                            </fieldset>
-
-                            <!-- SECCIÓN 3: Visibilidad y Banner -->
-                            <div style="display: flex; gap: 10px;">
-                                <div style="flex: 1; display: flex; align-items: center; background: rgba(255,102,0,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--naranja-marca);">
-                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: var(--texto-principal);">
-                                        <input type="checkbox" id="inputIndexPromo" name="mostrarEnIndex" value="true"> Mostrar en Carrusel
+</div>
+</header>
+<div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}"><span th:text="${mensajeError}"></span></div>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}"><span th:text="${mensajeExito}"></span></div>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>ID</th><th>Promoción</th><th>Fechas</th><th>Negocio</th><th>Index</th><th>Estado Real</th><th>Acciones</th></tr>
+</thead>
+<tbody id="tablaPromocionesBody">
+<tr th:each="promo : ${listaPromociones}">
+<td th:text="'#' + ${promo.idPromocion}"></td>
+<td>
+<div style="display: flex; align-items: center; gap: 12px;">
+<img style="width: 60px; height: 35px; border-radius: 5px; object-fit: cover;" th:if="${promo.imagenBanner != null}" th:src="@{'/promociones/' + ${promo.imagenBanner}}"/>
+<div>
+<strong style="display: block;" th:text="${promo.titulo}"></strong>
+<small style="color: gray;" th:if="${promo.horaInicio != null}" th:text="${promo.horaInicio + ' a ' + promo.horaFin}"></small>
+</div>
+</div>
+</td>
+<td th:text="${#temporals.format(promo.fechaInicio, 'dd/MM/yyyy') + ' al ' + #temporals.format(promo.fechaFin, 'dd/MM/yyyy')}"></td>
+<td th:text="${promo.negocio?.nombre}"></td>
+<td><i class="fa-solid fa-star" th:style="${promo.mostrarEnIndex != null and promo.mostrarEnIndex ? 'color: #ffaa00;' : 'color: #444;'}"></i></td>
+<td>
+<!-- Llama al método Java para saber si AHORA está activa -->
+<span class="badge" th:style="${promo.isActivaHoy()} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${promo.isActivaHoy()} ? 'Activa AHORA' : 'Inactiva'"></span>
+</td>
+<td class="acciones-celda">
+<button class="btn-icon editar" data-argc="11" data-click="abrirModalPromo" data-kind0="number" data-kind10="number" data-kind8="boolean" data-kind9="boolean" th:data-arg0="${promo.idPromocion}" th:data-arg1="${promo.titulo}" th:data-arg10="${promo.negocio?.idNegocio}" th:data-arg2="${promo.descripcion}" th:data-arg3="${promo.fechaInicio}" th:data-arg4="${promo.fechaFin}" th:data-arg5="${promo.horaInicio}" th:data-arg6="${promo.horaFin}" th:data-arg7="${promo.diasActivos}" th:data-arg8="${promo.mostrarEnIndex}" th:data-arg9="${promo.estado}"><i class="fa-solid fa-pen-to-square"></i></button>
+<form data-confirm="¿Eliminar promoción?" method="POST" style="display:inline;" th:action="@{/panel/promociones/eliminar}">
+<input name="idPromocion" th:value="${promo.idPromocion}" type="hidden"/>
+<button class="btn-icon eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- MODAL HTML PROMOCIONES -->
+<div class="modal-overlay" id="modalPromo">
+<div class="modal-content" style="width: 600px;">
+<form enctype="multipart/form-data" method="POST" th:action="@{/panel/promociones/guardar}">
+<div class="modal-header">
+<h3 class="modal-titulo" id="tituloModalPromo">Nueva Promoción</h3>
+<span class="btn-text" data-close-target="modalPromo" style="text-align: right; cursor: pointer;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></span>
+</div>
+<div class="modal-body" style="flex-direction: column; gap: 15px; max-height: 75vh; overflow-y: auto; padding-right: 10px;">
+<input id="inputIdPromo" name="idPromocion" type="hidden"/>
+<!-- SECCIÓN 1: Datos Generales -->
+<div style="display: flex; gap: 10px;">
+<input class="search-input" id="inputTituloPromo" name="titulo" placeholder="Título de la promoción" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; flex: 1;" type="text"/>
+<select class="search-input" id="inputNegocioPromo" name="negocio.idNegocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); width: 200px;">
+<option disabled="" selected="" value="">Negocio...</option>
+<option th:each="n : ${listaNegocios}" th:text="${n.nombre}" th:value="${n.idNegocio}"></option>
+</select>
+</div>
+<!-- SECCIÓN 2: Configuración de Tiempo (Agrupada y Opcional) -->
+<fieldset style="border: 1px solid var(--borde-sutil); padding: 15px; border-radius: 8px; margin: 0;">
+<legend style="font-size: 12px; color: var(--naranja-marca); font-weight: bold; padding: 0 5px;">Vigencia (Opcional - Dejar vacío para siempre activo)</legend>
+<div style="display: flex; gap: 15px; margin-bottom: 15px;">
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray;">Fecha Inicio</label>
+<div style="display: flex; align-items: center; gap: 5px;">
+<input class="search-input" id="inputFechaInicio" name="fechaInicio" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="datetime-local"/>
+<button class="btn-icon" data-clear-target="inputFechaInicio" style="padding: 10px;" title="Limpiar Fecha" type="button"><i class="fa-solid fa-eraser"></i></button>
+</div>
+</div>
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray;">Fecha Fin</label>
+<div style="display: flex; align-items: center; gap: 5px;">
+<input class="search-input" id="inputFechaFin" name="fechaFin" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="datetime-local"/>
+<button class="btn-icon" data-clear-target="inputFechaFin" style="padding: 10px;" title="Limpiar Fecha" type="button"><i class="fa-solid fa-eraser"></i></button>
+</div>
+</div>
+</div>
+<div style="display: flex; gap: 15px; margin-bottom: 15px;">
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray;">Hora Inicio Diaria</label>
+<div style="display: flex; align-items: center; gap: 5px;">
+<input class="search-input" id="inputHoraInicio" name="horaInicio" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="time"/>
+<button class="btn-icon" data-clear-target="inputHoraInicio" style="padding: 10px;" title="Limpiar Hora" type="button"><i class="fa-solid fa-eraser"></i></button>
+</div>
+</div>
+<div style="flex: 1;">
+<label style="font-size: 11px; color: gray;">Hora Fin Diaria</label>
+<div style="display: flex; align-items: center; gap: 5px;">
+<input class="search-input" id="inputHoraFin" name="horaFin" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%;" type="time"/>
+<button class="btn-icon" data-clear-target="inputHoraFin" style="padding: 10px;" title="Limpiar Hora" type="button"><i class="fa-solid fa-eraser"></i></button>
+</div>
+</div>
+</div>
+<div>
+<label style="font-size: 11px; color: gray; margin-bottom: 5px; display: block;">Días Activos (Dejar vacío para todos los días)</label>
+<div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 5px 0;">
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="1"/> Lun</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="2"/> Mar</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="3"/> Mié</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="4"/> Jue</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="5"/> Vie</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="6"/> Sáb</label>
+<label style="cursor: pointer;"><input class="check-dia" name="dias" type="checkbox" value="7"/> Dom</label>
+</div>
+</div>
+</fieldset>
+<!-- SECCIÓN 3: Visibilidad y Banner -->
+<div style="display: flex; gap: 10px;">
+<div style="flex: 1; display: flex; align-items: center; background: rgba(255,102,0,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--naranja-marca);">
+<label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: var(--texto-principal);">
+<input id="inputIndexPromo" name="mostrarEnIndex" type="checkbox" value="true"/> Mostrar en Carrusel
                                     </label>
-                                </div>
-                                
-                                <select id="inputEstadoPromo" name="estado" class="search-input" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); flex: 1;" required>
-                                    <option value="true">Estado: Activo</option>
-                                    <option value="false">Estado: Apagado (Ocultar)</option>
-                                </select>
-                            </div>
-
-                            <div style="border: 1px dashed var(--borde-sutil); padding: 15px; border-radius: 8px; text-align: center;">
-                                <label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Imagen Promocional (Proporción horizontal recomendada)</label>
-                                <input type="file" name="archivoBanner" accept="image/png, image/jpeg" style="color: var(--texto-principal); font-size: 13px;">
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer" style="margin-top: 10px;">
-                            <button type="submit" class="btn-aceptar" style="width: 100%; padding: 12px;">Guardar Promoción</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-		<!-- ==========================================
+</div>
+<select class="search-input" id="inputEstadoPromo" name="estado" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; background: var(--fondo-principal); flex: 1;">
+<option value="true">Estado: Activo</option>
+<option value="false">Estado: Apagado (Ocultar)</option>
+</select>
+</div>
+<div style="border: 1px dashed var(--borde-sutil); padding: 15px; border-radius: 8px; text-align: center;">
+<label style="font-size: 12px; color: var(--texto-secundario); display: block; margin-bottom: 8px;">Imagen Promocional (Proporción horizontal recomendada)</label>
+<input accept="image/png, image/jpeg" name="archivoBanner" style="color: var(--texto-principal); font-size: 13px;" type="file"/>
+</div>
+</div>
+<div class="modal-footer" style="margin-top: 10px;">
+<button class="btn-aceptar" style="width: 100%; padding: 12px;" type="submit">Guardar Promoción</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ==========================================
              8. CONFIGURACIÓN GLOBAL 
              ========================================== -->
-        <div th:if="${modulo == 'configuracion'}">
-            <header class="panel-header">
-                <h2>Configuración Global del Sistema</h2>
-            </header>
-
-            <div th:if="${mensajeExito}" class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00;"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
-
-            <section class="panel-contenido-crud">
-                
-                <!-- Formulario sin max-width para que el grid ocupe toda la pantalla disponible -->
-                <form th:action="@{/panel/configuracion/guardar}" method="POST" style="width: 100%;">
-                    
-                    <!-- CSS Grid: 3 columnas adaptables (min-width ajustado a 320px) -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 30px;">
-                        
-                        <!-- =====================================
+<div th:if="${modulo == 'configuracion'}">
+<header class="panel-header">
+<h2>Configuración Global del Sistema</h2>
+</header>
+<div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
+<section class="panel-contenido-crud">
+<!-- Formulario sin max-width para que el grid ocupe toda la pantalla disponible -->
+<form method="POST" style="width: 100%;" th:action="@{/panel/configuracion/guardar}">
+<!-- CSS Grid: 3 columnas adaptables (min-width ajustado a 320px) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 30px;">
+<!-- =====================================
                              TARJETA 1: WHATSAPP (Verde)
                              ===================================== -->
-                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(37, 211, 102, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
-                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 211, 102, 0.15); filter: blur(50px); border-radius: 50%;"></div>
-                            
-                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
-                                <div style="width: 65px; height: 65px; background: rgba(37, 211, 102, 0.1); color: #25D366; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);">
-                                    <i class="fa-brands fa-whatsapp"></i>
-                                </div>
-                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Atención al Cliente</h3>
-                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Configura el número y los mensajes predefinidos.</p>
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Número de Soporte">
-                                <i class="fa-solid fa-phone" style="color: #25D366;"></i>
-                                <input type="text" name="telefonoSoporte" th:value="${configApp.telefonoSoporte}" placeholder="N° WhatsApp (Ej: 984690217)" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Mensaje superior">
-                                <i class="fa-regular fa-comment-dots" style="color: gray;"></i>
-                                <input type="text" name="mensajeWspCabecera" th:value="${configApp.mensajeWspCabecera}" placeholder="Mensaje de la cabecera">
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 0;" title="Mensaje inferior">
-                                <i class="fa-regular fa-comment" style="color: gray;"></i>
-                                <input type="text" name="mensajeWspFooter" th:value="${configApp.mensajeWspFooter}" placeholder="Mensaje del pie de página">
-                            </div>
-                        </div>
-
-                        <!-- =====================================
+<div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(37, 211, 102, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+<div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 211, 102, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+<div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+<div style="width: 65px; height: 65px; background: rgba(37, 211, 102, 0.1); color: #25D366; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);">
+<i class="fa-brands fa-whatsapp"></i>
+</div>
+<h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Atención al Cliente</h3>
+<p style="color: gray; font-size: 13px; margin-top: 5px;">Configura el número y los mensajes predefinidos.</p>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Número de Soporte">
+<i class="fa-solid fa-phone" style="color: #25D366;"></i>
+<input data-digits-only="true" inputmode="numeric" name="telefonoSoporte" placeholder="N° WhatsApp (Ej: 984690217)" th:value="${configApp.telefonoSoporte}" type="text"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Mensaje superior">
+<i class="fa-regular fa-comment-dots" style="color: gray;"></i>
+<input name="mensajeWspCabecera" placeholder="Mensaje de la cabecera" th:value="${configApp.mensajeWspCabecera}" type="text"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 0;" title="Mensaje inferior">
+<i class="fa-regular fa-comment" style="color: gray;"></i>
+<input name="mensajeWspFooter" placeholder="Mensaje del pie de página" th:value="${configApp.mensajeWspFooter}" type="text"/>
+</div>
+</div>
+<!-- =====================================
                              TARJETA 2: REDES SOCIALES (Azul)
                              ===================================== -->
-                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(24, 119, 242, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
-                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(24, 119, 242, 0.15); filter: blur(50px); border-radius: 50%;"></div>
-                            
-                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
-                                <div style="width: 65px; height: 65px; background: rgba(24, 119, 242, 0.1); color: #1877F2; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(24, 119, 242, 0.2);">
-                                    <i class="fa-solid fa-share-nodes"></i>
-                                </div>
-                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Redes Sociales</h3>
-                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Enlaces a tus perfiles oficiales.</p>
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Facebook">
-                                <i class="fa-brands fa-facebook-f" style="color: #1877F2;"></i>
-                                <input type="text" name="linkFacebook" th:value="${configApp.linkFacebook}" placeholder="Página de Facebook">
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Link de Instagram">
-                                <i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
-                                <input type="text" name="linkInstagram" th:value="${configApp.linkInstagram}" placeholder="Perfil de Instagram">
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 0;" title="Link de TikTok">
-                                <i class="fa-brands fa-tiktok" style="color: #ffffff;"></i>
-                                <input type="text" name="linkTiktok" th:value="${configApp.linkTiktok}" placeholder="Cuenta de TikTok">
-                            </div>
-                        </div>
-
-                        <!-- =====================================
+<div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(24, 119, 242, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+<div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(24, 119, 242, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+<div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+<div style="width: 65px; height: 65px; background: rgba(24, 119, 242, 0.1); color: #1877F2; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(24, 119, 242, 0.2);">
+<i class="fa-solid fa-share-nodes"></i>
+</div>
+<h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Redes Sociales</h3>
+<p style="color: gray; font-size: 13px; margin-top: 5px;">Enlaces a tus perfiles oficiales.</p>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Link de Facebook">
+<i class="fa-brands fa-facebook-f" style="color: #1877F2;"></i>
+<input name="linkFacebook" placeholder="Página de Facebook" th:value="${configApp.linkFacebook}" type="text"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Link de Instagram">
+<i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
+<input name="linkInstagram" placeholder="Perfil de Instagram" th:value="${configApp.linkInstagram}" type="text"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 0;" title="Link de TikTok">
+<i class="fa-brands fa-tiktok" style="color: #ffffff;"></i>
+<input name="linkTiktok" placeholder="Cuenta de TikTok" th:value="${configApp.linkTiktok}" type="text"/>
+</div>
+</div>
+<!-- =====================================
                              TARJETA 3: TARIFAS DE DELIVERY (Naranja)
                              ===================================== -->
-                        <div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(255, 102, 0, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
-                            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(255, 102, 0, 0.15); filter: blur(50px); border-radius: 50%;"></div>
-                            
-                            <div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
-                                <div style="width: 65px; height: 65px; background: rgba(255, 102, 0, 0.1); color: var(--naranja-marca); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);">
-                                    <i class="fa-solid fa-motorcycle"></i>
-                                </div>
-                                <h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Tarifas de Delivery</h3>
-                                <p style="color: gray; font-size: 13px; margin-top: 5px;">Ajusta el cobro por distancia de entrega.</p>
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Precio Base (S/)">
-                                <i class="fa-solid fa-coins" style="color: var(--naranja-marca);"></i>
-                                <input type="number" step="0.01" name="precioBaseDelivery" th:value="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : 10.00}" placeholder="Precio Base (Ej: 10.00)" required>
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 15px;" title="Distancia Base (metros)">
-                                <i class="fa-solid fa-ruler-horizontal" style="color: gray;"></i>
-                                <input type="number" name="distanciaBaseMetros" th:value="${configApp.distanciaBaseMetros != null ? configApp.distanciaBaseMetros : 500}" placeholder="Distancia Base en metros (Ej: 500)" required>
-                            </div>
-
-                            <div class="input-group-login" style="margin-bottom: 0;" title="Precio por Km Adicional (S/)">
-                                <i class="fa-solid fa-road" style="color: gray;"></i>
-                                <input type="number" step="0.01" name="precioKmAdicional" th:value="${configApp.precioKmAdicional != null ? configApp.precioKmAdicional : 1.00}" placeholder="Precio por Km extra (Ej: 1.00)" required>
-                            </div>
-                        </div>
-
-                    </div> <!-- FIN DEL GRID -->
-
-                    <!-- Botón Guardar (Centrado y ancho) -->
-                    <button type="submit" class="btn-aceptar" style="width: 100%; max-width: 400px; display: block; margin: 0 auto; padding: 16px; font-size: 16px; border-radius: 12px;">
-                        <i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i> Guardar Configuración Global
+<div style="background: var(--fondo-tarjetas); padding: 35px 30px; border-radius: 15px; border: 1px solid rgba(255, 102, 0, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
+<div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(255, 102, 0, 0.15); filter: blur(50px); border-radius: 50%;"></div>
+<div style="text-align: center; margin-bottom: 30px; position: relative; z-index: 1;">
+<div style="width: 65px; height: 65px; background: rgba(255, 102, 0, 0.1); color: var(--naranja-marca); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);">
+<i class="fa-solid fa-motorcycle"></i>
+</div>
+<h3 style="margin: 0; color: var(--texto-principal); font-size: 19px;">Tarifas de Delivery</h3>
+<p style="color: gray; font-size: 13px; margin-top: 5px;">Ajusta el cobro por distancia de entrega.</p>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Precio Base (S/)">
+<i class="fa-solid fa-coins" style="color: var(--naranja-marca);"></i>
+<input name="precioBaseDelivery" placeholder="Precio Base (Ej: 10.00)" required="" step="0.01" th:value="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : 10.00}" type="number"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 15px;" title="Distancia Base (metros)">
+<i class="fa-solid fa-ruler-horizontal" style="color: gray;"></i>
+<input name="distanciaBaseMetros" placeholder="Distancia Base en metros (Ej: 500)" required="" th:value="${configApp.distanciaBaseMetros != null ? configApp.distanciaBaseMetros : 500}" type="number"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 0;" title="Precio por Km Adicional (S/)">
+<i class="fa-solid fa-road" style="color: gray;"></i>
+<input name="precioKmAdicional" placeholder="Precio por Km extra (Ej: 1.00)" required="" step="0.01" th:value="${configApp.precioKmAdicional != null ? configApp.precioKmAdicional : 1.00}" type="number"/>
+</div>
+</div>
+</div> <!-- FIN DEL GRID -->
+<!-- Botón Guardar (Centrado y ancho) -->
+<button class="btn-aceptar" style="width: 100%; max-width: 400px; display: block; margin: 0 auto; padding: 16px; font-size: 16px; border-radius: 12px;" type="submit">
+<i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i> Guardar Configuración Global
                     </button>
-                    
-                </form>
-            </section>
-        </div>
-        <!-- ==========================================
+</form>
+</section>
+</div>
+<!-- ==========================================
              6. CRUD DE PEDIDOS (Operaciones) 
              ========================================== -->
-        <div th:if="${modulo == 'pedidos'}">
-            <header class="panel-header">
-                <h2>Pedidos Activos</h2>
-                <div class="panel-acciones-top">
-                    <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="search-input" placeholder="Buscar N° de Pedido..."></div>
-                    <!-- Los repartidores no crean pedidos manualmente, por lo que este botón puede ir oculto o distinto, pero lo dejamos por consistencia estructural -->
-                    <button class="btn-aceptar" style="width: auto; padding: 10px 20px;" sec:authorize="hasRole('ADMINISTRADOR')"><i class="fa-solid fa-plus"></i> Crear Pedido Manual</button>
-                </div>
-            </header>
-            <section class="panel-contenido-crud">
-                <div class="tabla-contenedor">
-                    <table class="tabla-oscura">
-                        <thead>
-                            <tr><th>N° Pedido</th><th>Cliente</th><th>Negocio</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
-                        </thead>
-                        <tbody>
-						    <tr th:each="pedido : ${listaPedidos}">
-						        <td th:text="'#' + ${pedido.idPedido}"></td>
-						        
-						        <!-- El operador ?. evita que la página colapse si el dato es nulo -->
-						        <td th:text="${pedido.usuario?.nombres}"></td>
-						        <td th:text="${pedido.negocio?.nombre}"></td>
-						        
-						        <!-- Uso de barras | | para concatenar texto y números de forma nativa -->
-						        <td th:text="|S/ ${pedido.total != null ? pedido.total : '0.00'}|"></td>
-						        
-						        <td>
-						            <span class="badge" style="background: rgba(255, 170, 0, 0.2); color: #ffaa00;" th:text="${pedido.estadoPedido}"></span>
-						        </td>
-						        <td class="acciones-celda">
-						            <button class="btn-icon editar" title="Modificar Estado"><i class="fa-solid fa-pen-to-square"></i></button>
-						            <button class="btn-icon eliminar" title="Cancelar Pedido"><i class="fa-solid fa-trash"></i></button>
-						        </td>
-						    </tr>
-						</tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-
-    </main>
+<div th:if="${modulo == 'pedidos'}">
+<header class="panel-header">
+<h2>Pedidos Activos</h2>
+<div class="panel-acciones-top">
+<div class="search-container"><i class="fa-solid fa-magnifying-glass"></i><input class="search-input" placeholder="Buscar N° de Pedido..." type="text"/></div>
+<!-- Los repartidores no crean pedidos manualmente, por lo que este botón puede ir oculto o distinto, pero lo dejamos por consistencia estructural -->
+<button class="btn-aceptar" sec:authorize="hasRole('ADMINISTRADOR')" style="width: auto; padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Crear Pedido Manual</button>
+</div>
+</header>
+<section class="panel-contenido-crud">
+<div class="tabla-contenedor">
+<table class="tabla-oscura">
+<thead>
+<tr><th>N° Pedido</th><th>Cliente</th><th>Negocio</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+</thead>
+<tbody>
+<tr th:each="pedido : ${listaPedidos}">
+<td th:text="'#' + ${pedido.idPedido}"></td>
+<!-- El operador ?. evita que la página colapse si el dato es nulo -->
+<td th:text="${pedido.usuario?.nombres}"></td>
+<td th:text="${pedido.negocio?.nombre}"></td>
+<!-- Uso de barras | | para concatenar texto y números de forma nativa -->
+<td th:text="|S/ ${pedido.total != null ? pedido.total : '0.00'}|"></td>
+<td>
+<span class="badge" style="background: rgba(255, 170, 0, 0.2); color: #ffaa00;" th:text="${pedido.estadoPedido}"></span>
+</td>
+<td class="acciones-celda">
+<button class="btn-icon editar" title="Modificar Estado"><i class="fa-solid fa-pen-to-square"></i></button>
+<button class="btn-icon eliminar" title="Cancelar Pedido"><i class="fa-solid fa-trash"></i></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
 <script th:src="@{/js/main.js}"></script>
 </body>
 </html>

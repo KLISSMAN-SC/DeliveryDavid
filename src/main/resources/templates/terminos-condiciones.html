@@ -1,17 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones | Dablyn Delivery</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" th:href="@{/imagenes/favicon.png}">
-    
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Términos y Condiciones | Dablyn Delivery</title>
+<!-- Favicon -->
+<link rel="icon" th:href="@{/imagenes/favicon.png}" type="image/png"/>
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<style>
         .vista-legal {
             max-width: 800px;
             margin: 40px auto;
@@ -71,61 +68,49 @@
             color: #ffffff;
         }
     </style>
-</head>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body style="background-color: #121212;">
-
-    <!-- PANTALLA DE CARGA -->
-    <div id="pantalla-carga">
-        <div class="loader-circulo"></div>
-    </div>
-
-    <main style="padding: 20px;">
-        <div class="vista-legal">
-            
-            <!-- Cabecera -->
-            <div class="legal-header">
-                <a th:href="@{/}" class="btn-volver-legal" title="Volver al inicio">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h1>Términos y Condiciones de Uso</h1>
-                    <span style="color: #888; font-size: 13px;">Última actualización: Octubre 2026</span>
-                </div>
-            </div>
-
-            <!-- Contenido -->
-            <h2>1. Objeto y Ámbito de Aplicación</h2>
-            <p>Bienvenido a <strong>Dablyn Delivery</strong>. Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma web y los servicios ofrecidos por Dablyn Delivery. Al registrarse, acceder o utilizar nuestra plataforma, el usuario acepta de manera expresa y sin reservas todos los términos aquí descritos.</p>
-
-            <h2>2. Servicios Ofrecidos</h2>
-            <p>Dablyn Delivery es una plataforma tecnológica que actúa como intermediario facilitando la conexión entre usuarios (clientes), establecimientos comerciales (negocios/restaurantes) y repartidores independientes. A través de la plataforma, los usuarios pueden visualizar menús, realizar pedidos, calcular costos de envío en función de la distancia y gestionar la entrega de productos.</p>
-
-            <h2>3. Registro y Seguridad de la Cuenta</h2>
-            <ul>
-                <li><strong>Creación de cuenta:</strong> Para realizar pedidos, el usuario debe crear una cuenta proporcionando información veraz y actualizada. La plataforma valida la identidad mediante el envío de un código de verificación al correo electrónico.</li>
-                <li><strong>Responsabilidad de credenciales:</strong> El usuario es el único responsable de mantener la confidencialidad de su contraseña.</li>
-                <li><strong>Medidas de seguridad:</strong> Para proteger la integridad de las cuentas, implementamos un sistema que bloquea temporalmente el acceso tras 5 intentos fallidos de inicio de sesión. La recuperación de contraseña se realiza mediante enlaces encriptados enviados al correo registrado.</li>
-            </ul>
-
-            <h2>4. Realización de Pedidos y Coordinación</h2>
-            <ul>
-                <li><strong>Proceso de compra:</strong> El usuario puede agregar productos a su carrito y visualizar un resumen detallado que incluye el costo y la tarifa de envío calculada geográficamente (vía Google Maps).</li>
-                <li><strong>Coordinación vía WhatsApp:</strong> Dependiendo de la configuración del negocio, la plataforma puede derivar la orden a WhatsApp para la coordinación final. Dablyn Delivery no interviene en transacciones de pago realizadas fuera de la plataforma.</li>
-                <li><strong>Disponibilidad:</strong> Todos los pedidos están sujetos a la disponibilidad de los productos en el local y a su horario de atención.</li>
-            </ul>
-
-            <h2>5. Tarifas y Envíos</h2>
-            <p>El costo de envío se calcula dinámicamente según la distancia entre el negocio y la dirección de entrega registrada por el usuario. Los precios de los productos y las tarifas de envío se muestran de forma transparente antes de confirmar la orden.</p>
-
-            <h2>6. Responsabilidad</h2>
-            <p>Dablyn Delivery actúa exclusivamente como intermediario tecnológico. No somos responsables por la calidad, preparación, estado o inocuidad de los alimentos o productos adquiridos, recayendo esta responsabilidad de manera exclusiva en el establecimiento asociado.</p>
-
-            <h2>7. Legislación y Jurisdicción Aplicable</h2>
-            <p>Estos Términos y Condiciones se rigen por las leyes de la República del Perú. Cualquier controversia derivada del uso de la plataforma será sometida a la jurisdicción de los jueces y tribunales competentes de la ciudad de Pucallpa, Ucayali.</p>
-
-        </div>
-    </main>
-
-    <script th:src="@{/js/main.js}"></script>
+<!-- PANTALLA DE CARGA -->
+<div id="pantalla-carga">
+<div class="loader-circulo"></div>
+</div>
+<main style="padding: 20px;">
+<div class="vista-legal">
+<!-- Cabecera -->
+<div class="legal-header">
+<a class="btn-volver-legal" th:href="@{/}" title="Volver al inicio">
+<i class="fa-solid fa-arrow-left"></i>
+</a>
+<div>
+<h1>Términos y Condiciones de Uso</h1>
+<span style="color: #888; font-size: 13px;">Última actualización: Octubre 2026</span>
+</div>
+</div>
+<!-- Contenido -->
+<h2>1. Objeto y Ámbito de Aplicación</h2>
+<p>Bienvenido a <strong>Dablyn Delivery</strong>. Los presentes Términos y Condiciones regulan el acceso y uso de la plataforma web y los servicios ofrecidos por Dablyn Delivery. Al registrarse, acceder o utilizar nuestra plataforma, el usuario acepta de manera expresa y sin reservas todos los términos aquí descritos.</p>
+<h2>2. Servicios Ofrecidos</h2>
+<p>Dablyn Delivery es una plataforma tecnológica que actúa como intermediario facilitando la conexión entre usuarios (clientes), establecimientos comerciales (negocios/restaurantes) y repartidores independientes. A través de la plataforma, los usuarios pueden visualizar menús, realizar pedidos, calcular costos de envío en función de la distancia y gestionar la entrega de productos.</p>
+<h2>3. Registro y Seguridad de la Cuenta</h2>
+<ul>
+<li><strong>Creación de cuenta:</strong> Para realizar pedidos, el usuario debe crear una cuenta proporcionando información veraz y actualizada. La plataforma valida la identidad mediante el envío de un código de verificación al correo electrónico.</li>
+<li><strong>Responsabilidad de credenciales:</strong> El usuario es el único responsable de mantener la confidencialidad de su contraseña.</li>
+<li><strong>Medidas de seguridad:</strong> Para proteger la integridad de las cuentas, implementamos un sistema que bloquea temporalmente el acceso tras 5 intentos fallidos de inicio de sesión. La recuperación de contraseña se realiza mediante enlaces encriptados enviados al correo registrado.</li>
+</ul>
+<h2>4. Realización de Pedidos y Coordinación</h2>
+<ul>
+<li><strong>Proceso de compra:</strong> El usuario puede agregar productos a su carrito y visualizar un resumen detallado que incluye el costo y la tarifa de envío calculada geográficamente (vía Google Maps).</li>
+<li><strong>Coordinación vía WhatsApp:</strong> Dependiendo de la configuración del negocio, la plataforma puede derivar la orden a WhatsApp para la coordinación final. Dablyn Delivery no interviene en transacciones de pago realizadas fuera de la plataforma.</li>
+<li><strong>Disponibilidad:</strong> Todos los pedidos están sujetos a la disponibilidad de los productos en el local y a su horario de atención.</li>
+</ul>
+<h2>5. Tarifas y Envíos</h2>
+<p>El costo de envío se calcula dinámicamente según la distancia entre el negocio y la dirección de entrega registrada por el usuario. Los precios de los productos y las tarifas de envío se muestran de forma transparente antes de confirmar la orden.</p>
+<h2>6. Responsabilidad</h2>
+<p>Dablyn Delivery actúa exclusivamente como intermediario tecnológico. No somos responsables por la calidad, preparación, estado o inocuidad de los alimentos o productos adquiridos, recayendo esta responsabilidad de manera exclusiva en el establecimiento asociado.</p>
+<h2>7. Legislación y Jurisdicción Aplicable</h2>
+<p>Estos Términos y Condiciones se rigen por las leyes de la República del Perú. Cualquier controversia derivada del uso de la plataforma será sometida a la jurisdicción de los jueces y tribunales competentes de la ciudad de Pucallpa, Ucayali.</p>
+</div>
+</main>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

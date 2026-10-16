@@ -1,17 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Privacidad | Dablyn Delivery</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" th:href="@{/imagenes/favicon.png}">
-    
-  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Política de Privacidad | Dablyn Delivery</title>
+<!-- Favicon -->
+<link rel="icon" th:href="@{/imagenes/favicon.png}" type="image/png"/>
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<style>
         .vista-legal {
             max-width: 800px;
             margin: 40px auto;
@@ -71,70 +68,58 @@
             color: #ffffff;
         }
     </style>
-</head>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body style="background-color: #121212;">
-
-    <!-- PANTALLA DE CARGA -->
-    <div id="pantalla-carga">
-        <div class="loader-circulo"></div>
-    </div>
-
-    <main style="padding: 20px;">
-        <div class="vista-legal">
-            
-            <!-- Cabecera -->
-            <div class="legal-header">
-                <a th:href="@{/}" class="btn-volver-legal" title="Volver al inicio">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h1>Política de Privacidad</h1>
-                    <span style="color: #888; font-size: 13px;">Última actualización: Octubre 2026</span>
-                </div>
-            </div>
-
-            <!-- Contenido -->
-            <h2>1. Marco Legal y Compromiso</h2>
-            <p>En <strong>Dablyn Delivery</strong> valoramos y respetamos su privacidad. La presente Política de Privacidad se rige bajo la Ley N° 29733, Ley de Protección de Datos Personales del Perú, y su Reglamento. El objetivo de este documento es informar cómo recopilamos, utilizamos, almacenamos y protegemos la información personal de nuestros usuarios.</p>
-
-            <h2>2. Información que Recopilamos</h2>
-            <p>Para ofrecer nuestros servicios, recopilamos los siguientes datos personales de forma directa cuando el usuario se registra o interactúa con la plataforma:</p>
-            <ul>
-                <li><strong>Datos de identificación:</strong> Nombres y apellidos.</li>
-                <li><strong>Datos de contacto:</strong> Correo electrónico y número de teléfono.</li>
-                <li><strong>Datos de ubicación:</strong> Direcciones de entrega guardadas y coordenadas de geolocalización.</li>
-                <li><strong>Datos de acceso:</strong> Contraseña (almacenada de forma estrictamente encriptada, de modo que ni el personal de Dablyn Delivery tiene acceso a ella).</li>
-            </ul>
-
-            <h2>3. Finalidad del Tratamiento de Datos</h2>
-            <p>Los datos personales recopilados serán utilizados exclusivamente para los siguientes fines:</p>
-            <ul>
-                <li>Crear, validar y gestionar su cuenta de usuario.</li>
-                <li>Procesar sus compras, calcular tarifas de envío y gestionar la entrega de pedidos a su ubicación.</li>
-                <li>Facilitar la comunicación entre el usuario, el negocio asociado y el repartidor (ej. redirección segura a WhatsApp con el detalle del pedido).</li>
-                <li>Enviar correos electrónicos transaccionales estrictamente necesarios, como códigos de verificación de cuenta y tokens para el restablecimiento de contraseña.</li>
-            </ul>
-
-            <h2>4. Protección y Seguridad de la Información</h2>
-            <p>Dablyn Delivery adopta medidas de seguridad técnicas y organizativas para proteger sus datos contra acceso, pérdida o alteración no autorizada. Esto incluye:</p>
-            <ul>
-                <li>Encriptación de contraseñas mediante algoritmos seguros.</li>
-                <li>Generación de tokens temporales de un solo uso para la recuperación de cuentas.</li>
-                <li>Limitación de acceso a la base de datos únicamente a personal técnico autorizado y administradores.</li>
-            </ul>
-
-            <h2>5. Uso Compartido de Información</h2>
-            <p>Dablyn Delivery no vende ni comercializa sus datos personales a terceros. Sin embargo, para cumplir con el servicio de entrega, la información estrictamente necesaria (nombres, dirección de entrega, teléfono y detalle del pedido) será compartida temporalmente con el negocio donde se realiza el pedido y con el repartidor asignado.</p>
-
-            <h2>6. Ejercicio de los Derechos ARCO</h2>
-            <p>En cumplimiento de la legislación peruana, el usuario tiene derecho a ejercer sus derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) sobre sus datos personales. Puede solicitar la actualización de su información, así como la eliminación definitiva de su cuenta y direcciones almacenadas, contactando directamente a nuestro soporte a través de los canales habilitados en la plataforma.</p>
-
-            <h2>7. Modificaciones a la Política</h2>
-            <p>Dablyn Delivery se reserva el derecho de modificar esta Política de Privacidad para adaptarla a novedades legislativas o mejoras en la plataforma. Cualquier actualización significativa será notificada a los usuarios a través de la web o por correo electrónico.</p>
-
-        </div>
-    </main>
-
-    <script th:src="@{/js/main.js}"></script>
+<!-- PANTALLA DE CARGA -->
+<div id="pantalla-carga">
+<div class="loader-circulo"></div>
+</div>
+<main style="padding: 20px;">
+<div class="vista-legal">
+<!-- Cabecera -->
+<div class="legal-header">
+<a class="btn-volver-legal" th:href="@{/}" title="Volver al inicio">
+<i class="fa-solid fa-arrow-left"></i>
+</a>
+<div>
+<h1>Política de Privacidad</h1>
+<span style="color: #888; font-size: 13px;">Última actualización: Octubre 2026</span>
+</div>
+</div>
+<!-- Contenido -->
+<h2>1. Marco Legal y Compromiso</h2>
+<p>En <strong>Dablyn Delivery</strong> valoramos y respetamos su privacidad. La presente Política de Privacidad se rige bajo la Ley N° 29733, Ley de Protección de Datos Personales del Perú, y su Reglamento. El objetivo de este documento es informar cómo recopilamos, utilizamos, almacenamos y protegemos la información personal de nuestros usuarios.</p>
+<h2>2. Información que Recopilamos</h2>
+<p>Para ofrecer nuestros servicios, recopilamos los siguientes datos personales de forma directa cuando el usuario se registra o interactúa con la plataforma:</p>
+<ul>
+<li><strong>Datos de identificación:</strong> Nombres y apellidos.</li>
+<li><strong>Datos de contacto:</strong> Correo electrónico y número de teléfono.</li>
+<li><strong>Datos de ubicación:</strong> Direcciones de entrega guardadas y coordenadas de geolocalización.</li>
+<li><strong>Datos de acceso:</strong> Contraseña (almacenada de forma estrictamente encriptada, de modo que ni el personal de Dablyn Delivery tiene acceso a ella).</li>
+</ul>
+<h2>3. Finalidad del Tratamiento de Datos</h2>
+<p>Los datos personales recopilados serán utilizados exclusivamente para los siguientes fines:</p>
+<ul>
+<li>Crear, validar y gestionar su cuenta de usuario.</li>
+<li>Procesar sus compras, calcular tarifas de envío y gestionar la entrega de pedidos a su ubicación.</li>
+<li>Facilitar la comunicación entre el usuario, el negocio asociado y el repartidor (ej. redirección segura a WhatsApp con el detalle del pedido).</li>
+<li>Enviar correos electrónicos transaccionales estrictamente necesarios, como códigos de verificación de cuenta y tokens para el restablecimiento de contraseña.</li>
+</ul>
+<h2>4. Protección y Seguridad de la Información</h2>
+<p>Dablyn Delivery adopta medidas de seguridad técnicas y organizativas para proteger sus datos contra acceso, pérdida o alteración no autorizada. Esto incluye:</p>
+<ul>
+<li>Encriptación de contraseñas mediante algoritmos seguros.</li>
+<li>Generación de tokens temporales de un solo uso para la recuperación de cuentas.</li>
+<li>Limitación de acceso a la base de datos únicamente a personal técnico autorizado y administradores.</li>
+</ul>
+<h2>5. Uso Compartido de Información</h2>
+<p>Dablyn Delivery no vende ni comercializa sus datos personales a terceros. Sin embargo, para cumplir con el servicio de entrega, la información estrictamente necesaria (nombres, dirección de entrega, teléfono y detalle del pedido) será compartida temporalmente con el negocio donde se realiza el pedido y con el repartidor asignado.</p>
+<h2>6. Ejercicio de los Derechos ARCO</h2>
+<p>En cumplimiento de la legislación peruana, el usuario tiene derecho a ejercer sus derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) sobre sus datos personales. Puede solicitar la actualización de su información, así como la eliminación definitiva de su cuenta y direcciones almacenadas, contactando directamente a nuestro soporte a través de los canales habilitados en la plataforma.</p>
+<h2>7. Modificaciones a la Política</h2>
+<p>Dablyn Delivery se reserva el derecho de modificar esta Política de Privacidad para adaptarla a novedades legislativas o mejoras en la plataforma. Cualquier actualización significativa será notificada a los usuarios a través de la web o por correo electrónico.</p>
+</div>
+</main>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

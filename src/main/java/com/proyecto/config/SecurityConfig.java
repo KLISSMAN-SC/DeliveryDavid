@@ -1,76 +1,134 @@
 package com.proyecto.config;
 
+import com.proyecto.repository.UsuarioRepository;
+import com.proyecto.security.*;
 import com.proyecto.services.CustomUserDetailsService;
+import jakarta.servlet.DispatcherType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import jakarta.servlet.DispatcherType;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12);
+  }
 
-    // Define el algoritmo de encriptación
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public DaoAuthenticationProvider authenticationProvider(
+      CustomUserDetailsService service, PasswordEncoder encoder) {
+    var provider = new DaoAuthenticationProvider(service);
+    provider.setPasswordEncoder(encoder);
+    return provider;
+  }
 
-    // Conecta Spring Security con tu BD y el encriptador
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
-        http
-            .authenticationProvider(authProvider) // Activa la validación con BD
-            .authorizeHttpRequests(auth -> auth
-            	.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                .requestMatchers("/css/**", "/js/**", "/imagenes/**", "/promociones/**","/productos/**", "/banner/**", "/categorias_comidas/**", "/carta/**").permitAll()
-                // AQUÍ AÑADIMOS EL PERMISO PARA LAS RUTAS DE FALLO DE LOGIN
-                .requestMatchers("/", "/login", "/login?error=true","/terminos-condiciones", "/politica-privacidad", "/login?bloqueado=true", "/registro/**", "/verificar/**", "/api/**", "/recuperar-password/**").permitAll()
-                //.requestMatchers("/pedido/mis-pedidos").denyAll()
-                .requestMatchers("/panel/**").hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                    .loginPage("/login")
-                    .loginProcessingUrl("/login")
-                    .defaultSuccessUrl("/", true) // Si el login es exitoso, redirige al Inicio
-                    
-                    // CAMBIO AQUÍ: Agregamos el Context Path para que respete el "/api"
-                    .failureHandler((request, response, exception) -> {
-                        // Extraemos la ruta base de tu proyecto (en tu caso "/api")
-                        String contextPath = request.getContextPath();
-                        
-                        if (exception.getMessage() != null && exception.getMessage().startsWith("CUENTA_BLOQUEADA:")) {
-                            String horasRestantes = exception.getMessage().split(":")[1];
-                            // Redirigimos sumando el contextPath
-                            response.sendRedirect(contextPath + "/login?bloqueado=true&horas=" + horasRestantes);
-                        } else {
-                            // Redirigimos sumando el contextPath
-                            response.sendRedirect(contextPath + "/login?error=true");
-                        }
-                    })
+  @Bean
+  public SecurityFilterChain filterChain(
+      HttpSecurity http,
+      DaoAuthenticationProvider provider,
+      RateLimits limits,
+      SecurityAudit audit,
+      UsuarioRepository users,
+      @Value("${app.require-https:false}") boolean https)
+      throws Exception {
+    http.authenticationProvider(provider)
+        .authorizeHttpRequests(
+            a ->
+                a.dispatcherTypeMatchers(DispatcherType.ERROR)
                     .permitAll()
-                )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll()
-            )
-            .csrf(csrf -> csrf.disable());
-
-        return http.build();
-    }
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/",
+                        "/login",
+                        "/registro",
+                        "/verificar",
+                        "/recuperar-password",
+                        "/recuperar-password/reset",
+                        "/terminos-condiciones",
+                        "/politica-privacidad",
+                        "/error",
+                        "/csrf")
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/login",
+                        "/registro/enviar",
+                        "/verificar/confirmar",
+                        "/recuperar-password",
+                        "/recuperar-password/reset")
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/vendor/**",
+                        "/css/**",
+                        "/js/**",
+                        "/imagenes/**",
+                        "/promociones/**",
+                        "/productos/**",
+                        "/banner/**",
+                        "/categorias_comidas/**",
+                        "/carta/**",
+                        "/negocios/buscar",
+                        "/tipo/**",
+                        "/restaurante/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/panel", "/panel/")
+                    .hasAnyRole("ADMINISTRADOR", "REPARTIDOR")
+                    .requestMatchers("/panel/**")
+                    .hasRole("ADMINISTRADOR")
+                    .requestMatchers("/perfil/**", "/direcciones/**", "/carrito/**", "/pedido/**")
+                    .authenticated()
+                    .anyRequest()
+                    .denyAll())
+        .formLogin(
+            f ->
+                f.loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .defaultSuccessUrl("/", true)
+                    .failureHandler(
+                        (q, s, e) -> {
+                          audit.event("LOGIN_FAILURE", "anonymous");
+                          s.sendRedirect(q.getContextPath() + "/login?error=true");
+                        })
+                    .permitAll())
+        .logout(
+            l ->
+                l.logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("JSESSIONID"))
+        .csrf(org.springframework.security.config.Customizer.withDefaults())
+        .sessionManagement(s -> s.sessionFixation(f -> f.changeSessionId()))
+        .exceptionHandling(
+            e ->
+                e.authenticationEntryPoint(
+                        (q, s, x) -> {
+                          if ("XMLHttpRequest".equals(q.getHeader("X-Requested-With")))
+                            s.sendError(401);
+                          else s.sendRedirect(q.getContextPath() + "/login");
+                        })
+                    .accessDeniedHandler(
+                        (q, s, x) -> {
+                          audit.alert("ACCESS_DENIED", q.getServletPath());
+                          s.sendError(403);
+                        }))
+        .addFilterBefore(new RequestSecurityFilter(limits, audit), CsrfFilter.class)
+        .addFilterBefore(new SessionValidityFilter(users), AuthorizationFilter.class);
+    if (https) http.redirectToHttps(org.springframework.security.config.Customizer.withDefaults());
+    return http.build();
+  }
 }

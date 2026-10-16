@@ -1,79 +1,71 @@
-	<!DOCTYPE html>
+ <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Registro - Dablyn Delivery</title>
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
+<meta charset="utf-8"/>
+<title>Registro - Dablyn Delivery</title>
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body class="body-login">
-    <div class="login-wrapper">
-        <div class="login-card" style="max-width: 500px;"> <!-- Ligeramente más ancho para 2 columnas -->
-            <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
-                <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
-            </div>
-            
-            <h2>Crea tu cuenta</h2>
-            <p class="login-subtitulo">Únete y pide tu comida favorita en minutos.</p>
-
-            <form th:action="@{/registro/enviar}" method="POST" id="formRegistro" onsubmit="mostrarCarga()">
-                <div style="display: flex; gap: 15px;">
-                    <div class="input-group-login" style="flex: 1;">
-                        <i class="fa-solid fa-user"></i>
-                        <input type="text" name="nombres" placeholder="Nombres" required>
+<div class="login-wrapper">
+<div class="login-card" style="max-width: 500px;"> <p role="alert" style="color:#ff5555" th:if="${error}" th:text="${error}"></p><!-- Ligeramente más ancho para 2 columnas -->
+<div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
+<strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
+</div>
+<h2>Crea tu cuenta</h2>
+<p class="login-subtitulo">Únete y pide tu comida favorita en minutos.</p>
+<form data-argc="0" data-submit="mostrarCarga" id="formRegistro" method="POST" th:action="@{/registro/enviar}">
+<div style="display: flex; gap: 15px;">
+<div class="input-group-login" style="flex: 1;">
+<i class="fa-solid fa-user"></i>
+<input name="nombres" placeholder="Nombres" required="" type="text"/>
+</div>
+<div class="input-group-login" style="flex: 1;">
+<input name="apellidos" placeholder="Apellidos" required="" type="text"/>
+</div>
+</div>
+<!-- DNI ELIMINADO. Teléfono ahora ocupa el ancho completo con validación numérica -->
+<div class="input-group-login">
+<i class="fa-solid fa-phone"></i>
+<input data-digits-only="true" inputmode="numeric" maxlength="9" name="telefono" placeholder="Teléfono" required="" type="text"/>
+</div>
+<div class="input-group-login">
+<i class="fa-solid fa-envelope"></i>
+<input name="correoElectronico" placeholder="Correo electrónico" required="" type="email"/>
+</div>
+<div class="input-group-login" style="margin-bottom: 5px;">
+<i class="fa-solid fa-lock"></i>
+<input autocomplete="new-password" data-argc="0" data-input="validarPassword" id="inputPassword" minlength="12" name="password" placeholder="Crea una contraseña" required="" type="password"/>
+<!-- Opcional: Ojito para ver la contraseña -->
+<i class="fa-solid fa-eye-slash" data-argc="0" data-click="toggleVisibilidad" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);"></i>
+</div>
+<!-- Contenedor de validación visual -->
+<div class="password-requisitos" id="passwordRequisitos">
+<div class="req-item" id="req-long">
+<i class="fa-solid fa-circle-xmark"></i> Mínimo 12 caracteres
                     </div>
-                    <div class="input-group-login" style="flex: 1;">
-                        <input type="text" name="apellidos" placeholder="Apellidos" required>
+<div class="req-item" id="req-mayus">
+<i class="fa-solid fa-circle-xmark"></i> Una mayúscula
                     </div>
-                </div>
-
-                <!-- DNI ELIMINADO. Teléfono ahora ocupa el ancho completo con validación numérica -->
-                <div class="input-group-login">
-                    <i class="fa-solid fa-phone"></i>
-                    <input type="text" name="telefono" placeholder="Teléfono" required maxlength="9" 
-                           inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                </div>
-
-                <div class="input-group-login">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" name="correoElectronico" placeholder="Correo electrónico" required>
-                </div>
-                
-                <div class="input-group-login" style="margin-bottom: 5px;">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" name="password" id="inputPassword" placeholder="Crea una contraseña" required onkeyup="validarPassword()">
-                    <!-- Opcional: Ojito para ver la contraseña -->
-                    <i class="fa-solid fa-eye-slash" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);" onclick="toggleVisibilidad()"></i>
-                </div>
-
-                <!-- Contenedor de validación visual -->
-                <div class="password-requisitos" id="passwordRequisitos">
-                    <div class="req-item" id="req-long">
-                        <i class="fa-solid fa-circle-xmark"></i> Mínimo 8 caracteres
+<div class="req-item" id="req-minus">
+<i class="fa-solid fa-circle-xmark"></i> Una minúscula
                     </div>
-                    <div class="req-item" id="req-mayus">
-                        <i class="fa-solid fa-circle-xmark"></i> Una mayúscula
+<div class="req-item" id="req-especial">
+<i class="fa-solid fa-circle-xmark"></i> Un carácter especial
                     </div>
-                    <div class="req-item" id="req-minus">
-                        <i class="fa-solid fa-circle-xmark"></i> Una minúscula
-                    </div>
-                    <div class="req-item" id="req-especial">
-                        <i class="fa-solid fa-circle-xmark"></i> Un carácter especial
-                    </div>
-                </div>
-
-                <button type="submit" id="btnRegistrar" class="btn-aceptar" style="margin-top: 15px;">
-                    <span id="btnTexto">Registrarme</span>
-                    <i id="btnIcono" class="fa-solid fa-spinner fa-spin" style="display: none; margin-left: 8px;"></i>
-                </button>
-            </form>
-
-            <div class="login-footer">
-                <p>¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión aquí</a></p>
-            </div>
-        </div>
-    </div>
-    <script th:src="@{/js/sesion.js}"></script>
-    </body>
+</div>
+<button class="btn-aceptar" id="btnRegistrar" style="margin-top: 15px;" type="submit">
+<span id="btnTexto">Registrarme</span>
+<i class="fa-solid fa-spinner fa-spin" id="btnIcono" style="display: none; margin-left: 8px;"></i>
+</button>
+</form>
+<div class="login-footer">
+<p>¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión aquí</a></p>
+</div>
+</div>
+</div>
+<script th:src="@{/js/sesion.js}"></script>
+</body>
 </html>

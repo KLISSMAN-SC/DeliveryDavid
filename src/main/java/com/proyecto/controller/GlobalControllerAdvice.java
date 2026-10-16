@@ -8,17 +8,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
+  @ModelAttribute("cspNonce")
+  public String cspNonce(jakarta.servlet.http.HttpServletRequest req) {
+    return (String) req.getAttribute("cspNonce");
+  }
 
-    @Autowired
-    private ConfiguracionRepository configuracionRepository;
+  @Autowired private ConfiguracionRepository configuracionRepository;
 
-    @ModelAttribute("configApp")
-    public Configuracion globalConfig() {
-        // Busca la configuración con ID 1. Si no existe, devuelve una en blanco.
-    	return configuracionRepository
-                .findFirstByOrderByIdConfiguracionAsc()
-                .orElse(null);
-    }
-    
-    
+  @ModelAttribute("configApp")
+  public Configuracion globalConfig() {
+    // Busca la configuración con ID 1. Si no existe, devuelve una en blanco.
+    return configuracionRepository.findFirstByOrderByIdConfiguracionAsc().orElse(null);
+  }
 }

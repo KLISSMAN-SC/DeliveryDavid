@@ -6,17 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="ROL")
+@Table(name = "ROL")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rol {
-	
-	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private Integer idRol;
-	
-	@Column(length=45)
-	private String nombre;
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer idRol;
+
+  @Column(length = 45)
+  private String nombre;
 }

@@ -1,236 +1,155 @@
 package com.proyecto.services;
 
+import com.proyecto.model.DireccionUsuario;
+import com.proyecto.model.Usuario;
+import com.proyecto.repository.DireccionUsuarioRepository;
+import com.proyecto.repository.UsuarioRepository;
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.proyecto.repository.DireccionUsuarioRepository;
-import com.proyecto.repository.UsuarioRepository;
-import com.proyecto.model.DireccionUsuario;
-import com.proyecto.model.Usuario;
-
 @Service
 public class DireccionUsuarioService {
-	 
-	@Autowired
-	private DireccionUsuarioRepository direccionUsuarioRepository;
-	
-	@Autowired
-	private UsuarioRepository usuarioRepository;
-	 
-	 public DireccionUsuario guardarDireccion(
-	            Integer idUsuario,
-	            String alias,
-	            String direccion,
-	            String referencia,
-	            BigDecimal latitud,
-	            BigDecimal longitud) {
-		 	if (
-			        alias == null ||
-			        alias.isBlank()
-			    ) {
 
-			        throw new IllegalArgumentException(
-			            "El nombre de la dirección es obligatorio"
-			        );
-			    }
+  @Autowired private DireccionUsuarioRepository direccionUsuarioRepository;
 
+  @Autowired private UsuarioRepository usuarioRepository;
 
-			    if (
-			        direccion == null ||
-			        direccion.isBlank()
-			    ) {
+  public DireccionUsuario guardarDireccion(
+      Integer idUsuario,
+      String alias,
+      String direccion,
+      String referencia,
+      BigDecimal latitud,
+      BigDecimal longitud) {
+    if (alias == null || alias.isBlank()) {
 
-			        throw new IllegalArgumentException(
-			            "La dirección es obligatoria"
-			        );
-			    }
+      throw new IllegalArgumentException("El nombre de la dirección es obligatorio");
+    }
 
+    if (direccion == null || direccion.isBlank()) {
 
-			    if (
-			        latitud == null ||
-			        longitud == null
-			    ) {
+      throw new IllegalArgumentException("La dirección es obligatoria");
+    }
 
-			        throw new IllegalArgumentException(
-			            "La ubicación es obligatoria"
-			        );
-			    }
+    if (latitud == null || longitud == null) {
 
+      throw new IllegalArgumentException("La ubicación es obligatoria");
+    }
 
-			    if (alias.length() > 30) {
+    if (alias.length() > 30) {
 
-			        throw new IllegalArgumentException(
-			            "El alias no puede superar 30 caracteres"
-			        );
-			    }
+      throw new IllegalArgumentException("El alias no puede superar 30 caracteres");
+    }
 
+    if (direccion.length() > 150) {
 
-			    if (direccion.length() > 150) {
+      throw new IllegalArgumentException("La dirección no puede superar 150 caracteres");
+    }
 
-			        throw new IllegalArgumentException(
-			            "La dirección no puede superar 150 caracteres"
-			        );
-			    }
-		 	
-	        Usuario usuario =
-	                usuarioRepository
-	                .findById(idUsuario)
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "Usuario no encontrado"
-	                    )
-	                );
+    com.proyecto.security.InputChecks.coordinates(latitud, longitud);
+    com.proyecto.security.InputChecks.optional(referencia, 100);
+    if (direccion.length() > 100)
+      throw com.proyecto.security.BusinessException.invalid(
+          "La dirección no puede superar 100 caracteres.");
+    Usuario usuario =
+        usuarioRepository
+            .findById(idUsuario)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+    DireccionUsuario nueva = new DireccionUsuario();
 
-	        DireccionUsuario nueva =
-	                new DireccionUsuario();
+    nueva.setUsuario(usuario);
 
+    nueva.setAlias(alias);
 
-	        nueva.setUsuario(usuario);
+    nueva.setDireccion(direccion);
 
-	        nueva.setAlias(alias);
+    nueva.setReferencia(referencia != null ? referencia.trim() : null);
 
-	        nueva.setDireccion(direccion);
+    nueva.setLatitud(latitud);
 
-	        nueva.setReferencia(
-	                referencia != null
-	                    ? referencia.trim()
-	                    : null
-	            );
+    nueva.setLongitud(longitud);
 
-	        nueva.setLatitud(latitud);
+    // Si es la primera dirección,
+    // automáticamente será principal
+    boolean yaTienePrincipal =
+        direccionUsuarioRepository.existsByUsuarioIdUsuarioAndPrincipalTrue(idUsuario);
 
-	        nueva.setLongitud(longitud);
+    nueva.setPrincipal(!yaTienePrincipal);
 
+    return direccionUsuarioRepository.save(nueva);
+  }
 
-	        // Si es la primera dirección,
-	        // automáticamente será principal
-	        boolean yaTienePrincipal =
-	                direccionUsuarioRepository
-	                .existsByUsuarioIdUsuarioAndPrincipalTrue(
-	                        idUsuario
-	                );
+  public List<DireccionUsuario> listarPorUsuario(Integer idUsuario) {
 
+    return direccionUsuarioRepository
+        .findByUsuarioIdUsuarioOrderByPrincipalDescIdDireccionUsuarioAsc(idUsuario);
+  }
 
-	        nueva.setPrincipal(
-	                !yaTienePrincipal
-	        );
+  public DireccionUsuario obtenerDireccionUsuario(Integer idDireccionUsuario, Integer idUsuario) {
 
+    return direccionUsuarioRepository
+        .findByIdDireccionUsuarioAndUsuarioIdUsuario(idDireccionUsuario, idUsuario)
+        .orElseThrow(() -> com.proyecto.security.BusinessException.missing());
+  }
 
-	        return direccionUsuarioRepository
-	                .save(nueva);
-	    }
-	 
-	 
-	 
-	    public List<DireccionUsuario>
-	            listarPorUsuario(Integer idUsuario) {
+  public DireccionUsuario obtenerPrincipalOPrimera(Integer idUsuario) {
 
-	        return direccionUsuarioRepository.findByUsuarioIdUsuarioOrderByPrincipalDescIdDireccionUsuarioAsc(idUsuario);
-	    }
+    List<DireccionUsuario> direcciones = listarPorUsuario(idUsuario);
 
+    if (direcciones.isEmpty()) {
+      return null;
+    }
 
-	    public DireccionUsuario obtenerDireccionUsuario(Integer idDireccionUsuario,Integer idUsuario) {
+    // Como el Repository ordena
+    // principal DESC, la primera
+    // será la principal.
+    return direcciones.get(0);
+  }
 
-	        return direccionUsuarioRepository.findByIdDireccionUsuarioAndUsuarioIdUsuario(idDireccionUsuario,idUsuario).orElseThrow(() ->
-	                    new RuntimeException("La dirección no pertenece al usuario"));
-	    }
+  // =====================================
+  // ELIMINAR DIRECCIÓN
+  // =====================================
 
-	    public DireccionUsuario obtenerPrincipalOPrimera(Integer idUsuario) {
+  @Transactional
+  public void eliminarDireccion(Integer idDireccionUsuario, Integer idUsuario) {
 
-	        List<DireccionUsuario> direcciones =listarPorUsuario(idUsuario);
+    // Verificamos que pertenezca
+    // realmente al usuario.
 
-	        if (direcciones.isEmpty()) {
-	            return null;
-	        }
+    DireccionUsuario direccion = obtenerDireccionUsuario(idDireccionUsuario, idUsuario);
 
-	        // Como el Repository ordena
-	        // principal DESC, la primera
-	        // será la principal.
-	        return direcciones.get(0);
-	    }
-	 // =====================================
-	    // ELIMINAR DIRECCIÓN
-	    // =====================================
+    boolean eraPrincipal = Boolean.TRUE.equals(direccion.getPrincipal());
 
-	    @Transactional
-	    public void eliminarDireccion(
-	            Integer idDireccionUsuario,
-	            Integer idUsuario) {
+    direccionUsuarioRepository.delete(direccion);
 
+    direccionUsuarioRepository.flush();
 
-	        // Verificamos que pertenezca
-	        // realmente al usuario.
+    // Si eliminó la principal,
+    // elegimos otra.
 
-	        DireccionUsuario direccion =
-	                obtenerDireccionUsuario(
-	                        idDireccionUsuario,
-	                        idUsuario
-	                );
+    if (eraPrincipal) {
 
+      List<DireccionUsuario> restantes = listarPorUsuario(idUsuario);
 
-	        boolean eraPrincipal =
-	                Boolean.TRUE.equals(
-	                    direccion.getPrincipal()
-	                );
+      if (!restantes.isEmpty()) {
 
+        DireccionUsuario nuevaPrincipal = restantes.get(0);
 
-	        direccionUsuarioRepository.delete(
-	                direccion
-	        );
+        nuevaPrincipal.setPrincipal(true);
 
+        direccionUsuarioRepository.save(nuevaPrincipal);
+      }
+    }
+  }
 
-	        direccionUsuarioRepository.flush();
+  public DireccionUsuario obtenerPorIdYUsuario(Integer idDireccionUsuario, Integer idUsuario) {
 
-
-	        // Si eliminó la principal,
-	        // elegimos otra.
-
-	        if (eraPrincipal) {
-
-	            List<DireccionUsuario> restantes =
-	                    listarPorUsuario(
-	                            idUsuario
-	                    );
-
-
-	            if (!restantes.isEmpty()) {
-
-	                DireccionUsuario nuevaPrincipal =
-	                        restantes.get(0);
-
-
-	                nuevaPrincipal.setPrincipal(
-	                        true
-	                );
-
-
-	                direccionUsuarioRepository.save(
-	                        nuevaPrincipal
-	                );
-	            }
-	        }
-	    }
-	    public DireccionUsuario obtenerPorIdYUsuario(
-	            Integer idDireccionUsuario,
-	            Integer idUsuario) {
-
-
-	        return direccionUsuarioRepository
-	                .findByIdDireccionUsuarioAndUsuarioIdUsuario(
-	                    idDireccionUsuario,
-	                    idUsuario
-	                )
-	                .orElseThrow(
-	                    () -> new RuntimeException(
-	                        "La dirección seleccionada no existe."
-	                    )
-	                );
-	    }
-	    
-	    
-	}
+    return direccionUsuarioRepository
+        .findByIdDireccionUsuarioAndUsuarioIdUsuario(idDireccionUsuario, idUsuario)
+        .orElseThrow(() -> com.proyecto.security.BusinessException.missing());
+  }
+}

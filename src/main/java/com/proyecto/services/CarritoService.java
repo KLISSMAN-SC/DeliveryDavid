@@ -1,272 +1,108 @@
 package com.proyecto.services;
 
+import com.proyecto.model.*;
+import com.proyecto.repository.*;
+import com.proyecto.security.*;
 import java.time.LocalDateTime;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.proyecto.model.Carrito;
-import com.proyecto.model.DetalleCarrito;
-import com.proyecto.model.Negocio;
-import com.proyecto.model.Producto;
-import com.proyecto.model.Usuario;
-import com.proyecto.repository.CarritoRepository;
-import com.proyecto.repository.DetalleCarritoRepository;
-import com.proyecto.repository.NegocioRepository;
-import com.proyecto.repository.ProductoRepository;
-
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CarritoService {
-	 
-	@Autowired
-	 private CarritoRepository carritoRepository;
+  private final CarritoRepository carts;
+  private final ProductoRepository products;
+  private final NegocioRepository businesses;
+  private final UsuarioRepository users;
 
-	 @Autowired
-	 private DetalleCarritoRepository detalleCarritoRepository;
+  public CarritoService(
+      CarritoRepository carts,
+      ProductoRepository products,
+      NegocioRepository businesses,
+      UsuarioRepository users) {
+    this.carts = carts;
+    this.products = products;
+    this.businesses = businesses;
+    this.users = users;
+  }
 
-	 @Autowired
-	 private ProductoRepository productoRepository;
+  public static void availableBusiness(Negocio n) {
+    if (!"ABIERTO".equals(n.obtenerEstadoReal())
+        || n.getTipoNegocio() == null
+        || !Boolean.TRUE.equals(n.getTipoNegocio().getEstado()))
+      throw BusinessException.invalid("El negocio no está disponible para recibir pedidos.");
+  }
 
-	 @Autowired
-	 private NegocioRepository negocioRepository;
-	 
-	 public Carrito obtenerOCrearCarrito(
-	            Integer idUsuario,
-	            Integer idNegocio) {
+  @Transactional
+  public Carrito agregarProducto(Integer user, Integer business, Integer product) {
+    var n = businesses.findById(business).orElseThrow(BusinessException::missing);
+    availableBusiness(n);
+    var p = products.findById(product).orElseThrow(BusinessException::missing);
+    if (!p.getNegocio().getIdNegocio().equals(business) || !Boolean.TRUE.equals(p.getDisponible()))
+      throw BusinessException.invalid("El producto no está disponible en este negocio.");
+    InputChecks.money(p.getPrecio());
+    var c =
+        carts
+            .findActiveForUpdate(user, business)
+            .orElseGet(
+                () -> {
+                  var fresh = new Carrito();
+                  fresh.setUsuario(users.getReferenceById(user));
+                  fresh.setNegocio(n);
+                  fresh.setEstado("ACTIVO");
+                  fresh.setFechaCreacion(LocalDateTime.now());
+                  fresh.setFechaActualizacion(LocalDateTime.now());
+                  return carts.saveAndFlush(fresh);
+                });
+    var detail =
+        c.getDetalles().stream()
+            .filter(d -> d.getProducto().getIdProducto().equals(product))
+            .findFirst()
+            .orElse(null);
+    if (detail != null) {
+      if (detail.getCantidad() >= 99)
+        throw BusinessException.invalid("Máximo 99 unidades por producto.");
+      detail.setCantidad(detail.getCantidad() + 1);
+      detail.setPrecioUnitario(p.getPrecio());
+    } else {
+      if (c.getDetalles().size() >= 100)
+        throw BusinessException.invalid("El carrito alcanzó el límite de productos.");
+      detail = new DetalleCarrito();
+      detail.setCarrito(c);
+      detail.setProducto(p);
+      detail.setCantidad(1);
+      detail.setPrecioUnitario(p.getPrecio());
+      c.getDetalles().add(detail);
+    }
+    return carts.saveAndFlush(c);
+  }
 
-	        return carritoRepository
-	                .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(
-	                        idUsuario,
-	                        idNegocio,
-	                        "ACTIVO"
-	                )
-	                .orElseGet(() -> {
+  private Carrito locked(Integer u, Integer b) {
+    return carts.findActiveForUpdate(u, b).orElseThrow(BusinessException::missing);
+  }
 
-	                    Usuario usuario = new Usuario();
-	                    usuario.setIdUsuario(idUsuario);
+  @Transactional
+  public Carrito disminuirProducto(Integer u, Integer b, Integer p) {
+    var c = locked(u, b);
+    var d =
+        c.getDetalles().stream()
+            .filter(x -> x.getProducto().getIdProducto().equals(p))
+            .findFirst()
+            .orElseThrow(BusinessException::missing);
+    if (d.getCantidad() > 1) d.setCantidad(d.getCantidad() - 1);
+    else c.getDetalles().remove(d);
+    return carts.saveAndFlush(c);
+  }
 
-	                    Negocio negocio = negocioRepository
-	                            .findById(idNegocio)
-	                            .orElseThrow(() ->
-	                                new RuntimeException(
-	                                    "No existe el negocio"
-	                                )
-	                            );
+  @Transactional
+  public Carrito eliminarProducto(Integer u, Integer b, Integer p) {
+    var c = locked(u, b);
+    if (!c.getDetalles().removeIf(x -> x.getProducto().getIdProducto().equals(p)))
+      throw BusinessException.missing();
+    return carts.saveAndFlush(c);
+  }
 
-	                    Carrito carrito = new Carrito();
-
-	                    carrito.setUsuario(usuario);
-	                    carrito.setNegocio(negocio);
-	                    carrito.setEstado("ACTIVO");
-	                    carrito.setFechaCreacion(LocalDateTime.now());
-	                    carrito.setFechaActualizacion(LocalDateTime.now());
-
-	                    return carritoRepository.save(carrito);
-	                });
-	    }
-
-
-	// =====================================================
-	    // AGREGAR PRODUCTO (Optimizado)
-	    // =====================================================
-	    @Transactional
-	    public Carrito agregarProducto(
-	            Integer idUsuario,
-	            Integer idNegocio,
-	            Integer idProducto) {
-
-
-	        Carrito carrito =
-	                obtenerOCrearCarrito(
-	                        idUsuario,
-	                        idNegocio
-	                );
-
-
-	        Producto producto =
-	                productoRepository
-	                .findById(idProducto)
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "Producto no encontrado"
-	                    )
-	                );
-
-
-	        if (!producto
-	                .getNegocio()
-	                .getIdNegocio()
-	                .equals(idNegocio)) {
-
-	            throw new RuntimeException(
-	                "El producto no pertenece al negocio"
-	            );
-	        }
-
-	        // Lógica JPA pura en lugar del Query nativo: Buscar si existe
-	        DetalleCarrito detalleExistente = detalleCarritoRepository
-	                .findByCarritoIdCarritoAndProductoIdProducto(carrito.getIdCarrito(), producto.getIdProducto())
-	                .orElse(null);
-
-	        if (detalleExistente != null) {
-	            // SI EXISTE: Actualizamos cantidad
-	            detalleExistente.setCantidad(detalleExistente.getCantidad() + 1);
-	            detalleCarritoRepository.save(detalleExistente);
-	        } else {
-	            // SI NO EXISTE: Lo creamos
-	            DetalleCarrito nuevoDetalle = new DetalleCarrito();
-	            nuevoDetalle.setCarrito(carrito);
-	            nuevoDetalle.setProducto(producto);
-	            nuevoDetalle.setCantidad(1);
-	            nuevoDetalle.setPrecioUnitario(producto.getPrecio());
-	            detalleCarritoRepository.save(nuevoDetalle);
-	        }
-
-	        // Actualizar la fecha del carrito
-	        carrito.setFechaActualizacion(LocalDateTime.now());
-	        carritoRepository.save(carrito);
-
-	        // MUY IMPORTANTE:
-	        // volver a consultar el carrito actualizado
-	        return carritoRepository
-	                .buscarCarritoCompleto(
-	                        idUsuario,
-	                        idNegocio
-	                )
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "No se pudo recuperar el carrito"
-	                    )
-	                );
-	    }
-	 
-	 public Carrito disminuirProducto(
-		        Integer idUsuario,
-		        Integer idNegocio,
-		        Integer idProducto) {
-
-		    // 1. Buscar el carrito activo
-		    Carrito carrito = carritoRepository
-		            .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(
-		                    idUsuario,
-		                    idNegocio,
-		                    "ACTIVO"
-		            )
-		            .orElseThrow(() ->
-		                    new RuntimeException("No existe carrito activo")
-		            );
-
-
-		    // 2. Buscar el producto dentro del carrito
-		    DetalleCarrito detalle = detalleCarritoRepository
-		            .findByCarritoIdCarritoAndProductoIdProducto(
-		                    carrito.getIdCarrito(),
-		                    idProducto
-		            )
-		            .orElseThrow(() ->
-		                    new RuntimeException(
-		                            "El producto no existe en el carrito"
-		                    )
-		            );
-
-
-		    // 3. Si hay más de uno, restamos
-		    if (detalle.getCantidad() > 1) {
-
-		        detalle.setCantidad(
-		                detalle.getCantidad() - 1
-		        );
-
-		        detalleCarritoRepository.save(detalle);
-
-		    } else {
-
-		        // Si cantidad = 1, se elimina completamente
-		        detalleCarritoRepository.delete(detalle);
-
-		        // También lo quitamos de la lista que está en memoria
-		        carrito.getDetalles().removeIf(
-		                d -> d.getIdDetalleCarrito()
-		                        .equals(detalle.getIdDetalleCarrito())
-		        );
-		    }
-
-
-		    carrito.setFechaActualizacion(
-		            LocalDateTime.now()
-		    );
-
-		    carritoRepository.save(carrito);
-
-
-		    return carrito;
-		}
-	 public Carrito eliminarProducto(
-		        Integer idUsuario,
-		        Integer idNegocio,
-		        Integer idProducto) {
-
-		    // Buscar carrito activo
-		    Carrito carrito = carritoRepository
-		            .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(
-		                    idUsuario,
-		                    idNegocio,
-		                    "ACTIVO"
-		            )
-		            .orElseThrow(() ->
-		                    new RuntimeException("No existe carrito activo")
-		            );
-
-
-		    // Buscar detalle
-		    DetalleCarrito detalle = detalleCarritoRepository
-		            .findByCarritoIdCarritoAndProductoIdProducto(
-		                    carrito.getIdCarrito(),
-		                    idProducto
-		            )
-		            .orElseThrow(() ->
-		                    new RuntimeException(
-		                            "El producto no existe en el carrito"
-		                    )
-		            );
-
-
-		    // Eliminar completamente
-		    detalleCarritoRepository.delete(detalle);
-
-
-		    // Actualizar carrito
-		    carrito.setFechaActualizacion(
-		            LocalDateTime.now()
-		    );
-
-		    carritoRepository.save(carrito);
-
-
-		    // Volver a consultar para devolverlo actualizado
-		    return obtenerCarritoActual(
-		            idUsuario,
-		            idNegocio
-		    );
-		}
-
-
-	    // =====================================================
-	    // OBTENER CARRITO ACTUAL
-	    // =====================================================
-
-	    public Carrito obtenerCarritoActual(
-	            Integer idUsuario,
-	            Integer idNegocio) {
-
-	        return carritoRepository
-	                .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(
-	                        idUsuario,
-	                        idNegocio,
-	                        "ACTIVO"
-	                )
-	                .orElse(null);
-	    }
+  @Transactional(readOnly = true)
+  public Carrito obtenerCarritoActual(Integer u, Integer b) {
+    return carts.findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(u, b, "ACTIVO").orElse(null);
+  }
 }

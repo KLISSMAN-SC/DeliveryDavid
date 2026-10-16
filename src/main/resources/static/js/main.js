@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         timeoutId = setTimeout(() => {
-            fetch(`/api/negocios/buscar?q=${encodeURIComponent(query)}`)
+            secureFetch(`/api/negocios/buscar?q=${encodeURIComponent(query)}`)
             .then(res => res.json())
             .then(data => {
                 dropdownResultados.innerHTML = "";
@@ -119,53 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     dropdownResultados.innerHTML = `<div class="search-no-results">No se encontraron resultados</div>`;
                 } else {
 					data.forEach(negocio => {
-					    const div = document.createElement("div");
-					    const estaCerrado = negocio.estado === 'CERRADO';
-					    div.className = estaCerrado ? "search-item search-item-cerrado" : "search-item";
-					    
-					    let imagenHTML = "";
-					    const filtroEstilo = estaCerrado ? 'filter: grayscale(90%);' : '';
-					    const lockOverlay = estaCerrado ? '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; border-radius: 6px;"><i class="fa-solid fa-lock" style="font-size: 14px; color: #ff5555;"></i></div>' : '';
-
-					    if (negocio.imagenLogo && negocio.imagenLogo.trim() !== "") {
-					        imagenHTML = '<div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">' +
-					                     '<img src="/api/imagenes/' + negocio.imagenLogo.trim() + '" class="search-item-img" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; ' + filtroEstilo + '">' +
-					                     lockOverlay +
-					                     '</div>';
-					    } else {
-					        imagenHTML = '<div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 6px; ' + filtroEstilo + '">' +
-					                     '<i class="fa-solid fa-image"></i>' +
-					                     lockOverlay +
-					                     '</div>';
-					    }
-					                      
-					    const badgeBg = estaCerrado ? 'rgba(255,85,85,0.1)' : 'rgba(0,255,0,0.1)';
-					    const badgeColor = estaCerrado ? '#ff5555' : '#00ff00';
-					    const clickAttr = estaCerrado ? '' : 'onclick="abrirRestaurante(' + negocio.id + ')"';
-
-					    div.innerHTML = imagenHTML +
-					        '<div class="search-item-info" ' + clickAttr + ' style="flex-grow: 1; overflow: hidden;">' +
-					            '<div style="display: flex; justify-content: space-between; align-items: center;">' +
-					                '<span class="search-item-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + negocio.nombre + '</span>' +
-					                '<span style="font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 10px; background: ' + badgeBg + '; color: ' + badgeColor + ';">' + negocio.estado + '</span>' +
-					            '</div>' +
-					            '<span class="search-item-sub" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + negocio.tipo + ' - ' + negocio.direccion + '</span>' +
-					        '</div>';
-					    
-					    if (estaCerrado) {
-					        div.style.cursor = 'not-allowed';
-					        div.style.opacity = '0.75';
-					        div.style.filter = 'grayscale(80%)';
-					        div.style.pointerEvents = 'none';
-					    } else {
-					        div.addEventListener('click', () => {
-					            inputBuscar.value = negocio.nombre;
-					            dropdownResultados.style.display = 'none';
-					        });
-					    }
-
-					    dropdownResultados.appendChild(div);
-					});
+ const div=document.createElement('div');const closed=negocio.estado==='CERRADO';div.className=closed?'search-item search-item-cerrado':'search-item';
+ const id=Number(negocio.id);if(!Number.isSafeInteger(id)||id<1)return;
+ if(typeof negocio.imagenLogo==='string'&&/^[a-zA-Z0-9_. -]+\.(png|jpe?g|webp|gif)$/i.test(negocio.imagenLogo)){
+  const image=document.createElement('img');image.src='/api/imagenes/'+encodeURIComponent(negocio.imagenLogo);image.className='search-item-img';image.alt='Logo';div.append(image);
+ }
+ const info=document.createElement('div');info.className='search-item-info';
+ const title=document.createElement('span');title.className='search-item-title';title.textContent=negocio.nombre;
+ const status=document.createElement('span');status.textContent=negocio.estado;
+ const sub=document.createElement('span');sub.className='search-item-sub';sub.textContent=negocio.tipo+' - '+negocio.direccion;info.append(title,status,sub);div.append(info);
+ if(!closed)div.addEventListener('click',()=>{inputBuscar.value=negocio.nombre;dropdownResultados.style.display='none';abrirRestaurante(id);});
+ dropdownResultados.appendChild(div);
+});
                 }
                 dropdownResultados.style.display = "block";
             })
@@ -654,7 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // MODAL CRUD PRODUCTOS
 // ==========================================
-function abrirModalProducto(id, nombre, descripcion, precio, disponible, idNegocio, idCategoria) {
+function abrirModalProducto(id, nombre, descripcion, precio, disponible, idNegocio, idCategoria, seccionMenu) {
+    document.getElementById("inputSeccionMenu").value = seccionMenu || "PRINCIPAL";
     if (id) {
         document.getElementById('tituloModalProducto').innerText = 'Editar Producto';
         document.getElementById('inputIdProducto').value = id;

@@ -1,463 +1,158 @@
 package com.proyecto.services;
 
+import com.proyecto.model.*;
+import com.proyecto.model.Pedido.EstadoPedido;
+import com.proyecto.repository.*;
+import com.proyecto.security.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.proyecto.dto.ResultadoDelivery;
-import com.proyecto.model.Carrito;
-import com.proyecto.model.DetalleCarrito;
-import com.proyecto.model.DetallePedido;
-import com.proyecto.model.DireccionUsuario;
-import com.proyecto.model.Pedido;
-import com.proyecto.model.Pedido.EstadoPedido;
-import com.proyecto.repository.CarritoRepository;
-import com.proyecto.repository.DetallePedidoRepository;
-import com.proyecto.repository.PedidoRepository;
-
-
-
 @Service
 public class PedidoService {
-	 
-		@Autowired
-	    private PedidoRepository pedidoRepository;
-		
-		@Autowired
-		private DeliveryService deliveryService;
-
-	    @Autowired
-	    private DetallePedidoRepository
-	            detallePedidoRepository;
-
-
-	    @Autowired
-	    private CarritoRepository
-	            carritoRepository;
-
-
-	    @Autowired
-	    private DireccionUsuarioService
-	            direccionUsuarioService;
-
-
-	    public Carrito obtenerCarritoCheckout(
-	            Integer idUsuario,
-	            Integer idNegocio) {
-
-	        return carritoRepository
-	                .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(
-	                        idUsuario,
-	                        idNegocio,
-	                        "ACTIVO"
-	                )
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "No existe carrito activo"
-	                    )
-	                );
-	    }
-
-
-	    // ==========================================
-	    // SUBTOTAL
-	    // ==========================================
-
-	    public BigDecimal calcularSubtotal(
-	            Carrito carrito) {
-
-	        return carrito
-	                .getDetalles()
-	                .stream()
-
-	                .map(detalle ->
-
-	                    detalle.getPrecioUnitario()
-	                    .multiply(
-	                        BigDecimal.valueOf(
-	                            detalle.getCantidad()
-	                        )
-	                    )
-
-	                )
-
-	                .reduce(
-	                    BigDecimal.ZERO,
-	                    BigDecimal::add
-	                );
-	    }
-
-
-	    // ==========================================
-	    // CONFIRMAR PEDIDO
-	    // ==========================================
-
-	    @Transactional
-	    public Pedido confirmarPedido(
-
-	            Integer idUsuario,
-	            Integer idNegocio,
-	            Integer idDireccionUsuario,
-	            String metodoPago,
-	            BigDecimal propina) {
-
-
-	        // =====================================
-	        // 1. OBTENER CARRITO
-	        // =====================================
-
-	        Carrito carrito =
-	                obtenerCarritoCheckout(
-	                        idUsuario,
-	                        idNegocio
-	                );
-
-
-	        if (carrito.getDetalles() == null ||
-	            carrito.getDetalles().isEmpty()) {
-
-	            throw new RuntimeException(
-	                    "El carrito está vacío"
-	            );
-	        }
-
-
-	        // =====================================
-	        // 2. DIRECCIÓN
-	        // =====================================
-
-	        DireccionUsuario direccion =
-	                direccionUsuarioService
-	                .obtenerDireccionUsuario(
-	                        idDireccionUsuario,
-	                        idUsuario
-	                );
-
-
-	        // =====================================
-	        // 3. TOTALES
-	        // =====================================
-	        ResultadoDelivery resultado =
-	                deliveryService
-	                    .calcularDelivery(
-	                        carrito.getNegocio(),
-	                        direccion
-	                    );
-	        BigDecimal subtotal =
-	                calcularSubtotal(carrito);
-
-
-	        BigDecimal costoEnvio = resultado.costoEnvio();
-	                
-
-
-	        if (costoEnvio == null) {
-	            costoEnvio = BigDecimal.ZERO;
-	        }
-
-
-	        if (propina == null) {
-	            propina = BigDecimal.ZERO;
-	        }
-
-
-	        BigDecimal total =
-	                subtotal
-	                .add(costoEnvio)
-	                .add(propina);
-
-
-	        // =====================================
-	        // 4. INSERT PEDIDO
-	        // =====================================
-
-	        Pedido pedido =
-	                new Pedido();
-
-
-	        pedido.setUsuario(
-	                carrito.getUsuario()
-	        );
-
-	        pedido.setNegocio(
-	                carrito.getNegocio()
-	        );
-
-
-	        pedido.setEstadoPedido(
-	                EstadoPedido.PENDIENTE
-	        );
-
-
-	        pedido.setMetodoPago(
-	                metodoPago
-	        );
-
-
-	        pedido.setCostoEnvio(
-	                costoEnvio
-	        );
-
-
-	        pedido.setPropina(
-	                propina
-	        );
-
-
-	        pedido.setTotal(
-	                total
-	        );
-
-
-	        // Copia histórica de dirección
-
-	        pedido.setDireccionEnvio(
-	                direccion.getDireccion()
-	        );
-
-	        pedido.setReferencia(
-	                direccion.getReferencia()
-	        );
-
-	        pedido.setLatitudEnvio(
-	                direccion.getLatitud()
-	        );
-
-	        pedido.setLongitudEnvio(
-	                direccion.getLongitud()
-	        );
-
-
-	        // Si tu fecha la maneja MySQL automáticamente,
-	        // NO pongas esto.
-	        //
-	        // pedido.setFechaHora(
-	        //        LocalDateTime.now()
-	        // );
-
-
-	        pedido =
-	            pedidoRepository.save(pedido);
-
-
-	        // =====================================
-	        // 5. DETALLE_CARRITO → DETALLE_PEDIDO
-	        // =====================================
-
-	        for (
-	            DetalleCarrito detalleCarrito
-	                : carrito.getDetalles()
-	        ) {
-
-	            DetallePedido detallePedido =
-	                    new DetallePedido();
-
-
-	            detallePedido.setPedido(
-	                    pedido
-	            );
-
-
-	            detallePedido.setProducto(
-	                    detalleCarrito.getProducto()
-	            );
-
-
-	            detallePedido.setCantidad(
-	                    detalleCarrito.getCantidad()
-	            );
-
-
-	            detallePedido.setPrecioUnitario(
-	                    detalleCarrito
-	                    .getPrecioUnitario()
-	            );
-
-
-	            BigDecimal subtotalDetalle =
-	                    detalleCarrito
-	                    .getPrecioUnitario()
-	                    .multiply(
-	                        BigDecimal.valueOf(
-	                            detalleCarrito
-	                            .getCantidad()
-	                        )
-	                    );
-
-
-	            detallePedido.setSubtotal(
-	                    subtotalDetalle
-	            );
-
-
-	            detallePedido.setNotaEspecial(
-	                    detalleCarrito
-	                    .getNotaEspecial()
-	            );
-
-
-	            detallePedidoRepository.save(
-	                    detallePedido
-	            );
-	        }
-
-
-	        // =====================================
-	        // 6. FINALIZAR CARRITO
-	        // =====================================
-
-	        carrito.setEstado(
-	                "FINALIZADO"
-	        );
-
-
-	        carritoRepository.save(
-	                carrito
-	        );
-
-
-	        return pedido;
-	    }
-	    @Transactional
-	    public Pedido cancelarPedido(
-	            Integer idPedido,
-	            Integer idUsuario) {
-
-
-	        Pedido pedido =
-	                pedidoRepository
-	                .findByIdPedidoAndUsuarioIdUsuario(
-	                        idPedido,
-	                        idUsuario
-	                )
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "Pedido no encontrado"
-	                    )
-	                );
-
-
-	        String estadoActual =
-	                pedido.getEstadoPedido().toString();
-
-
-	        // Ya cancelado
-	        if ("CANCELADO".equals(estadoActual)) {
-
-	            throw new RuntimeException(
-	                "El pedido ya se encuentra cancelado"
-	            );
-	        }
-
-
-	        // Ya entregado
-	        if ("ENTREGADO".equals(estadoActual)) {
-
-	            throw new RuntimeException(
-	                "Un pedido entregado no puede cancelarse"
-	            );
-	        }
-
-
-	        // Si ya salió a reparto, tampoco
-	        if ("EN_CAMINO".equals(estadoActual)) {
-
-	            throw new RuntimeException(
-	                "El pedido ya está en camino y no puede cancelarse"
-	            );
-	        }
-
-
-	        pedido.setEstadoPedido(
-	                EstadoPedido.CANCELADO
-	        );
-
-
-	        return pedidoRepository.save(
-	                pedido
-	        );
-
-	    }
-	    // ==========================================
-	    // OBTENER PEDIDO
-	    // ==========================================
-
-	    public Pedido obtenerPedido(
-	            Integer idPedido) {
-
-	        return pedidoRepository
-	                .findById(idPedido)
-	                .orElseThrow(() ->
-	                    new RuntimeException(
-	                        "Pedido no encontrado"
-	                    )
-	                );
-	    }
-	    public List<Pedido> listarPedidosUsuario(
-	            Integer idUsuario) {
-
-	        return pedidoRepository
-	                .findByUsuarioIdUsuarioOrderByIdPedidoDesc(
-	                        idUsuario
-	                );
-	    }
-
-
-	    // ==========================================
-	    // OBTENER DETALLES
-	    // ==========================================
-
-	    public List<DetallePedido>
-	    obtenerDetallesPedido(
-	            Integer idPedido) {
-
-	        return detallePedidoRepository
-	                .findByPedidoIdPedido(
-	                        idPedido
-	                );
-	    }
-	    public Map<Integer, List<DetallePedido>>
-	    obtenerDetallesAgrupados(
-	            List<Pedido> pedidos) {
-
-
-	        if (pedidos.isEmpty()) {
-
-	            return new HashMap<>();
-	        }
-
-
-	        List<Integer> idsPedidos =
-	                pedidos.stream()
-	                .map(Pedido::getIdPedido)
-	                .toList();
-
-
-	        List<DetallePedido> detalles =
-	                detallePedidoRepository
-	                .findByPedidoIdPedidoIn(
-	                        idsPedidos
-	                );
-
-
-	        return detalles.stream()
-	                .collect(
-	                    Collectors.groupingBy(
-	                        detalle ->
-	                            detalle
-	                            .getPedido()
-	                            .getIdPedido()
-	                    )
-	                );
-	    }
-	
-	 	
-	}
-
+  private final PedidoRepository pedidos;
+  private final CarritoRepository carts;
+  private final DetallePedidoRepository details;
+  private final DeliveryService delivery;
+  private final DireccionUsuarioService addresses;
+  private final SecurityAudit audit;
+
+  public PedidoService(
+      PedidoRepository pedidos,
+      CarritoRepository carts,
+      DetallePedidoRepository details,
+      DeliveryService delivery,
+      DireccionUsuarioService addresses,
+      SecurityAudit audit) {
+    this.pedidos = pedidos;
+    this.carts = carts;
+    this.details = details;
+    this.delivery = delivery;
+    this.addresses = addresses;
+    this.audit = audit;
+  }
+
+  public Carrito obtenerCarritoCheckout(Integer u, Integer n) {
+    return carts
+        .findByUsuarioIdUsuarioAndNegocioIdNegocioAndEstado(u, n, "ACTIVO")
+        .orElseThrow(BusinessException::missing);
+  }
+
+  public BigDecimal calcularSubtotal(Carrito c) {
+    BigDecimal total = BigDecimal.ZERO;
+    for (var d : c.getDetalles()) {
+      InputChecks.money(d.getPrecioUnitario());
+      if (d.getCantidad() == null || d.getCantidad() < 1 || d.getCantidad() > 99)
+        throw BusinessException.invalid("Cantidad no válida.");
+      total = total.add(d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())));
+    }
+    InputChecks.money(total);
+    return total;
+  }
+
+  @Transactional
+  public Pedido confirmarPedido(
+      Integer u,
+      Integer n,
+      Integer direccion,
+      String metodo,
+      BigDecimal propina,
+      Integer idCarrito) {
+    propina = propina == null ? BigDecimal.ZERO : propina;
+    InputChecks.money(propina);
+    if (propina.compareTo(new BigDecimal("1000")) > 0)
+      throw BusinessException.invalid("La propina supera el límite permitido.");
+    if (!Set.of("EFECTIVO", "YAPE", "PLIN").contains(metodo))
+      throw BusinessException.invalid("Método de pago no válido.");
+    Carrito c =
+        (idCarrito == null
+                ? carts.findActiveForUpdate(u, n)
+                : carts.findCartForUpdate(idCarrito, u, n))
+            .orElseThrow(BusinessException::missing);
+    if (!"ACTIVO".equals(c.getEstado())) {
+      return pedidos
+          .findByIdCarritoOrigen(c.getIdCarrito())
+          .filter(p -> p.getUsuario().getIdUsuario().equals(u))
+          .orElseThrow(
+              () -> new BusinessException(HttpStatus.CONFLICT, "Este carrito ya fue procesado."));
+    }
+    CarritoService.availableBusiness(c.getNegocio());
+    if (c.getDetalles().isEmpty()) throw BusinessException.invalid("El carrito está vacío.");
+    for (var d : c.getDetalles()) {
+      if (!Boolean.TRUE.equals(d.getProducto().getDisponible())
+          || !d.getProducto().getNegocio().getIdNegocio().equals(n))
+        throw BusinessException.invalid("Hay productos no disponibles.");
+      if (d.getProducto().getPrecio().compareTo(d.getPrecioUnitario()) != 0)
+        throw new BusinessException(
+            HttpStatus.CONFLICT, "El catálogo cambió. Actualiza el carrito antes de confirmar.");
+    }
+    var a = addresses.obtenerDireccionUsuario(direccion, u);
+    var calculation = delivery.calcularDelivery(c.getNegocio(), a);
+    InputChecks.money(calculation.costoEnvio());
+    var total = calcularSubtotal(c).add(calculation.costoEnvio()).add(propina);
+    InputChecks.money(total);
+    var p = new Pedido();
+    p.setIdCarritoOrigen(c.getIdCarrito());
+    p.setUsuario(c.getUsuario());
+    p.setNegocio(c.getNegocio());
+    p.setEstadoPedido(EstadoPedido.PENDIENTE);
+    p.setMetodoPago(metodo);
+    p.setPropina(propina);
+    p.setCostoEnvio(calculation.costoEnvio());
+    p.setTotal(total);
+    p.setDireccionEnvio(a.getDireccion());
+    p.setReferencia(a.getReferencia());
+    p.setLatitudEnvio(a.getLatitud());
+    p.setLongitudEnvio(a.getLongitud());
+    pedidos.saveAndFlush(p);
+    for (var d : c.getDetalles()) {
+      var item = new DetallePedido();
+      item.setPedido(p);
+      item.setProducto(d.getProducto());
+      item.setCantidad(d.getCantidad());
+      item.setPrecioUnitario(d.getPrecioUnitario());
+      item.setSubtotal(d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())));
+      item.setNotaEspecial(d.getNotaEspecial());
+      details.save(item);
+    }
+    c.setEstado("FINALIZADO");
+    carts.saveAndFlush(c);
+    audit.event("ORDER_CREATED", p.getIdPedido() + " user=" + u);
+    return p;
+  }
+
+  @Transactional
+  public Pedido cancelarPedido(Integer id, Integer u) {
+    var p = pedidos.findForCancel(id, u).orElseThrow(BusinessException::missing);
+    if (p.getEstadoPedido() == EstadoPedido.CANCELADO) return p;
+    if (!Set.of(EstadoPedido.PENDIENTE, EstadoPedido.CONFIRMADO).contains(p.getEstadoPedido()))
+      throw new BusinessException(HttpStatus.CONFLICT, "Este pedido ya no puede cancelarse.");
+    p.setEstadoPedido(EstadoPedido.CANCELADO);
+    pedidos.saveAndFlush(p);
+    audit.event("ORDER_CANCELLED", id + " user=" + u);
+    return p;
+  }
+
+  public Pedido obtenerPedidoUsuario(Integer id, Integer u) {
+    return pedidos.findByIdPedidoAndUsuarioIdUsuario(id, u).orElseThrow(BusinessException::missing);
+  }
+
+  public List<Pedido> listarPedidosUsuario(Integer u) {
+    return pedidos.findByUsuarioIdUsuarioOrderByIdPedidoDesc(u);
+  }
+
+  public List<DetallePedido> obtenerDetallesPedido(Integer id) {
+    return details.findByPedidoIdPedido(id);
+  }
+
+  public Map<Integer, List<DetallePedido>> obtenerDetallesAgrupados(List<Pedido> orders) {
+    if (orders.isEmpty()) return Map.of();
+    return details
+        .findByPedidoIdPedidoIn(orders.stream().map(Pedido::getIdPedido).toList())
+        .stream()
+        .collect(Collectors.groupingBy(d -> d.getPedido().getIdPedido()));
+  }
+}

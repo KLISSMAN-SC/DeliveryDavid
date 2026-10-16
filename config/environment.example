@@ -1,0 +1,14 @@
+# Copiar los nombres y definir los valores en Eclipse > Run Configurations > Environment.
+# Spring Boot no carga automáticamente este archivo. No guardar secretos reales en git.
+DB_URL=jdbc:mysql://localhost:3306/proyecto_david?connectionTimeZone=UTC
+DB_USERNAME=delivery_app
+DB_PASSWORD=DEFINIR_UN_SECRETO_NUEVO
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=DEFINIR_CORREO_EMISOR
+MAIL_PASSWORD=DEFINIR_CREDENCIAL_SMTP
+GOOGLE_MAPS_API_KEY=DEFINIR_CLAVE_RESTRINGIDA_POR_DOMINIO_Y_API
+APP_PUBLIC_BASE_URL=http://localhost:8080/api
+APP_STORAGE_ROOT=RIDE_MEAL
+APP_LOG_DIR=logs
+# En producción: SPRING_PROFILES_ACTIVE=prod y APP_PUBLIC_BASE_URL=https://tu-dominio/api

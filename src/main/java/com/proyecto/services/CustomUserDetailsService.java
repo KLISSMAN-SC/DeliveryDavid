@@ -1,61 +1,43 @@
 package com.proyecto.services;
 
-import com.proyecto.model.Usuario;
 import com.proyecto.repository.UsuarioRepository;
-
-// IMPORT CORREGIDO: Usando la clase nativa de Java
-import java.time.Duration; 
+import com.proyecto.security.AppUserPrincipal;
 import java.time.LocalDateTime;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+  private final UsuarioRepository users;
+  private final int lockMinutes;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+  public CustomUserDetailsService(
+      UsuarioRepository users, @Value("${app.security.login-lock-minutes:15}") int lockMinutes) {
+    this.users = users;
+    this.lockMinutes = lockMinutes;
+  }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
-        // Busca, y si el Optional está vacío, lanza la excepción de una vez
-        Usuario usuario = usuarioRepository.findByCorreoElectronico(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        // ==========================================
-        // VALIDACIÓN DE BLOQUEO (Las 5 horas)
-        // ==========================================
-        if (usuario.getFechaBloqueo() != null) {
-            LocalDateTime ahora = LocalDateTime.now();
-            Duration tiempoTranscurrido = Duration.between(usuario.getFechaBloqueo(), ahora);
-
-            if (tiempoTranscurrido.toHours() < 5) {
-                long horasRestantes = 5 - tiempoTranscurrido.toHours();
-                throw new RuntimeException("CUENTA_BLOQUEADA:" + horasRestantes);
-            } else {
-                usuario.setIntentosFallidos(0);
-                usuario.setFechaBloqueo(null);
-                usuarioRepository.save(usuario);
-            }
-        }
-
-        return User.builder()
-                .username(usuario.getCorreoElectronico())
-                .password(usuario.getPassword())
-                .roles(obtenerNombreRol(usuario.getRol().getIdRol()))
-                .build();
-    }
-    
-    // MÉTODO AUXILIAR AÑADIDO (Este era el que marcaba error en la línea 50)
-    private String obtenerNombreRol(Integer idRol) {
-        if(idRol == 1) return "ADMINISTRADOR";
-        if(idRol == 2) return "CLIENTE";
-        if(idRol == 3) return "REPARTIDOR";
-        return "USUARIO";
-    }
+  @Override
+  public UserDetails loadUserByUsername(String name) {
+    var u =
+        users
+            .findByCorreoElectronico(UserAccountService.normalizeEmail(name))
+            .orElseThrow(() -> new UsernameNotFoundException("Credenciales no válidas"));
+    if (u.getFechaBloqueo() != null
+        && u.getFechaBloqueo()
+            .plusMinutes(lockMinutes)
+            .isAfter(LocalDateTime.now(java.time.ZoneOffset.UTC)))
+      throw new LockedException("Credenciales no válidas");
+    if (u.getRol() == null) throw new UsernameNotFoundException("Credenciales no válidas");
+    String role =
+        switch (u.getRol().getIdRol()) {
+          case 1 -> "ADMINISTRADOR";
+          case 2 -> "CLIENTE";
+          case 3 -> "REPARTIDOR";
+          default -> throw new UsernameNotFoundException("Credenciales no válidas");
+        };
+    return new AppUserPrincipal(u, role);
+  }
 }

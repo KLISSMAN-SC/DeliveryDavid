@@ -32,3 +32,18 @@ build/
 ### VS Code ###
 .vscode/
 /RIDE_MEAL/
+
+# Seguridad: secretos, activos, resultados locales
+.env
+.env.*
+!environment.example
+RIDE_MEAL/
+logs/
+*.jks
+*.p12
+*.pem
+/ARCHIVOS_MODIFICADOS.txt
+/CHECKSUMS.sha256
+/INSTRUCCIONES.md
+/CORRECCIONES_OWASP.md
+/VERIFICACION.md

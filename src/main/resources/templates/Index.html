@@ -1,459 +1,332 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>DABLYN - Delivery</title>
-    
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-    
-    <!-- Conexión al archivo CSS externo -->
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" th:href="@{/css/mapa.css}">
-    <link rel="stylesheet" th:href="@{/css/direccion.css}">
-    <link rel="stylesheet" th:href="@{/css/pedidos.css}">
-    
-    <!-- Librería FontAwesome para los íconos de redes sociales -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
+<meta charset="utf-8"/>
+<title>DABLYN - Delivery</title>
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<!-- Conexión al archivo CSS externo -->
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/css/mapa.css}"/>
+<link rel="stylesheet" th:href="@{/css/direccion.css}"/>
+<link rel="stylesheet" th:href="@{/css/pedidos.css}"/>
+<!-- Librería FontAwesome para los íconos de redes sociales -->
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body>
 <!-- ===================================== -->
-    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
-    <!-- ===================================== -->
-    <div id="pantalla-carga">
-        <div class="loader-circulo"></div>
-    </div>
+<!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+<!-- ===================================== -->
+<div id="pantalla-carga">
+<div class="loader-circulo"></div>
+</div>
 <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR -->
-    <header class="header-principal">
-        
-        <!-- Logo estructurado -->
-        <div class="logo-container">
-            <!-- Si tienes la imagen del logo usa la etiqueta <img>, por ahora recreo el diseño visualmente -->
-            <img th:src="@{/banner/DablynDelivery.png}" alt="Logo Dablyn Delivery" style="height: 80px; width: auto; object-fit: contain;">
-        </div>
-        
-        <!-- Buscador mejorado (Más ancho y centrado) -->
-        <div class="search-wrapper">
-            <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar Negocio..." autocomplete="off">
-            </div>
-            <!-- Contenedor desplegable dinámico -->
-            <div id="dropdownResultados" class="search-dropdown"></div>
-        </div>
-		
-        <!-- Acciones de Usuario (Ubicación, Carrito, Login) -->
-        <div class="user-actions">
-            <button
-    	type="button"
-    	class="btn-agregar-direccion"
-    	onclick="abrirModalAgregarDireccion('inicio')">
-
-    	<i class="fa-solid fa-plus"></i>
+<header class="header-principal">
+<!-- Logo estructurado -->
+<div class="logo-container">
+<!-- Si tienes la imagen del logo usa la etiqueta <img>, por ahora recreo el diseño visualmente -->
+<img alt="Logo Dablyn Delivery" style="height: 80px; width: auto; object-fit: contain;" th:src="@{/banner/DablynDelivery.png}"/>
+</div>
+<!-- Buscador mejorado (Más ancho y centrado) -->
+<div class="search-wrapper">
+<div class="search-container">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input autocomplete="off" class="search-input" id="inputBuscar" placeholder="Buscar Negocio..." type="text"/>
+</div>
+<!-- Contenedor desplegable dinámico -->
+<div class="search-dropdown" id="dropdownResultados"></div>
+</div>
+<!-- Acciones de Usuario (Ubicación, Carrito, Login) -->
+<div class="user-actions">
+<button class="btn-agregar-direccion" data-arg0="inicio" data-argc="1" data-click="abrirModalAgregarDireccion" type="button">
+<i class="fa-solid fa-plus"></i>
 
    		Agregar dirección
 
 		</button>
-            <!-- Botón de WhatsApp Cabecera Dinámico -->
-            <a th:if="${configApp.telefonoSoporte != null}" 
-               th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=' + ${configApp.mensajeWspCabecera}}" 
-               target="_blank" class="btn-wsp-cabecera" title="Ayuda por WhatsApp">
-                <i class="fa-brands fa-whatsapp"></i>
-            </a>
-            
-    <!-- ==========================================
+<!-- Botón de WhatsApp Cabecera Dinámico -->
+<a class="btn-wsp-cabecera" target="_blank" th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&amp;text=' + ${configApp.mensajeWspCabecera}}" th:if="${configApp.telefonoSoporte != null}" title="Ayuda por WhatsApp">
+<i class="fa-brands fa-whatsapp"></i>
+</a>
+<!-- ==========================================
      USUARIO NO AUTENTICADO
      ========================================== -->
-<a th:if="${usuarioAutenticado == null}"
-   th:href="@{/login}"
-   class="btn-login"
-   style="text-decoration: none; display: inline-block; text-align: center;">
+<a class="btn-login" style="text-decoration: none; display: inline-block; text-align: center;" th:href="@{/login}" th:if="${usuarioAutenticado == null}">
     Iniciar sesión
 </a>
-
-
 <!-- ==========================================
      USUARIO AUTENTICADO (Menú Personalizado)
      ========================================== -->
-<div th:if="${usuarioAutenticado != null}" class="usuario-menu-custom">
-    
-    <!-- Botón visible -->
-    <div class="usuario-boton" onclick="toggleDropdown()">
-        <i class="fa-solid fa-circle-user usuario-icono"></i>
-        <span class="usuario-nombre" th:text="${usuarioAutenticado.nombres + ' ' + usuarioAutenticado.apellidos}">Usuario</span>
-        <i class="fa-solid fa-chevron-down flecha"></i>
-    </div>
-
-    <!-- Menú desplegable oculto -->
-    <div class="dropdown-contenido" id="menuUsuario">
-        <!-- Solo Admin/Repartidor -->
-        <a th:if="${usuarioAutenticado.rol.idRol == 1 or usuarioAutenticado.rol.idRol == 3}" th:href="@{/panel}">
-            <i class="fa-solid fa-chart-line"></i> Panel de Gestión
+<div class="usuario-menu-custom" th:if="${usuarioAutenticado != null}">
+<!-- Botón visible -->
+<div class="usuario-boton" data-argc="0" data-click="toggleDropdown">
+<i class="fa-solid fa-circle-user usuario-icono"></i>
+<span class="usuario-nombre" th:text="${usuarioAutenticado.nombres + ' ' + usuarioAutenticado.apellidos}">Usuario</span>
+<i class="fa-solid fa-chevron-down flecha"></i>
+</div>
+<!-- Menú desplegable oculto -->
+<div class="dropdown-contenido" id="menuUsuario">
+<!-- Solo Admin/Repartidor -->
+<a th:href="@{/panel}" th:if="${usuarioAutenticado.rol.idRol == 1 or usuarioAutenticado.rol.idRol == 3}">
+<i class="fa-solid fa-chart-line"></i> Panel de Gestión
         </a>
-        
-        <a th:href="@{/perfil}">
-            <i class="fa-solid fa-id-badge"></i> Mi Perfil
+<a th:href="@{/perfil}">
+<i class="fa-solid fa-id-badge"></i> Mi Perfil
         </a>
-        
-     
-         <a
-    	th:href="@{/pedido/mis-pedidos}"
-    	class="menu-usuario-opcion">
-
-    	<i class="fa-solid fa-bag-shopping"></i>
-
-    	<span>
+<a class="menu-usuario-opcion" th:href="@{/pedido/mis-pedidos}">
+<i class="fa-solid fa-bag-shopping"></i>
+<span>
         Mis pedidos
     	</span>
-
-		</a>
-       
-        
-        
-        <a
-    	th:href="@{/direcciones}"
-    	class="menu-usuario-opcion">
-
-    	<i class="fa-solid fa-location-dot"></i>
-
-    	<span>Mis direcciones</span>
-
-		</a>
-        
-        <div class="dropdown-divisor"></div>
-        
-        <!-- Botón de Cerrar Sesión que activa tu formulario oculto -->
-        <a href="#" onclick="document.getElementById('formLogout').submit(); return false;" class="logout-texto">
-            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+</a>
+<a class="menu-usuario-opcion" th:href="@{/direcciones}">
+<i class="fa-solid fa-location-dot"></i>
+<span>Mis direcciones</span>
+</a>
+<div class="dropdown-divisor"></div>
+<!-- Botón de Cerrar Sesión que activa tu formulario oculto -->
+<a class="logout-texto" data-submit-target="formLogout" href="#">
+<i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
         </a>
-    </div>
 </div>
-
-
+</div>
 <!-- Formulario oculto para cerrar sesión -->
-<form id="formLogout"
-      th:action="@{/logout}"
-      method="post"
-      style="display: none;">
+<form id="formLogout" method="post" style="display: none;" th:action="@{/logout}">
 </form>
-            
-        </div>
-    </header>
-	
-	<div id="contenido-principal">
-	
-    <hr>
-
-   <!-- 2. SECCIÓN DE BANNER -->
-    <section class="banner-principal">
-        <!-- Izquierda: Textos e Íconos -->
-        <div class="banner-contenido">
-            <h1>TODO LO QUE NECESITAS,<br><span style="color: var(--naranja-marca);">DIRECTO A TU PUERTA.</span></h1>
-            <p>Desde tu plato favorito hasta las compras del súper, farmacia y artículos para tu mascota. Lo llevamos donde estés, en minutos.</p>
-            
-            <div class="banner-features">
-                <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
-                    <div class="feature-text">
-                        <strong>Envíos rápidos</strong>
-                        <span>20 - 40 min</span>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-shield"></i></div>
-                    <div class="feature-text">
-                        <strong>Pagos seguros</strong>
-                        <span>100% confiable</span>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-location-dot"></i></div>
-                    <div class="feature-text">
-                        <strong>Seguimiento</strong>
-                        <span>Tu pedido en a tu casa</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Derecha: Carrusel de Promociones Dinámico -->
-        <div class="banner-promociones" style="padding: 0; background: transparent; border: none;">
-            
-            <div th:each="promo, iterStat : ${promocionesCarrusel}" 
-                 th:class="${iterStat.index == 0} ? 'promo-slide activo' : 'promo-slide'"
-                 style="position: relative; width: 100%; height: 100%; cursor: pointer;"
-                 th:data-negocio="${promo.negocio.idNegocio}"> <!-- Enlace limpio de JS -->
-                
-                <img th:src="@{'/promociones/' + ${promo.imagenBanner}}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;">
-                
-                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px; box-sizing: border-box; border-radius: 0 0 15px 15px;">
-                    <span class="promo-tag" style="margin-bottom: 5px;">DESTACADO</span>
-                    <h3 th:text="${promo.titulo}" style="font-size: 16px; margin: 0; text-shadow: 1px 1px 3px black;">TÍTULO</h3>
-                </div>
-            </div>
-
-            <div class="promo-dots" style="z-index: 10;">
-                <span th:each="promo, iterStat : ${promocionesCarrusel}" 
-                      th:class="${iterStat.index == 0} ? 'dot activo' : 'dot'" 
-                      th:onclick="'cambiarSlide(' + ${iterStat.index} + ')'"></span>
-            </div>
-        </div>
-    </section>
-
-    <hr>
-	<br>
-   <!-- 3. TIPOS DE NEGOCIO -->
-    <section>
-        <ul class="lista-tipos">
-            <li>
-                <a th:href="@{/(zonaId=${zonaSeleccionada})}" th:class="${tipoSeleccionado == null} ? 'btn-tipo seleccionado' : 'btn-tipo'">Todos</a>
-            </li>
-            <li th:each="tipo : ${listaTipos}">
-                <!-- Lógica para desmarcar: si ya es el seleccionado, pasa un null -->
-                <a th:href="@{/(tipoId=${tipoSeleccionado == tipo.idTipoNegocio ? null : tipo.idTipoNegocio}, zonaId=${zonaSeleccionada})}" 
-                   th:class="${tipoSeleccionado == tipo.idTipoNegocio} ? 'btn-tipo seleccionado' : 'btn-tipo'" 
-                   th:text="${tipo.nombre}"></a>
-            </li>
-        </ul>
-    </section>
-	<br>
-    <!-- 4. LUGARES (ZONAS) -->
-    <section>
-        <h2>Lugares</h2>
-        <ul class="lista-zonas">
-            <li>
-                <a th:href="@{/(tipoId=${tipoSeleccionado}, categoria=${categoriaSeleccionada})}" 
-                   th:class="${zonaSeleccionada == null} ? 'btn-zona seleccionado' : 'btn-zona'">Todas</a>
-            </li>
-            <li th:each="zona : ${listaZonas}">
-                <!-- Lógica para desmarcar -->
-                <a th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada == zona.idZona ? null : zona.idZona}, categoria=${categoriaSeleccionada})}" 
-                   th:class="${zonaSeleccionada == zona.idZona} ? 'btn-zona seleccionado' : 'btn-zona'" 
-                   th:text="${zona.nombre}"></a>
-            </li>
-        </ul>
-    </section>
-	<br>
-   <!-- 5. EXPLORA POR CATEGORÍA -->
-    <th:block th:if="${esRestaurante}">
-        <section>
-            <h2>Explora por categoría</h2>
-            <!-- Añadido padding-bottom para que la sombra del hover no se corte -->
-            <ul style="display: flex; gap: 15px; list-style: none; padding: 0 0 10px 0; margin: 0; overflow-x: auto;">
-                
-                <li th:each="nombreCategoria, iterStat : ${listaCategorias}" th:if="${iterStat.index < 7}">
-                    <!-- Nueva clase 'categoria-card' y lógica de desmarcado intacta -->
-                    <a th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada}, categoria=${categoriaSeleccionada == nombreCategoria ? null : nombreCategoria})}"
-                       th:class="${categoriaSeleccionada == nombreCategoria} ? 'categoria-card seleccionado' : 'categoria-card'">
-                        
-                        <!-- Llama a la imagen dinámicamente -->
-                        <img th:src="@{'/categorias_comidas/' + ${nombreCategoria} + '.png'}" 
-                             alt="Icono" 
-                             class="img-categoria">
-                        
-                        <span th:text="${nombreCategoria}"></span>
-                    </a>
-                </li>
-                
-                <!-- Botón de Ver más adaptado al nuevo diseño -->
-                <li id="btnAbrirFiltrosCaja" class="categoria-card" style="cursor: pointer;">
-                    <div class="icono-mas">📦</div>
-                    <span>Ver más</span>
-                </li>
-                
-            </ul>
-        </section>
-        <hr>
-    </th:block>
-
-   <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
-    <div id="modalFiltros" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="btnCancelarModal" class="btn-text">Cancelar</span>
-                <h3 class="modal-titulo">Todos los filtros</h3>
-                <span id="btnLimpiarModal" class="btn-text">Limpiar</span>
-            </div>
-            
-            <div class="modal-body">
-                <button class="filtro-pill" 
-                        th:each="nombreCategoria : ${listaCategorias}" 
-                        th:data-categoria="${nombreCategoria}"
-                        th:classappend="${categoriaSeleccionada == nombreCategoria} ? ' seleccionado' : ''"
-                        th:text="${#strings.toUpperCase(nombreCategoria)}">
+</div>
+</header>
+<div id="contenido-principal">
+<hr/>
+<!-- 2. SECCIÓN DE BANNER -->
+<section class="banner-principal">
+<!-- Izquierda: Textos e Íconos -->
+<div class="banner-contenido">
+<h1>TODO LO QUE NECESITAS,<br/><span style="color: var(--naranja-marca);">DIRECTO A TU PUERTA.</span></h1>
+<p>Desde tu plato favorito hasta las compras del súper, farmacia y artículos para tu mascota. Lo llevamos donde estés, en minutos.</p>
+<div class="banner-features">
+<div class="feature-item">
+<div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+<div class="feature-text">
+<strong>Envíos rápidos</strong>
+<span>20 - 40 min</span>
+</div>
+</div>
+<div class="feature-item">
+<div class="feature-icon"><i class="fa-solid fa-shield"></i></div>
+<div class="feature-text">
+<strong>Pagos seguros</strong>
+<span>100% confiable</span>
+</div>
+</div>
+<div class="feature-item">
+<div class="feature-icon"><i class="fa-solid fa-location-dot"></i></div>
+<div class="feature-text">
+<strong>Seguimiento</strong>
+<span>Tu pedido en a tu casa</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Derecha: Carrusel de Promociones Dinámico -->
+<div class="banner-promociones" style="padding: 0; background: transparent; border: none;">
+<div style="position: relative; width: 100%; height: 100%; cursor: pointer;" th:class="${iterStat.index == 0} ? 'promo-slide activo' : 'promo-slide'" th:data-negocio="${promo.negocio.idNegocio}" th:each="promo, iterStat : ${promocionesCarrusel}"> <!-- Enlace limpio de JS -->
+<img style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" th:src="@{'/promociones/' + ${promo.imagenBanner}}"/>
+<div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px; box-sizing: border-box; border-radius: 0 0 15px 15px;">
+<span class="promo-tag" style="margin-bottom: 5px;">DESTACADO</span>
+<h3 style="font-size: 16px; margin: 0; text-shadow: 1px 1px 3px black;" th:text="${promo.titulo}">TÍTULO</h3>
+</div>
+</div>
+<div class="promo-dots" style="z-index: 10;">
+<span data-argc="1" data-click="cambiarSlide" data-kind0="number" th:class="${iterStat.index == 0} ? 'dot activo' : 'dot'" th:data-arg0="${iterStat.index}" th:each="promo, iterStat : ${promocionesCarrusel}"></span>
+</div>
+</div>
+</section>
+<hr/>
+<br/>
+<!-- 3. TIPOS DE NEGOCIO -->
+<section>
+<ul class="lista-tipos">
+<li>
+<a th:class="${tipoSeleccionado == null} ? 'btn-tipo seleccionado' : 'btn-tipo'" th:href="@{/(zonaId=${zonaSeleccionada})}">Todos</a>
+</li>
+<li th:each="tipo : ${listaTipos}">
+<!-- Lógica para desmarcar: si ya es el seleccionado, pasa un null -->
+<a th:class="${tipoSeleccionado == tipo.idTipoNegocio} ? 'btn-tipo seleccionado' : 'btn-tipo'" th:href="@{/(tipoId=${tipoSeleccionado == tipo.idTipoNegocio ? null : tipo.idTipoNegocio}, zonaId=${zonaSeleccionada})}" th:text="${tipo.nombre}"></a>
+</li>
+</ul>
+</section>
+<br/>
+<!-- 4. LUGARES (ZONAS) -->
+<section>
+<h2>Lugares</h2>
+<ul class="lista-zonas">
+<li>
+<a th:class="${zonaSeleccionada == null} ? 'btn-zona seleccionado' : 'btn-zona'" th:href="@{/(tipoId=${tipoSeleccionado}, categoria=${categoriaSeleccionada})}">Todas</a>
+</li>
+<li th:each="zona : ${listaZonas}">
+<!-- Lógica para desmarcar -->
+<a th:class="${zonaSeleccionada == zona.idZona} ? 'btn-zona seleccionado' : 'btn-zona'" th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada == zona.idZona ? null : zona.idZona}, categoria=${categoriaSeleccionada})}" th:text="${zona.nombre}"></a>
+</li>
+</ul>
+</section>
+<br/>
+<!-- 5. EXPLORA POR CATEGORÍA -->
+<th:block th:if="${esRestaurante}">
+<section>
+<h2>Explora por categoría</h2>
+<!-- Añadido padding-bottom para que la sombra del hover no se corte -->
+<ul style="display: flex; gap: 15px; list-style: none; padding: 0 0 10px 0; margin: 0; overflow-x: auto;">
+<li th:each="nombreCategoria, iterStat : ${listaCategorias}" th:if="${iterStat.index &lt; 7}">
+<!-- Nueva clase 'categoria-card' y lógica de desmarcado intacta -->
+<a th:class="${categoriaSeleccionada == nombreCategoria} ? 'categoria-card seleccionado' : 'categoria-card'" th:href="@{/(tipoId=${tipoSeleccionado}, zonaId=${zonaSeleccionada}, categoria=${categoriaSeleccionada == nombreCategoria ? null : nombreCategoria})}">
+<!-- Llama a la imagen dinámicamente -->
+<img alt="Icono" class="img-categoria" th:src="@{'/categorias_comidas/' + ${nombreCategoria} + '.png'}"/>
+<span th:text="${nombreCategoria}"></span>
+</a>
+</li>
+<!-- Botón de Ver más adaptado al nuevo diseño -->
+<li class="categoria-card" id="btnAbrirFiltrosCaja" style="cursor: pointer;">
+<div class="icono-mas">📦</div>
+<span>Ver más</span>
+</li>
+</ul>
+</section>
+<hr/>
+</th:block>
+<!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
+<div class="modal-overlay" id="modalFiltros">
+<div class="modal-content">
+<div class="modal-header">
+<span class="btn-text" id="btnCancelarModal">Cancelar</span>
+<h3 class="modal-titulo">Todos los filtros</h3>
+<span class="btn-text" id="btnLimpiarModal">Limpiar</span>
+</div>
+<div class="modal-body">
+<button class="filtro-pill" th:classappend="${categoriaSeleccionada == nombreCategoria} ? ' seleccionado' : ''" th:data-categoria="${nombreCategoria}" th:each="nombreCategoria : ${listaCategorias}" th:text="${#strings.toUpperCase(nombreCategoria)}">
                     FILTRO
                 </button>
-            </div>
-            
-            <div class="modal-footer">
-                <button id="btnAceptarModal" class="btn-aceptar">Aceptar</button>
-            </div>
-        </div>
-    </div>
-
-    <hr>
-
-   <!-- 6. NEGOCIOS DISPONIBLES (Restaurantes desde BD) -->
-    <section>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Restaurantes cerca de ti</h2>
-            
-        </div>
-        
-        <div class="grid-restaurantes">
-            
-            <!-- Tarjeta generada automáticamente por cada negocio -->
-<article th:each="negocio : ${listaNegocios}" 
-         th:with="estadoReal=${negocio.obtenerEstadoReal()}"
-         th:classappend="${estadoReal == 'CERRADO'} ? ' tarjeta-cerrada' : ''"
-         class="tarjeta-restaurante" 
-         th:data-id="${negocio.idNegocio}" 
-         th:onclick="${estadoReal == 'ABIERTO'} ? 'abrirRestaurante(this.dataset.id)' : ''"
-         th:style="${estadoReal == 'ABIERTO'} ? 'cursor: pointer;' : 'cursor: not-allowed;'">	
- 	
-    <!-- Contenedor de Imagen -->
-    <div class="tarjeta-img-contenedor" style="position: relative;">
-        <img th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" 
-             th:src="@{'/imagenes/' + ${negocio.imagenLogo}}" 
-             alt="Logo del negocio">
-        
-        <div th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" class="tarjeta-placeholder">
-            <i class="fa-solid fa-image"></i>
-        </div>
-        
-        <!-- OVERLAY CERRADO (Fondo oscuro con Candado) -->
-<div th:if="${estadoReal == 'CERRADO'}" class="overlay-cerrado">
-    <i class="fa-solid fa-lock" style="font-size: 32px; color: #ccc;"></i>
-    <span style="font-size: 13px; font-weight: bold; margin-top: 8px; color: #ff5555; letter-spacing: 1px;">CERRADO</span>
-    
-    <!-- Mostrar Horario si está configurado -->
-    <div th:if="${negocio.horaInicio != null and negocio.horaFin != null}" style="margin-top: 8px; font-size: 11px; color: #ddd; text-align: center; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;">
-        Apertura: <span th:text="${#temporals.format(negocio.horaInicio, 'HH:mm')}"></span><br>
-        Cierre: <span th:text="${#temporals.format(negocio.horaFin, 'HH:mm')}"></span>
-    </div>
 </div>
-    </div>
-
-    <!-- Contenedor de Información -->
-    <div class="tarjeta-info">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
-            <h3 class="tarjeta-titulo" th:text="${negocio.nombre}" style="margin: 0; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Nombre Negocio</h3>
-            
-            <!-- Etiqueta de Estado Dinámica -->
-            <span th:style="${estadoReal == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;'" 
-                  th:text="${estadoReal}">
+<div class="modal-footer">
+<button class="btn-aceptar" id="btnAceptarModal">Aceptar</button>
+</div>
+</div>
+</div>
+<hr/>
+<!-- 6. NEGOCIOS DISPONIBLES (Restaurantes desde BD) -->
+<section>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<h2>Restaurantes cerca de ti</h2>
+</div>
+<div class="grid-restaurantes">
+<!-- Tarjeta generada automáticamente por cada negocio -->
+<article class="tarjeta-restaurante" data-argc="1" data-click="abrirRestaurante" data-from0="id" th:classappend="${estadoReal == 'CERRADO'} ? ' tarjeta-cerrada' : ''" th:data-enabled="${estadoReal == 'ABIERTO'}" th:data-id="${negocio.idNegocio}" th:each="negocio : ${listaNegocios}" th:style="${estadoReal == 'ABIERTO'} ? 'cursor: pointer;' : 'cursor: not-allowed;'" th:with="estadoReal=${negocio.obtenerEstadoReal()}">
+<!-- Contenedor de Imagen -->
+<div class="tarjeta-img-contenedor" style="position: relative;">
+<img alt="Logo del negocio" th:if="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}" th:src="@{'/imagenes/' + ${negocio.imagenLogo}}"/>
+<div class="tarjeta-placeholder" th:unless="${negocio.imagenLogo != null and !negocio.imagenLogo.isEmpty()}">
+<i class="fa-solid fa-image"></i>
+</div>
+<!-- OVERLAY CERRADO (Fondo oscuro con Candado) -->
+<div class="overlay-cerrado" th:if="${estadoReal == 'CERRADO'}">
+<i class="fa-solid fa-lock" style="font-size: 32px; color: #ccc;"></i>
+<span style="font-size: 13px; font-weight: bold; margin-top: 8px; color: #ff5555; letter-spacing: 1px;">CERRADO</span>
+<!-- Mostrar Horario si está configurado -->
+<div style="margin-top: 8px; font-size: 11px; color: #ddd; text-align: center; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;" th:if="${negocio.horaInicio != null and negocio.horaFin != null}">
+        Apertura: <span th:text="${#temporals.format(negocio.horaInicio, 'HH:mm')}"></span><br/>
+        Cierre: <span th:text="${#temporals.format(negocio.horaFin, 'HH:mm')}"></span>
+</div>
+</div>
+</div>
+<!-- Contenedor de Información -->
+<div class="tarjeta-info">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+<h3 class="tarjeta-titulo" style="margin: 0; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" th:text="${negocio.nombre}">Nombre Negocio</h3>
+<!-- Etiqueta de Estado Dinámica -->
+<span th:style="${estadoReal == 'ABIERTO'} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555; font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: bold;'" th:text="${estadoReal}">
+</span>
+</div>
+<!-- Subtítulo con separador de punto medio (•) -->
+<p class="tarjeta-subtitulo" style="margin-top: 0;" th:text="${negocio.tipoNegocio.nombre + ' • ' + negocio.direccion}">Categoría • Dirección</p>
+<!-- Pie de tarjeta con tiempo y precio alineados a los extremos -->
+<div class="tarjeta-footer">
+<span class="tarjeta-tiempo">
+<i class="fa-regular fa-clock"></i> 25 - 40 min
             </span>
-        </div>
-        
-        <!-- Subtítulo con separador de punto medio (•) -->
-        <p class="tarjeta-subtitulo" th:text="${negocio.tipoNegocio.nombre + ' • ' + negocio.direccion}" style="margin-top: 0;">Categoría • Dirección</p>
-        
-        <!-- Pie de tarjeta con tiempo y precio alineados a los extremos -->
-        <div class="tarjeta-footer">
-            <span class="tarjeta-tiempo">
-                <i class="fa-regular fa-clock"></i> 25 - 40 min
-            </span>
-            <span class="tarjeta-precio">S/ <span th:text="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : '10.00'}">0.00</span></span>
-        </div>
-    </div>
+<span class="tarjeta-precio">S/ <span th:text="${configApp.precioBaseDelivery != null ? configApp.precioBaseDelivery : '10.00'}">0.00</span></span>
+</div>
+</div>
 </article>
-
-        </div>
-        <!-- NUEVO: Contenedor del botón "Ver más" -->
-        <div class="contenedor-ver-mas" id="contenedorVerMas" style="display: none;">
-            <button id="btnVerMasRestaurantes" class="btn-ver-mas">
+</div>
+<!-- NUEVO: Contenedor del botón "Ver más" -->
+<div class="contenedor-ver-mas" id="contenedorVerMas" style="display: none;">
+<button class="btn-ver-mas" id="btnVerMasRestaurantes">
                 Ver más restaurantes <i class="fa-solid fa-chevron-down"></i>
-            </button>
-        </div>
-    </section>
-    <!-- ... Fin de la sección de Negocios ... -->
-   	<section id="contenedor-productos">
-
-	</section>
-	
-	</div>
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-izq">
-            <div>
-                <strong>Dablyn Delivery</strong>
-            </div>
-            <p>Comida que encaja con tu día.</p>
-            
-            <!-- Íconos de Redes Sociales Dinámicos -->
-            <div class="redes-sociales">
-                <a th:if="${configApp.linkFacebook != null and !configApp.linkFacebook.isEmpty()}" th:href="${configApp.linkFacebook}" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                <a th:if="${configApp.linkInstagram != null and !configApp.linkInstagram.isEmpty()}" th:href="${configApp.linkInstagram}" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a th:if="${configApp.linkTiktok != null and !configApp.linkTiktok.isEmpty()}" th:href="${configApp.linkTiktok}" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                
-                <a th:if="${configApp.telefonoSoporte != null}" 
-                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=' + ${configApp.mensajeWspFooter}}" 
-                   target="_blank" title="WhatsApp Soporte"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
-            
-            <p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Dablyn Delivery</p>
-        </div>
-        
-        <div class="footer-der">
-            <div class="footer-enlaces">
-                <!-- Enlace de Ayuda -->
-                <a th:if="${configApp != null and configApp.telefonoSoporte != null}" 
-                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=Hola,%20necesito%20ayuda%20con%20la%20plataforma%20Dablyn%20Delivery.'}" 
-                   target="_blank" rel="noopener noreferrer">
+</button>
+</div>
+</section>
+<!-- ... Fin de la sección de Negocios ... -->
+<section id="contenedor-productos">
+</section>
+</div>
+<!-- FOOTER -->
+<footer>
+<div class="footer-izq">
+<div>
+<strong>Dablyn Delivery</strong>
+</div>
+<p>Comida que encaja con tu día.</p>
+<!-- Íconos de Redes Sociales Dinámicos -->
+<div class="redes-sociales">
+<a target="_blank" th:href="${configApp.linkFacebook}" th:if="${configApp.linkFacebook != null and !configApp.linkFacebook.isEmpty()}" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+<a target="_blank" th:href="${configApp.linkInstagram}" th:if="${configApp.linkInstagram != null and !configApp.linkInstagram.isEmpty()}" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+<a target="_blank" th:href="${configApp.linkTiktok}" th:if="${configApp.linkTiktok != null and !configApp.linkTiktok.isEmpty()}" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+<a target="_blank" th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&amp;text=' + ${configApp.mensajeWspFooter}}" th:if="${configApp.telefonoSoporte != null}" title="WhatsApp Soporte"><i class="fa-brands fa-whatsapp"></i></a>
+</div>
+<p style="font-size: 12px; margin-top: 15px;">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Dablyn Delivery</p>
+</div>
+<div class="footer-der">
+<div class="footer-enlaces">
+<!-- Enlace de Ayuda -->
+<a rel="noopener noreferrer" target="_blank" th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&amp;text=Hola,%20necesito%20ayuda%20con%20la%20plataforma%20Dablyn%20Delivery.'}" th:if="${configApp != null and configApp.telefonoSoporte != null}">
                    Ayuda
                 </a>
-                <a th:unless="${configApp != null and configApp.telefonoSoporte != null}" href="#">
+<a href="#" th:unless="${configApp != null and configApp.telefonoSoporte != null}">
                    Ayuda
                 </a>
-                
-                <!-- Enlace para Afiliar Restaurante -->
-                <a th:if="${configApp != null and configApp.telefonoSoporte != null}" 
-                   th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&text=Hola,%20estoy%20interesado%20en%20afiliar%20mi%20restaurante%20a%20Dablyn%20Delivery.'}" 
-                   target="_blank" rel="noopener noreferrer">
+<!-- Enlace para Afiliar Restaurante -->
+<a rel="noopener noreferrer" target="_blank" th:href="@{'https://api.whatsapp.com/send?phone=51' + ${configApp.telefonoSoporte} + '&amp;text=Hola,%20estoy%20interesado%20en%20afiliar%20mi%20restaurante%20a%20Dablyn%20Delivery.'}" th:if="${configApp != null and configApp.telefonoSoporte != null}">
                    Afilia tu restaurante
                 </a>
-                <a th:unless="${configApp != null and configApp.telefonoSoporte != null}" href="#">
+<a href="#" th:unless="${configApp != null and configApp.telefonoSoporte != null}">
                    Afilia tu restaurante
                 </a>
-            </div>
-            
-            <div class="footer-legal">
-                <a th:href="@{/terminos-condiciones}">Términos y condiciones</a> · 
+</div>
+<div class="footer-legal">
+<a th:href="@{/terminos-condiciones}">Términos y condiciones</a> · 
                 <a th:href="@{/politica-privacidad}">Privacidad</a>
-            </div>
-        </div>
-        
-    </footer>
-    
-
-    <!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
-    <div id="modalFiltros" class="modal-overlay"></div>
-    <div id="contenedor-modal-pedido"></div>
-    <div
-    th:replace="~{fragmentos/direccion-modal :: modalDireccion}">
-	</div>
-	
-	<!-- TOAST -->
-	<div id="toastNotificacion" class="toast-notificacion">
-
-    <div class="toast-icono">
-        <i class="fa-solid fa-circle-check"></i>
-    </div>
-
-    <div class="toast-contenido">
-
-        <strong id="toastTitulo">
+</div>
+</div>
+</footer>
+<!-- EL MODAL DE FILTROS (Oculto inicialmente) -->
+<div class="modal-overlay" id="modalFiltros"></div>
+<div id="contenedor-modal-pedido"></div>
+<div th:replace="~{fragmentos/direccion-modal :: modalDireccion}">
+</div>
+<!-- TOAST -->
+<div class="toast-notificacion" id="toastNotificacion">
+<div class="toast-icono">
+<i class="fa-solid fa-circle-check"></i>
+</div>
+<div class="toast-contenido">
+<strong id="toastTitulo">
             Dirección guardada
         </strong>
-
-        <span id="toastMensaje">
+<span id="toastMensaje">
             La dirección se registró correctamente.
         </span>
-
-    </div>
-
 </div>
-    
-    <script th:inline="javascript">
+</div>
+<script th:attr="nonce=${cspNonce}" th:inline="javascript">
 
     window.idUsuarioValidado =
         /*[[${usuarioAutenticado != null
@@ -467,7 +340,7 @@
 <script th:src="@{/js/pedido.js}"></script>
 <script th:src="@{/js/direccion.js}"></script>
 <script th:src="@{/js/carga.js}"></script>
-<script th:inline="javascript">
+<script th:attr="nonce=${cspNonce}" th:inline="javascript">
         window.idUsuarioValidado = /*[[${usuarioAutenticado != null ? usuarioAutenticado.idUsuario : null}]]*/ null;
 
         // NUEVO SCRIPT: Detectar alertas de Spring Security y mostrar el Toast

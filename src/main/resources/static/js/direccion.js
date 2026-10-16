@@ -321,7 +321,7 @@ function guardarNuevaDireccion() {
     );
 
 
-    fetch(
+    secureFetch(
         "/api/direcciones/agregar",
         {
 
@@ -458,7 +458,7 @@ function eliminarDireccionUsuario(
     boton.disabled = true;
 
 
-    fetch(
+    secureFetch(
         `/api/direcciones/${idDireccionUsuario}`,
         {
             method: "DELETE",

@@ -1,121 +1,105 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis direcciones | Dablyn Delivery</title>
-    
-    <!-- CSS -->
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" th:href="@{/css/direccion.css}">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mis direcciones | Dablyn Delivery</title>
+<!-- CSS -->
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/css/direccion.css}"/>
+<!-- FontAwesome -->
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <!-- Cambia el body a esto: -->
 <body class="pagina-direcciones" style="background-color: #121212;">
-	<!-- ===================================== -->
-    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
-    <!-- ===================================== -->
-    <div id="pantalla-carga">
-        <div class="loader-circulo"></div>
-    </div>
-    <main class="vista-mis-direcciones">
-
-        <!-- ===================================== -->
-        <!-- CABECERA PROFESIONAL -->
-        <!-- ===================================== -->
-        <div class="direcciones-header-pro">
-            <div class="header-pro-texto">
-                <a th:href="@{/}" class="btn-volver-pro" title="Volver al inicio">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h1>Mis direcciones</h1>
-                    <p>Administra y guarda tus lugares frecuentes de entrega.</p>
-                </div>
-            </div>
-
-            <button type="button" class="btn-nueva-direccion-pro" onclick="abrirModalAgregarDireccion('direcciones')">
-                <i class="fa-solid fa-plus"></i> Nueva dirección
+<!-- ===================================== -->
+<!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+<!-- ===================================== -->
+<div id="pantalla-carga">
+<div class="loader-circulo"></div>
+</div>
+<main class="vista-mis-direcciones">
+<!-- ===================================== -->
+<!-- CABECERA PROFESIONAL -->
+<!-- ===================================== -->
+<div class="direcciones-header-pro">
+<div class="header-pro-texto">
+<a class="btn-volver-pro" th:href="@{/}" title="Volver al inicio">
+<i class="fa-solid fa-arrow-left"></i>
+</a>
+<div>
+<h1>Mis direcciones</h1>
+<p>Administra y guarda tus lugares frecuentes de entrega.</p>
+</div>
+</div>
+<button class="btn-nueva-direccion-pro" data-arg0="direcciones" data-argc="1" data-click="abrirModalAgregarDireccion" type="button">
+<i class="fa-solid fa-plus"></i> Nueva dirección
             </button>
-        </div>
-
-        <!-- ===================================== -->
-        <!-- LISTADO DE DIRECCIONES (GRID) -->
-        <!-- ===================================== -->
-        <div class="direcciones-grid" th:if="${!#lists.isEmpty(direcciones)}">
-
-            <!-- TARJETAS -->
-            <article class="direccion-card-pro" th:each="direccion : ${direcciones}">
-                
-                <div class="card-pro-cuerpo">
-                    <!-- Icono lateral -->
-                    <div class="card-pro-icono">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-
-                    <!-- Información de la dirección -->
-                    <div class="card-pro-info">
-                        <div class="card-pro-titulo-fila">
-                            <h3 th:text="${direccion.alias}">Casa</h3>
-                            <span class="badge-pro" th:if="${direccion.principal}">Principal</span>
-                        </div>
-                        
-                        <p class="card-pro-texto-direccion" th:text="${direccion.direccion}">Av. Siempre Viva 123</p>
-                        
-                        <p class="card-pro-referencia" th:if="${direccion.referencia != null and !direccion.referencia.isEmpty()}">
-                            <i class="fa-solid fa-street-view"></i> <span th:text="${direccion.referencia}">Portón negro</span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Footer de la tarjeta: Acciones -->
-                <div class="card-pro-footer">
-                    <button type="button" class="btn-pro-eliminar" th:data-direccion="${direccion.idDireccionUsuario}" onclick="eliminarDireccionUsuario(this)">
-                        <i class="fa-regular fa-trash-can"></i> Eliminar
+</div>
+<!-- ===================================== -->
+<!-- LISTADO DE DIRECCIONES (GRID) -->
+<!-- ===================================== -->
+<div class="direcciones-grid" th:if="${!#lists.isEmpty(direcciones)}">
+<!-- TARJETAS -->
+<article class="direccion-card-pro" th:each="direccion : ${direcciones}">
+<div class="card-pro-cuerpo">
+<!-- Icono lateral -->
+<div class="card-pro-icono">
+<i class="fa-solid fa-location-dot"></i>
+</div>
+<!-- Información de la dirección -->
+<div class="card-pro-info">
+<div class="card-pro-titulo-fila">
+<h3 th:text="${direccion.alias}">Casa</h3>
+<span class="badge-pro" th:if="${direccion.principal}">Principal</span>
+</div>
+<p class="card-pro-texto-direccion" th:text="${direccion.direccion}">Av. Siempre Viva 123</p>
+<p class="card-pro-referencia" th:if="${direccion.referencia != null and !direccion.referencia.isEmpty()}">
+<i class="fa-solid fa-street-view"></i> <span th:text="${direccion.referencia}">Portón negro</span>
+</p>
+</div>
+</div>
+<!-- Footer de la tarjeta: Acciones -->
+<div class="card-pro-footer">
+<button class="btn-pro-eliminar" data-argc="1" data-click="eliminarDireccionUsuario" data-self0="true" th:data-direccion="${direccion.idDireccionUsuario}" type="button">
+<i class="fa-regular fa-trash-can"></i> Eliminar
                     </button>
-                </div>
-            </article>
-
-        </div>
-
-        <!-- ===================================== -->
-        <!-- ESTADO VACÍO (EMPTY STATE) -->
-        <!-- ===================================== -->
-        <div class="direcciones-vacio-pro" th:if="${#lists.isEmpty(direcciones)}">
-            <div class="vacio-pro-icono">
-                <i class="fa-solid fa-map-location-dot"></i>
-            </div>
-            <h2>Aún no tienes direcciones</h2>
-            <p>Guarda tus direcciones favoritas para hacer tus pedidos mucho más rápido.</p>
-            <button type="button" class="btn-nueva-direccion-pro" onclick="abrirModalAgregarDireccion('direcciones')">
-                <i class="fa-solid fa-plus"></i> Agregar mi primera dirección
+</div>
+</article>
+</div>
+<!-- ===================================== -->
+<!-- ESTADO VACÍO (EMPTY STATE) -->
+<!-- ===================================== -->
+<div class="direcciones-vacio-pro" th:if="${#lists.isEmpty(direcciones)}">
+<div class="vacio-pro-icono">
+<i class="fa-solid fa-map-location-dot"></i>
+</div>
+<h2>Aún no tienes direcciones</h2>
+<p>Guarda tus direcciones favoritas para hacer tus pedidos mucho más rápido.</p>
+<button class="btn-nueva-direccion-pro" data-arg0="direcciones" data-argc="1" data-click="abrirModalAgregarDireccion" type="button">
+<i class="fa-solid fa-plus"></i> Agregar mi primera dirección
             </button>
-        </div>
-
-    </main>
-
-    <!-- Modales y Scripts -->
-    <div th:replace="~{fragmentos/direccion-modal :: modalDireccion}"></div>
-
-    <!-- TOAST -->
-    <div id="toastNotificacion" class="toast-notificacion">
-        <div class="toast-icono"><i class="fa-solid fa-circle-check"></i></div>
-        <div class="toast-contenido">
-            <strong id="toastTitulo">Dirección guardada</strong>
-            <span id="toastMensaje"></span>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script th:inline="javascript">
+</div>
+</main>
+<!-- Modales y Scripts -->
+<div th:replace="~{fragmentos/direccion-modal :: modalDireccion}"></div>
+<!-- TOAST -->
+<div class="toast-notificacion" id="toastNotificacion">
+<div class="toast-icono"><i class="fa-solid fa-circle-check"></i></div>
+<div class="toast-contenido">
+<strong id="toastTitulo">Dirección guardada</strong>
+<span id="toastMensaje"></span>
+</div>
+</div>
+<!-- Scripts -->
+<script th:attr="nonce=${cspNonce}" th:inline="javascript">
         window.idUsuarioValidado = /*[[${idUsuarioValidado}]]*/ null;
     </script>
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/direccion.js}"></script>
-    <script th:src="@{/js/pedido.js}"></script>
-    <script th:src="@{/js/carrito.js}"></script>
-    <script th:src="@{/js/carga.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/direccion.js}"></script>
+<script th:src="@{/js/pedido.js}"></script>
+<script th:src="@{/js/carrito.js}"></script>
+<script th:src="@{/js/carga.js}"></script>
 </body>
 </html>

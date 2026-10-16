@@ -1,85 +1,63 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Iniciar Sesión - Dablyn Delivery</title>
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-    <!-- Conexión al archivo CSS externo -->
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    
-    <!-- Librería FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
+<meta charset="utf-8"/>
+<title>Iniciar Sesión - Dablyn Delivery</title>
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<!-- Conexión al archivo CSS externo -->
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<!-- Librería FontAwesome -->
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body class="body-login">
-
-    <div class="login-wrapper">
-        <div class="login-card">
-            
-            <!-- Logo -->
-            <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
-                <strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
+<div class="login-wrapper">
+<div class="login-card"><p role="status" th:if="${param.passwordActualizada}">Contraseña actualizada. Inicia sesión nuevamente.</p><p role="status" th:if="${param.sesionExpirada}">Tu sesión venció. Inicia sesión nuevamente.</p>
+<!-- Logo -->
+<div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
+<strong><span class="logo-italic">Dablyn</span> <span class="logo-orange">Delivery</span></strong>
+</div>
+<h2>Iniciar sesión</h2>
+<p class="login-subtitulo">Bienvenido de nuevo, ingresa tus credenciales.</p>
+<!-- ALERTA DE CREDENCIALES INVÁLIDAS -->
+<div style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);" th:if="${param.error}">
+<i class="fa-solid fa-triangle-exclamation"></i> Correo electrónico o contraseña incorrectos.
             </div>
-            
-            <h2>Iniciar sesión</h2>
-            <p class="login-subtitulo">Bienvenido de nuevo, ingresa tus credenciales.</p>
-			
-			<!-- ALERTA DE CREDENCIALES INVÁLIDAS -->
-            <div th:if="${param.error}" style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);">
-                <i class="fa-solid fa-triangle-exclamation"></i> Correo electrónico o contraseña incorrectos.
+<!-- NUEVA ALERTA: CUENTA BLOQUEADA -->
+<!-- ALERTA: ÉXITO AL RESETEAR CONTRASEÑA -->
+<div style="background-color: rgba(37, 211, 102, 0.1); color: #25D366; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(37, 211, 102, 0.3);" th:if="${exitoReseteo}">
+<i class="fa-solid fa-circle-check"></i> <span th:text="${exitoReseteo}"></span>
+</div>
+<!-- ALERTA: ENLACE CADUCADO O FALSO -->
+<div style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);" th:if="${param.errorToken}">
+<i class="fa-solid fa-triangle-exclamation"></i> El enlace de recuperación no es válido o ya fue utilizado.
             </div>
-
-            <!-- NUEVA ALERTA: CUENTA BLOQUEADA -->
-            <div th:if="${param.bloqueado}" style="background-color: rgba(255, 165, 0, 0.1); color: #ffaa00; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 165, 0, 0.3);">
-                <i class="fa-solid fa-lock"></i> Cuenta bloqueada por seguridad. <br>
-                <small style="color: var(--texto-secundario);">Inténtelo nuevamente en <span th:text="${param.horas}"></span> horas.</small>
-            </div>
-			
-			<!-- ALERTA: ÉXITO AL RESETEAR CONTRASEÑA -->
-            <div th:if="${exitoReseteo}" style="background-color: rgba(37, 211, 102, 0.1); color: #25D366; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(37, 211, 102, 0.3);">
-                <i class="fa-solid fa-circle-check"></i> <span th:text="${exitoReseteo}"></span>
-            </div>
-
-            <!-- ALERTA: ENLACE CADUCADO O FALSO -->
-            <div th:if="${param.errorToken}" style="background-color: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid rgba(255, 85, 85, 0.3);">
-                <i class="fa-solid fa-triangle-exclamation"></i> El enlace de recuperación no es válido o ya fue utilizado.
-            </div>
-			
-            <!-- Formulario -->
-            <form th:action="@{/login}" method="POST">
-                
-                <div class="input-group-login">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" name="username" placeholder="Correo electrónico" required autocomplete="email">
-                </div>
-                
-                <div class="input-group-login">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="inputPassword" name="password" placeholder="Contraseña" required>
-                    <i class="fa-solid fa-eye-slash" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);" onclick="toggleVisibilidad()"></i>
-                </div>
-                
-                <div class="login-opciones">
-                    
-                    <a th:href="@{/recuperar-password}">¿Olvidaste tu contraseña?</a>
-                </div>
-
-                <!-- Reutilizamos la clase del botón del modal para que tenga el mismo diseño ancho y naranja -->
-                <button type="submit" class="btn-aceptar" style="margin-top: 10px;">Ingresar</button>
-                
-            </form>
-
-            <div class="login-footer">
-                <p>¿No tienes una cuenta? <a th:href="@{/registro}">Regístrate aquí</a></p>
-                
-                <hr class="separador-sutil">
-                
-                <a th:href="@{/}" class="volver-inicio">
-                    <i class="fa-solid fa-arrow-left"></i> Volver al inicio
+<!-- Formulario -->
+<form method="POST" th:action="@{/login}">
+<div class="input-group-login">
+<i class="fa-solid fa-envelope"></i>
+<input autocomplete="email" name="username" placeholder="Correo electrónico" required="" type="email"/>
+</div>
+<div class="input-group-login">
+<i class="fa-solid fa-lock"></i>
+<input id="inputPassword" name="password" placeholder="Contraseña" required="" type="password"/>
+<i class="fa-solid fa-eye-slash" data-argc="0" data-click="toggleVisibilidad" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);"></i>
+</div>
+<div class="login-opciones">
+<a th:href="@{/recuperar-password}">¿Olvidaste tu contraseña?</a>
+</div>
+<!-- Reutilizamos la clase del botón del modal para que tenga el mismo diseño ancho y naranja -->
+<button class="btn-aceptar" style="margin-top: 10px;" type="submit">Ingresar</button>
+</form>
+<div class="login-footer">
+<p>¿No tienes una cuenta? <a th:href="@{/registro}">Regístrate aquí</a></p>
+<hr class="separador-sutil"/>
+<a class="volver-inicio" th:href="@{/}">
+<i class="fa-solid fa-arrow-left"></i> Volver al inicio
                 </a>
-            </div>
-            
-        </div>
-    </div>
+</div>
+</div>
+</div>
 <script th:src="@{/js/sesion.js}"></script>
 </body>
 </html>

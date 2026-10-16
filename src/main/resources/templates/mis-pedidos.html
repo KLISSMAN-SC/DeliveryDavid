@@ -1,230 +1,94 @@
 
 <!DOCTYPE html>
 
-<html
-    lang="es"
-    xmlns:th="http://www.thymeleaf.org">
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
         Mis pedidos | Dablyn Delivery
     </title>
-    <link rel="icon" type="image/png" th:href="@{/banner/favicon.png}">
-	<!-- Conexión al archivo CSS externo -->
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" th:href="@{/css/mapa.css}">
-    <link rel="stylesheet" th:href="@{/css/direccion.css}">
-    <link rel="stylesheet" th:href="@{/css/pedidos.css}">
-    <!-- Librería FontAwesome para los íconos de redes sociales -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-</head>
-
-
+<link rel="icon" th:href="@{/banner/favicon.png}" type="image/png"/>
+<!-- Conexión al archivo CSS externo -->
+<link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+<link rel="stylesheet" th:href="@{/css/mapa.css}"/>
+<link rel="stylesheet" th:href="@{/css/direccion.css}"/>
+<link rel="stylesheet" th:href="@{/css/pedidos.css}"/>
+<!-- Librería FontAwesome para los íconos de redes sociales -->
+<link rel="stylesheet" th:href="@{/vendor/fontawesome/css/all.min.css}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/><meta name="_csrf_header" th:content="${_csrf.headerName}"/><meta name="app-context" th:content="@{/}"/><script th:src="@{/js/security.js}"></script></head>
 <body class="pagina-mis-pedidos">
 <!-- ===================================== -->
-    <!-- PANTALLA DE CARGA (TRANSICIÓN) -->
-    <!-- ===================================== -->
-    <div id="pantalla-carga">
-        <div class="loader-circulo"></div>
-    </div>
-
+<!-- PANTALLA DE CARGA (TRANSICIÓN) -->
+<!-- ===================================== -->
+<div id="pantalla-carga">
+<div class="loader-circulo"></div>
+</div>
 <main class="mis-pedidos-contenedor">
-
-	
-    <!-- ===================================== -->
-    <!-- CABECERA -->
-    <!-- ===================================== -->
-
-    <div class="mis-pedidos-header">
-
-
-        <a
-            th:href="@{/}"
-            class="btn-volver-pedidos">
-
-            <i class="fa-solid fa-arrow-left"></i>
-
-        </a>
-
-
-        <div>
-
-            <h1>
+<!-- ===================================== -->
+<!-- CABECERA -->
+<!-- ===================================== -->
+<div class="mis-pedidos-header">
+<a class="btn-volver-pedidos" th:href="@{/}">
+<i class="fa-solid fa-arrow-left"></i>
+</a>
+<div>
+<h1>
                 Mis pedidos
             </h1>
-
-            <p>
+<p>
                 Consulta el historial
                 de tus pedidos realizados.
             </p>
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- ===================================== -->
-    <!-- FILTROS -->
-    <!-- ===================================== -->
-	<!-- 
-    <div class="filtros-pedidos">
-
-
-        <button
-            type="button"
-            class="filtro-pedido activo"
-            data-filtro="TODOS"
-            onclick="filtrarPedidos(this)">
-
-            Todos
-
-        </button>
-
-
-        <button
-            type="button"
-            class="filtro-pedido"
-            data-filtro="CURSO"
-            onclick="filtrarPedidos(this)">
-
-            En curso
-
-        </button>
-
-
-        <button
-            type="button"
-            class="filtro-pedido"
-            data-filtro="ENTREGADO"
-            onclick="filtrarPedidos(this)">
-
-            Entregados
-
-        </button>
-
-
-        <button
-            type="button"
-            class="filtro-pedido"
-            data-filtro="CANCELADO"
-            onclick="filtrarPedidos(this)">
-
-            Cancelados
-
-        </button>
-
-
-    </div>
-	-->
-
-
-    <!-- ===================================== -->
-    <!-- SIN PEDIDOS -->
-    <!-- ===================================== -->
-
-    <div
-        class="pedidos-vacio"
-        th:if="${#lists.isEmpty(pedidos)}">
-
-
-        <i class="fa-solid fa-bag-shopping"></i>
-
-
-        <h2>
+</div>
+</div>
+<!-- ===================================== -->
+<!-- FILTROS -->
+<!-- ===================================== -->
+<!-- ===================================== -->
+<!-- SIN PEDIDOS -->
+<!-- ===================================== -->
+<div class="pedidos-vacio" th:if="${#lists.isEmpty(pedidos)}">
+<i class="fa-solid fa-bag-shopping"></i>
+<h2>
             Aún no tienes pedidos
         </h2>
-
-
-        <p>
+<p>
             Cuando realices tu primer pedido,
             aparecerá aquí.
         </p>
-
-
-        <a th:href="@{/}">
+<a th:href="@{/}">
             Ir al catálogo
         </a>
-
-
-    </div>
-
-
-
-    <!-- ===================================== -->
-    <!-- PEDIDOS -->
-    <!-- ===================================== -->
-
-    <div
-        class="grid-mis-pedidos"
-        th:if="${!#lists.isEmpty(pedidos)}">
-
-
-        <article
-            class="pedido-cliente-card"
-
-            th:each="pedido : ${pedidos}"
-
-            th:data-estado="${pedido.estadoPedido}">
-
-
-            <!-- NEGOCIO -->
-
-            <div class="pedido-card-header">
-
-
-                <div class="pedido-negocio-logo">
-
-                    <img
-                        th:if="${pedido.negocio.imagenLogo != null}"
-                        th:src="@{'/imagenes/' + ${pedido.negocio.imagenLogo}}">
-
-                    <i
-                        th:unless="${pedido.negocio.imagenLogo != null}"
-                        class="fa-solid fa-store">
-                    </i>
-
-                </div>
-
-
-
-                <div class="pedido-card-negocio">
-
-
-                    <h3
-                        th:text="${pedido.negocio.nombre}">
+</div>
+<!-- ===================================== -->
+<!-- PEDIDOS -->
+<!-- ===================================== -->
+<div class="grid-mis-pedidos" th:if="${!#lists.isEmpty(pedidos)}">
+<article class="pedido-cliente-card" th:data-estado="${pedido.estadoPedido}" th:each="pedido : ${pedidos}">
+<!-- NEGOCIO -->
+<div class="pedido-card-header">
+<div class="pedido-negocio-logo">
+<img th:if="${pedido.negocio.imagenLogo != null}" th:src="@{'/imagenes/' + ${pedido.negocio.imagenLogo}}"/>
+<i class="fa-solid fa-store" th:unless="${pedido.negocio.imagenLogo != null}">
+</i>
+</div>
+<div class="pedido-card-negocio">
+<h3 th:text="${pedido.negocio.nombre}">
 
                         Restaurante
 
                     </h3>
-
-
-                    <span>
+<span>
 
                         Pedido #
 
-                        <span
-                            th:text="${pedido.idPedido}">
-                        </span>
-
-                    </span>
-
-
-                </div>
-
-
-
-                <!-- ESTADO -->
-				<!-- 
+                        <span th:text="${pedido.idPedido}">
+</span>
+</span>
+</div>
+<!-- ESTADO -->
+<!-- 
                 <span
                     class="pedido-estado"
                     th:classappend="${
@@ -286,27 +150,18 @@
                 </span>
 
 			 -->
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <div class="pedido-card-footer">
-
-
-                <div>
-
-                    <small>
+</div>
+<!-- FOOTER -->
+<div class="pedido-card-footer">
+<div>
+<small>
                         TOTAL
                     </small>
-
-
-                    <strong>
+<strong>
 
                         S/
 
-                        <span
-                            th:text="${#numbers.formatDecimal(
+                        <span th:text="${#numbers.formatDecimal(
                                 pedido.total,
                                 1,
                                 2
@@ -315,121 +170,47 @@
                             0.00
 
                         </span>
-
-                    </strong>
-
-                </div>
-
-
-
-                <div class="pedido-card-acciones">
-
-
-                    <button
-    				type="button"
-    				class="btn-ver-pedido"
-    				th:data-pedido="${pedido.idPedido}"
-    				onclick="mostrarPedidoConfirmado(this.dataset.pedido)">
+</strong>
+</div>
+<div class="pedido-card-acciones">
+<button class="btn-ver-pedido" data-argc="1" data-click="mostrarPedidoConfirmado" data-from0="pedido" th:data-pedido="${pedido.idPedido}" type="button">
 
     				Ver pedido
 
 					</button>
-
-
-					<!-- 
-                    <button
-                        th:if="${
-                            pedido.estadoPedido == 'PENDIENTE_DE_WHATSAPP'
-                            or pedido.estadoPedido == 'CONFIRMADO'
-                        }"
-
-                        type="button"
-
-                        class="btn-cancelar-card"
-
-                        th:data-pedido="${pedido.idPedido}"
-
-                        onclick="cancelarPedidoDesdeLista(
-                            this.dataset.pedido,
-                            this
-                        )">
-
-                        Cancelar
-
-                    </button>
-					 -->
-
-                </div>
-
-
-            </div>
-
-
-        </article>
-
-
-    </div>
-
-
-    <!-- Cuando un filtro no encuentre pedidos -->
-
-    <div
-        id="sinPedidosFiltro"
-        class="sin-pedidos-filtro"
-        style="display:none;">
+</div>
+</div>
+</article>
+</div>
+<!-- Cuando un filtro no encuentre pedidos -->
+<div class="sin-pedidos-filtro" id="sinPedidosFiltro" style="display:none;">
 
         No hay pedidos en esta categoría.
 
     </div>
-
-
 </main>
-
-
 <!-- PARA ABRIR DETALLE -->
-
 <div id="contenedor-modal-pedido"></div>
-
-
-
 <!-- TOAST -->
-
-<div
-    id="toastNotificacion"
-    class="toast-notificacion">
-
-    <div class="toast-icono">
-
-        <i class="fa-solid fa-circle-check"></i>
-
-    </div>
-
-    <div class="toast-contenido">
-
-        <strong id="toastTitulo"></strong>
-
-        <span id="toastMensaje"></span>
-
-    </div>
-
+<div class="toast-notificacion" id="toastNotificacion">
+<div class="toast-icono">
+<i class="fa-solid fa-circle-check"></i>
 </div>
-
-
-
-<script th:inline="javascript">
+<div class="toast-contenido">
+<strong id="toastTitulo"></strong>
+<span id="toastMensaje"></span>
+</div>
+</div>
+<script th:attr="nonce=${cspNonce}" th:inline="javascript">
 
     window.idUsuarioValidado =
         /*[[${idUsuarioValidado}]]*/ null;
 
 </script>
-
-
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/pedido.js}"></script>
 <script th:src="@{/js/direccion.js}"></script>
 <script th:src="@{/js/productos.js}"></script>
 <script th:src="@{/js/carga.js}"></script>
-
 </body>
-
 </html>

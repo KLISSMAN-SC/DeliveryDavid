@@ -1,558 +1,475 @@
 package com.proyecto.controller;
 
-import com.proyecto.model.CategoriaProducto;
-import com.proyecto.model.Configuracion;
-import com.proyecto.model.Negocio;
-import com.proyecto.model.Producto;
-import com.proyecto.model.Promocion;
-import com.proyecto.model.TipoNegocio;
-import com.proyecto.model.Usuario;
+import com.proyecto.model.*;
 import com.proyecto.repository.*;
+import com.proyecto.security.*;
+import com.proyecto.services.*;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/panel")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class PanelController {
+  @Autowired private UsuarioRepository usuarioRepo;
+  @Autowired private TipoNegocioRepository tipoNegocioRepo;
+  @Autowired private NegocioRepository negocioRepo;
+  @Autowired private CategoriaProductoRepository categoriaRepo;
+  @Autowired private PromocionRepository promocionRepo;
+  @Autowired private PedidoRepository pedidoRepo;
+  @Autowired private ProductoRepository productoRepo;
+  @Autowired private RolRepository rolRepo;
+  @Autowired private ZonaRepository zonaRepo;
+  @Autowired private CentroComercialRepository centroRepo;
+  @Autowired private ConfiguracionRepository configRepo;
+  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordPolicy passwords;
+  @Autowired private FileStorageService storage;
+  @Autowired private SecurityAudit audit;
 
-    @Autowired private UsuarioRepository usuarioRepo;
-    @Autowired private TipoNegocioRepository tipoNegocioRepo;
-    @Autowired private NegocioRepository negocioRepo;
-    @Autowired private CategoriaProductoRepository categoriaRepo;
-    @Autowired private PromocionRepository promocionRepo;
-    @Autowired private PedidoRepository pedidoRepo;
-    @Autowired private ProductoRepository productoRepo;
-    
-    @Autowired private RolRepository rolRepo;
-    @Autowired private PasswordEncoder passwordEncoder;
-    
-    @Autowired private ZonaRepository zonaRepo;
-    @Autowired private CentroComercialRepository centroRepo;
-    
-    @Autowired private ConfiguracionRepository configRepo;
-    
-    @Value("${google.maps.api-key:}")
-    private String googleMapsApiKey;
+  @Value("${google.maps.api-key:}")
+  private String googleMapsApiKey;
 
-    
-    @GetMapping
-    public String mostrarPanel(
-    		@RequestParam(name = "modulo", required = false) String modulo, 
-    		@RequestParam(name = "q", required = false) String query,
-    		Model model) {
-    	
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean esAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR"));
+  @InitBinder("usuario")
+  public void userBinder(WebDataBinder b) {
+    b.setAllowedFields(
+        "idUsuario",
+        "nombres",
+        "apellidos",
+        "dni",
+        "telefono",
+        "correoElectronico",
+        "password",
+        "rol.idRol");
+  }
 
-        if (modulo == null || modulo.isEmpty()) {
-            return esAdmin ? "redirect:/panel?modulo=usuarios" : "redirect:/panel?modulo=pedidos";
-        }
+  @InitBinder("negocio")
+  public void businessBinder(WebDataBinder b) {
+    b.setAllowedFields(
+        "idNegocio",
+        "nombre",
+        "direccion",
+        "latitud",
+        "longitud",
+        "telefono",
+        "estado",
+        "tipoNegocio.idTipoNegocio",
+        "zona.idZona",
+        "centroComercial.idCentroComercial",
+        "horaInicio",
+        "horaFin",
+        "modoWhatsapp");
+  }
 
-        if (!esAdmin && !modulo.equals("pedidos")) {
-            return "redirect:/panel?modulo=pedidos";
-        }
+  @InitBinder("producto")
+  public void productBinder(WebDataBinder b) {
+    b.setAllowedFields(
+        "idProducto",
+        "nombre",
+        "descripcion",
+        "precio",
+        "disponible",
+        "negocio.idNegocio",
+        "categoriaProducto.idCategoriaProducto",
+        "seccionMenu");
+  }
 
-        model.addAttribute("modulo", modulo);
+  @InitBinder("categoria")
+  public void categoryBinder(WebDataBinder b) {
+    b.setAllowedFields("idCategoriaProducto", "nombre", "negocio.idNegocio");
+  }
 
-        // Consultar la base de datos dinámicamente según el módulo seleccionado
-        switch (modulo) {
-            case "usuarios":
-            	// 1. LÓGICA DEL BUSCADOR DE USUARIOS
-                if (query != null && !query.isEmpty()) {
-                    model.addAttribute("listaUsuarios", usuarioRepo.buscarPorFiltro(query));
-                    model.addAttribute("q", query); // Mantiene el texto escrito en la barra
-                } else {
-                    model.addAttribute("listaUsuarios", usuarioRepo.findAll());
-                }
-                // Pasamos los roles a la vista para el Modal
-                model.addAttribute("listaRoles", rolRepo.findAll());
-                break;
-            case "tipos_negocio":
-                model.addAttribute("listaTipos", tipoNegocioRepo.findAll());
-                break;
-            case "negocios":
-                model.addAttribute("listaNegocios", negocioRepo.findAll());
-                // Listas para los combobox del Modal
-                model.addAttribute("listaTipos", tipoNegocioRepo.findAll());
-                model.addAttribute("listaZonas", zonaRepo.findAll());
-                model.addAttribute("listaCentros", centroRepo.findAll());
-             // Google Maps
-                model.addAttribute("googleMapsKey",googleMapsApiKey);
-                break;
-            case "categorias":
-            	model.addAttribute("listaCategorias", categoriaRepo.findAll());
-                // Pasamos los negocios para que el administrador pueda asignar la categoría a uno de ellos
-                model.addAttribute("listaNegocios", negocioRepo.findAll());
-                break;
-            case "productos": 
-                model.addAttribute("listaProductos", productoRepo.findAll());
-                // Pasamos las listas para los selectores del Modal
-                model.addAttribute("listaNegocios", negocioRepo.findAll());
-                model.addAttribute("listaCategorias", categoriaRepo.findAll());
-                break;
-            case "promociones":
-            	model.addAttribute("listaPromociones", promocionRepo.findAll());
-                model.addAttribute("listaNegocios", negocioRepo.findAll());
-                break;
-            case "pedidos":
-                model.addAttribute("listaPedidos", pedidoRepo.findAll());
-                break;
-            case "configuracion":
-                model.addAttribute("configApp", configRepo.findById(1).orElse(new Configuracion()));
-                break;
-        }
+  @InitBinder("promo")
+  public void promotionBinder(WebDataBinder b) {
+    b.setAllowedFields(
+        "idPromocion",
+        "titulo",
+        "descripcion",
+        "fechaInicio",
+        "fechaFin",
+        "horaInicio",
+        "horaFin",
+        "mostrarEnIndex",
+        "estado",
+        "negocio.idNegocio");
+  }
 
-        return "Panel";
+  @InitBinder("tipo")
+  public void typeBinder(WebDataBinder b) {
+    b.setAllowedFields("idTipoNegocio", "nombre", "estado", "icono");
+  }
+
+  @InitBinder("config")
+  public void configBinder(WebDataBinder b) {
+    b.setAllowedFields(
+        "telefonoSoporte",
+        "linkFacebook",
+        "linkInstagram",
+        "linkTiktok",
+        "mensajeWspCabecera",
+        "mensajeWspFooter",
+        "precioBaseDelivery",
+        "distanciaBaseMetros",
+        "precioKmAdicional");
+  }
+
+  @GetMapping
+  @PreAuthorize("hasAnyRole('ADMINISTRADOR','REPARTIDOR')")
+  public String mostrarPanel(
+      @RequestParam(required = false) String modulo,
+      @RequestParam(name = "q", required = false) String query,
+      Authentication auth,
+      Model model) {
+    boolean admin =
+        auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR"));
+    if (modulo == null || modulo.isBlank())
+      return "redirect:/panel?modulo=" + (admin ? "usuarios" : "pedidos");
+    if (!admin && !"pedidos".equals(modulo))
+      throw new org.springframework.security.access.AccessDeniedException("Acceso denegado");
+    model.addAttribute("modulo", modulo);
+    switch (modulo) {
+      case "usuarios" -> {
+        model.addAttribute(
+            "listaUsuarios",
+            query == null || query.isBlank()
+                ? usuarioRepo.findAll()
+                : usuarioRepo.buscarPorFiltro(InputChecks.text(query, 80)));
+        model.addAttribute("q", query);
+        model.addAttribute("listaRoles", rolRepo.findAll());
+      }
+      case "tipos_negocio" -> model.addAttribute("listaTipos", tipoNegocioRepo.findAll());
+      case "negocios" -> {
+        model.addAttribute("listaNegocios", negocioRepo.findAll());
+        model.addAttribute("listaTipos", tipoNegocioRepo.findAll());
+        model.addAttribute("listaZonas", zonaRepo.findAll());
+        model.addAttribute("listaCentros", centroRepo.findAll());
+        model.addAttribute("googleMapsKey", googleMapsApiKey);
+      }
+      case "categorias" -> {
+        model.addAttribute("listaCategorias", categoriaRepo.findAll());
+        model.addAttribute("listaNegocios", negocioRepo.findAll());
+      }
+      case "productos" -> {
+        model.addAttribute("listaProductos", productoRepo.findAll());
+        model.addAttribute("listaNegocios", negocioRepo.findAll());
+        model.addAttribute("listaCategorias", categoriaRepo.findAll());
+      }
+      case "promociones" -> {
+        model.addAttribute("listaPromociones", promocionRepo.findAll());
+        model.addAttribute("listaNegocios", negocioRepo.findAll());
+      }
+      case "pedidos" -> {
+        var u =
+            usuarioRepo
+                .findByCorreoElectronico(auth.getName())
+                .orElseThrow(BusinessException::missing);
+        model.addAttribute(
+            "listaPedidos",
+            admin
+                ? pedidoRepo.findAll()
+                : pedidoRepo.findByRepartidorIdUsuarioOrderByIdPedidoDesc(u.getIdUsuario()));
+      }
+      case "configuracion" ->
+          model.addAttribute("configApp", configRepo.findById(1).orElse(new Configuracion()));
+      default -> throw BusinessException.missing();
     }
-    
-    // ==========================================
-    // LÓGICA PARA CREAR Y EDITAR NEGOCIO
-    // ==========================================
-    @PostMapping("/negocios/guardar")
-    public String guardarNegocio(@ModelAttribute Negocio negocio, 
-                                 @RequestParam(value = "archivoLogo", required = false) MultipartFile archivoLogo,
-                                 @RequestParam(value = "archivoCarta", required = false) MultipartFile archivoCarta,
-                                 RedirectAttributes redirectAttributes) { 
-        try {
-            boolean esEdicion = negocio.getIdNegocio() != null;
-            Negocio existente = esEdicion ? negocioRepo.findById(negocio.getIdNegocio()).orElse(null) : null;
+    return "Panel";
+  }
 
-            // 1. Manejo de la Imagen (Guardado Dinámico y Seguro)
-            if (archivoLogo != null && !archivoLogo.isEmpty()) {
-                
-                // Extraemos la extensión original (ej. ".png")
-                String nombreOriginal = archivoLogo.getOriginalFilename();
-                String extension = (nombreOriginal != null && nombreOriginal.contains(".")) ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) : "";
-                
-                // Generamos un código único para el archivo
-                String nombreUnico = UUID.randomUUID().toString() + extension;
-                
-                // Apuntamos a la carpeta dinámica (se creará en la raíz de tu proyecto)
-                Path directorio = Paths.get("RIDE_MEAL", "imagenes");
-                
-                // Si la carpeta no existe, Spring Boot la crea automáticamente
-                if (!Files.exists(directorio)) {
-                    Files.createDirectories(directorio);
-                }
-                
-                // Guardamos el archivo físico
-                Path rutaAbsoluta = directorio.resolve(nombreUnico);
-                Files.write(rutaAbsoluta, archivoLogo.getBytes());
-                
-                // Guardamos solo el nombre (ej. "8f7d9...jpg") en la Base de Datos
-                negocio.setImagenLogo(nombreUnico);
-                
-            } else if (existente != null) {
-                // Si está editando pero no subió una foto nueva, conservamos la que ya tenía
-                negocio.setImagenLogo(existente.getImagenLogo());
-            }
+  private String success(RedirectAttributes flash, String module, String event) {
+    flash.addFlashAttribute("mensajeExito", "Cambios guardados correctamente.");
+    audit.event(event, SecurityAudit.actor());
+    return "redirect:/panel?modulo=" + module;
+  }
 
-            // 2. Manejo de campos nulos
-            if (negocio.getZona() != null && negocio.getZona().getIdZona() == null) negocio.setZona(null);
-            if (negocio.getCentroComercial() != null && negocio.getCentroComercial().getIdCentroComercial() == null) negocio.setCentroComercial(null);
-            
-            if (archivoCarta != null && !archivoCarta.isEmpty()) {
-                try {
-                    // Generar nombre único para que no se sobreescriban
-                    String nombreArchivoCarta = System.currentTimeMillis() + "_" + archivoCarta.getOriginalFilename();
-                    // Ruta exacta hacia la carpeta "carta"
-                    Path rutaDirectorioCarta = Paths.get("RIDE_MEAL/carta"); 
-                    
-                    if (!Files.exists(rutaDirectorioCarta)) {
-                        Files.createDirectories(rutaDirectorioCarta);
-                    }
-                    
-                    Path rutaFichaCarta = rutaDirectorioCarta.resolve(nombreArchivoCarta);
-                    Files.copy(archivoCarta.getInputStream(), rutaFichaCarta, StandardCopyOption.REPLACE_EXISTING);
-                    
-                    // Guardar solo el nombre en la base de datos
-                    negocio.setImagenCarta(nombreArchivoCarta);
-                    
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                // Si no suben una nueva carta al editar, mantener la que ya estaba en BD
-                if (existente != null) {
-                    negocio.setImagenCarta(existente.getImagenCarta());
-                }
-            }
-            
-            // 3. Guardar en BD
-         // ==========================================
-         // VALIDAR COORDENADAS
-         // ==========================================
-
-         if (
-             negocio.getLatitud() == null ||
-             negocio.getLongitud() == null
-         ) {
-
-             redirectAttributes.addFlashAttribute(
-                 "mensajeError",
-                 "Debe registrar las coordenadas del negocio."
-             );
-
-             return "redirect:/panel?modulo=negocios";
-         }
-
-
-         // ==========================================
-         // LATITUD: -90 hasta 90
-         // ==========================================
-
-         if (
-             negocio.getLatitud().compareTo(
-                 BigDecimal.valueOf(-90)
-             ) < 0
-
-             ||
-
-             negocio.getLatitud().compareTo(
-                 BigDecimal.valueOf(90)
-             ) > 0
-         ) {
-
-             redirectAttributes.addFlashAttribute(
-                 "mensajeError",
-                 "La latitud ingresada no es válida."
-             );
-
-             return "redirect:/panel?modulo=negocios";
-         }
-
-
-         // ==========================================
-         // LONGITUD: -180 hasta 180
-         // ==========================================
-
-         if (
-             negocio.getLongitud().compareTo(
-                 BigDecimal.valueOf(-180)
-             ) < 0
-
-             ||
-
-             negocio.getLongitud().compareTo(
-                 BigDecimal.valueOf(180)
-             ) > 0
-         ) {
-
-             redirectAttributes.addFlashAttribute(
-                 "mensajeError",
-                 "La longitud ingresada no es válida."
-             );
-
-             return "redirect:/panel?modulo=negocios";
-         }
-            negocioRepo.save(negocio);
-            redirectAttributes.addFlashAttribute("mensajeExito", esEdicion ? "Negocio actualizado correctamente." : "Nuevo negocio creado con éxito.");
-            
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al procesar el archivo o guardar el negocio.");
-        }
-        return "redirect:/panel?modulo=negocios";
+  @PostMapping("/negocios/guardar")
+  public String guardarNegocio(
+      @ModelAttribute("negocio") Negocio n,
+      @RequestParam(required = false) MultipartFile archivoLogo,
+      @RequestParam(required = false) MultipartFile archivoCarta,
+      RedirectAttributes flash)
+      throws java.io.IOException {
+    n.setNombre(InputChecks.text(n.getNombre(), 45));
+    n.setDireccion(InputChecks.text(n.getDireccion(), 50));
+    InputChecks.phone(n.getTelefono());
+    InputChecks.coordinates(n.getLatitud(), n.getLongitud());
+    if (n.getTipoNegocio() == null || n.getTipoNegocio().getIdTipoNegocio() == null)
+      throw BusinessException.invalid("Selecciona un tipo de negocio.");
+    n.setTipoNegocio(
+        tipoNegocioRepo
+            .findById(n.getTipoNegocio().getIdTipoNegocio())
+            .orElseThrow(BusinessException::missing));
+    n.setZona(
+        n.getZona() == null || n.getZona().getIdZona() == null
+            ? null
+            : zonaRepo.findById(n.getZona().getIdZona()).orElseThrow(BusinessException::missing));
+    n.setCentroComercial(
+        n.getCentroComercial() == null || n.getCentroComercial().getIdCentroComercial() == null
+            ? null
+            : centroRepo
+                .findById(n.getCentroComercial().getIdCentroComercial())
+                .orElseThrow(BusinessException::missing));
+    var old =
+        n.getIdNegocio() == null
+            ? null
+            : negocioRepo.findById(n.getIdNegocio()).orElseThrow(BusinessException::missing);
+    try (var logo = storage.storeImage(archivoLogo, "imagenes");
+        var carta = storage.storeImage(archivoCarta, "carta")) {
+      n.setImagenLogo(
+          logo.filename() != null ? logo.filename() : old == null ? null : old.getImagenLogo());
+      n.setImagenCarta(
+          carta.filename() != null ? carta.filename() : old == null ? null : old.getImagenCarta());
+      negocioRepo.saveAndFlush(n);
+      logo.commit();
+      carta.commit();
     }
+    return success(flash, "negocios", "BUSINESS_SAVED");
+  }
 
-    // ==========================================
-    // LÓGICA PARA ELIMINAR NEGOCIO
-    // ==========================================
-    @PostMapping("/negocios/eliminar")
-    public String eliminarNegocio(@RequestParam("idNegocio") Integer idNegocio, RedirectAttributes redirectAttributes) {
-        try {
-            negocioRepo.deleteById(idNegocio);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Negocio eliminado correctamente.");
-        } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar porque este negocio tiene productos, promociones o pedidos activos.");
-        }
-        return "redirect:/panel?modulo=negocios";
+  @PostMapping("/negocios/eliminar")
+  public String eliminarNegocio(@RequestParam Integer idNegocio, RedirectAttributes f) {
+    negocioRepo.deleteById(idNegocio);
+    return success(f, "negocios", "BUSINESS_DELETED");
+  }
+
+  @PostMapping("/usuarios/guardar")
+  public String guardarUsuario(
+      @ModelAttribute("usuario") Usuario form, Authentication auth, RedirectAttributes f) {
+    String email = UserAccountService.normalizeEmail(form.getCorreoElectronico());
+    if (email.length() > 45 || !email.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+"))
+      throw BusinessException.invalid("Correo no válido.");
+    InputChecks.text(form.getNombres(), 45);
+    InputChecks.text(form.getApellidos(), 45);
+    InputChecks.phone(form.getTelefono());
+    if (form.getDni() != null && !form.getDni().isBlank() && !form.getDni().matches("[0-9]{8}"))
+      throw BusinessException.invalid("DNI no válido.");
+    Usuario u =
+        form.getIdUsuario() == null
+            ? new Usuario()
+            : usuarioRepo.findById(form.getIdUsuario()).orElseThrow(BusinessException::missing);
+    if (usuarioRepo
+            .findByCorreoElectronico(email)
+            .filter(x -> !x.getIdUsuario().equals(u.getIdUsuario()))
+            .isPresent()
+        || usuarioRepo
+            .findByTelefono(form.getTelefono())
+            .filter(x -> !x.getIdUsuario().equals(u.getIdUsuario()))
+            .isPresent()
+        || (form.getDni() != null
+            && !form.getDni().isBlank()
+            && usuarioRepo
+                .findByDni(form.getDni())
+                .filter(x -> !x.getIdUsuario().equals(u.getIdUsuario()))
+                .isPresent()))
+      throw BusinessException.invalid("Correo, teléfono o DNI ya registrado.");
+    if (form.getRol() == null
+        || form.getRol().getIdRol() == null
+        || !Set.of(1, 2, 3).contains(form.getRol().getIdRol()))
+      throw BusinessException.invalid("Rol no válido.");
+    boolean sensitive =
+        u.getIdUsuario() != null
+            && (!Objects.equals(u.getCorreoElectronico(), email)
+                || !Objects.equals(u.getRol().getIdRol(), form.getRol().getIdRol()));
+    if (form.getPassword() != null && !form.getPassword().isBlank()) {
+      passwords.validate(form.getPassword());
+      u.setPassword(passwordEncoder.encode(form.getPassword()));
+      sensitive = u.getIdUsuario() != null;
+    } else if (u.getIdUsuario() == null)
+      throw BusinessException.invalid("La contraseña es obligatoria.");
+    u.setNombres(form.getNombres().strip());
+    u.setApellidos(form.getApellidos().strip());
+    u.setTelefono(form.getTelefono());
+    u.setDni(form.getDni() == null || form.getDni().isBlank() ? null : form.getDni());
+    u.setCorreoElectronico(email);
+    u.setRol(rolRepo.findById(form.getRol().getIdRol()).orElseThrow(BusinessException::missing));
+    if (sensitive) UserAccountService.revoke(u);
+    usuarioRepo.saveAndFlush(u);
+    audit.alert(
+        "ADMIN_USER_OR_ROLE_CHANGED", SecurityAudit.actor() + " target=" + u.getIdUsuario());
+    return success(f, "usuarios", "USER_SAVED");
+  }
+
+  @PostMapping("/usuarios/eliminar")
+  public String eliminarUsuario(
+      @RequestParam Integer idUsuario, Authentication auth, RedirectAttributes f) {
+    var u = usuarioRepo.findById(idUsuario).orElseThrow(BusinessException::missing);
+    if (u.getCorreoElectronico().equals(auth.getName()))
+      throw BusinessException.invalid("No puedes eliminar tu propia cuenta.");
+    usuarioRepo.delete(u);
+    audit.alert("ADMIN_USER_DELETED", SecurityAudit.actor() + " target=" + idUsuario);
+    return success(f, "usuarios", "USER_DELETED");
+  }
+
+  @PostMapping("/categorias/guardar")
+  public String guardarCategoria(
+      @ModelAttribute("categoria") CategoriaProducto c,
+      @RequestParam(required = false) MultipartFile archivoLogo,
+      RedirectAttributes f)
+      throws java.io.IOException {
+    c.setNombre(InputChecks.text(c.getNombre(), 45));
+    if (c.getNegocio() == null || c.getNegocio().getIdNegocio() == null)
+      throw BusinessException.invalid("Selecciona el negocio.");
+    c.setNegocio(
+        negocioRepo
+            .findById(c.getNegocio().getIdNegocio())
+            .orElseThrow(BusinessException::missing));
+    var old =
+        c.getIdCategoriaProducto() == null
+            ? null
+            : categoriaRepo
+                .findById(c.getIdCategoriaProducto())
+                .orElseThrow(BusinessException::missing);
+    try (var image = storage.storeImage(archivoLogo, "categorias_comidas")) {
+      c.setLogo(image.filename() != null ? image.filename() : old == null ? null : old.getLogo());
+      categoriaRepo.saveAndFlush(c);
+      image.commit();
     }
-    
-    // ==========================================
-    // 2. LÓGICA PARA CREAR Y EDITAR USUARIO
-    // ==========================================
-    @PostMapping("/usuarios/guardar")
-    public String guardarUsuario(@ModelAttribute Usuario usuario, RedirectAttributes redirectAttributes) {
-        
-        boolean esEdicion = usuario.getIdUsuario() != null;
+    return success(f, "categorias", "CATEGORY_SAVED");
+  }
 
-        // 1. Validar Correo Electrónico
-        Usuario existenteCorreo = usuarioRepo.findByCorreoElectronico(usuario.getCorreoElectronico()).orElse(null);
-        if (existenteCorreo != null && (!esEdicion || !existenteCorreo.getIdUsuario().equals(usuario.getIdUsuario()))) {
-            redirectAttributes.addFlashAttribute("mensajeError", "El correo electrónico ya está registrado por otro usuario.");
-            return "redirect:/panel?modulo=usuarios";
-        }
+  @PostMapping("/categorias/eliminar")
+  public String eliminarCategoria(@RequestParam Integer idCategoriaProducto, RedirectAttributes f) {
+    categoriaRepo.deleteById(idCategoriaProducto);
+    return success(f, "categorias", "CATEGORY_DELETED");
+  }
 
-        // 2. Validar DNI
-        Usuario existenteDni = usuarioRepo.findByDni(usuario.getDni()).orElse(null);
-        if (existenteDni != null && (!esEdicion || !existenteDni.getIdUsuario().equals(usuario.getIdUsuario()))) {
-            redirectAttributes.addFlashAttribute("mensajeError", "El DNI ya está registrado en el sistema.");
-            return "redirect:/panel?modulo=usuarios";
-        }
-
-        // 3. Validar Teléfono
-        Usuario existenteTel = usuarioRepo.findByTelefono(usuario.getTelefono()).orElse(null);
-        if (existenteTel != null && (!esEdicion || !existenteTel.getIdUsuario().equals(usuario.getIdUsuario()))) {
-            redirectAttributes.addFlashAttribute("mensajeError", "El número de teléfono ya pertenece a otra cuenta.");
-            return "redirect:/panel?modulo=usuarios";
-        }
-
-        // Si pasa todas las validaciones, procedemos a guardar
-        if (esEdicion) {
-            Usuario usuarioExistente = usuarioRepo.findById(usuario.getIdUsuario()).orElse(null);
-            if (usuarioExistente != null) {
-                usuarioExistente.setNombres(usuario.getNombres());
-                usuarioExistente.setApellidos(usuario.getApellidos());
-                usuarioExistente.setDni(usuario.getDni());
-                usuarioExistente.setTelefono(usuario.getTelefono());
-                usuarioExistente.setCorreoElectronico(usuario.getCorreoElectronico());
-                usuarioExistente.setRol(usuario.getRol());
-                
-                // Si escribió una nueva contraseña, la encriptamos y la cambiamos
-                if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-                    usuarioExistente.setPassword(passwordEncoder.encode(usuario.getPassword()));
-                }
-                usuarioRepo.save(usuarioExistente);
-                redirectAttributes.addFlashAttribute("mensajeExito", "Usuario actualizado correctamente.");
-            }
-        } else {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword())); // Encriptamos
-            usuarioRepo.save(usuario);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Nuevo usuario creado con éxito.");
-        }
-        
-        return "redirect:/panel?modulo=usuarios";
+  @PostMapping("/productos/guardar")
+  public String guardarProducto(
+      @ModelAttribute("producto") Producto p,
+      @RequestParam(required = false) MultipartFile archivoImagen,
+      RedirectAttributes f)
+      throws java.io.IOException {
+    p.setNombre(InputChecks.text(p.getNombre(), 45));
+    InputChecks.optional(p.getDescripcion(), 255);
+    InputChecks.optional(p.getSeccionMenu(), 45);
+    if (p.getSeccionMenu() == null) p.setSeccionMenu("PRINCIPAL");
+    if (!Set.of("RECOMENDADO", "PRINCIPAL", "BEBIDA", "COMPLEMENTO").contains(p.getSeccionMenu()))
+      throw BusinessException.invalid("Sección del menú no válida.");
+    InputChecks.money(p.getPrecio());
+    if (p.getNegocio() == null
+        || p.getNegocio().getIdNegocio() == null
+        || p.getCategoriaProducto() == null
+        || p.getCategoriaProducto().getIdCategoriaProducto() == null)
+      throw BusinessException.invalid("Selecciona el negocio y la categoría.");
+    p.setNegocio(
+        negocioRepo
+            .findById(p.getNegocio().getIdNegocio())
+            .orElseThrow(BusinessException::missing));
+    p.setCategoriaProducto(
+        categoriaRepo
+            .findById(p.getCategoriaProducto().getIdCategoriaProducto())
+            .orElseThrow(BusinessException::missing));
+    if (!p.getCategoriaProducto().getNegocio().getIdNegocio().equals(p.getNegocio().getIdNegocio()))
+      throw BusinessException.invalid("La categoría no pertenece al negocio.");
+    var old =
+        p.getIdProducto() == null
+            ? null
+            : productoRepo.findById(p.getIdProducto()).orElseThrow(BusinessException::missing);
+    try (var image = storage.storeImage(archivoImagen, "productos")) {
+      p.setImagen(
+          image.filename() != null ? image.filename() : old == null ? null : old.getImagen());
+      productoRepo.saveAndFlush(p);
+      image.commit();
     }
+    return success(f, "productos", "PRODUCT_SAVED");
+  }
 
-    // ==========================================
-    // 3. LÓGICA PARA ELIMINAR USUARIO
-    // ==========================================
-    @PostMapping("/usuarios/eliminar")
-    public String eliminarUsuario(@RequestParam("idUsuario") Integer idUsuario, RedirectAttributes redirectAttributes) {
-        try {
-            usuarioRepo.deleteById(idUsuario);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Usuario eliminado correctamente.");
-        } catch (DataIntegrityViolationException e) {
-            // Si MySQL rechaza la eliminación por llaves foráneas (el usuario tiene pedidos)
-            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar el usuario porque tiene pedidos registrados en el sistema.");
-        }
-        return "redirect:/panel?modulo=usuarios"; 
-    }
- // ==========================================
-    // LÓGICA PARA CREAR Y EDITAR CATEGORÍA
-    // ==========================================
-    @PostMapping("/categorias/guardar")
-    public String guardarCategoria(@ModelAttribute CategoriaProducto categoria, 
-                                   @RequestParam(value = "archivoLogo", required = false) MultipartFile archivoLogo, 
-                                   RedirectAttributes redirectAttributes) {
-        try {
-            boolean esEdicion = categoria.getIdCategoriaProducto() != null;
-            CategoriaProducto existente = esEdicion ? categoriaRepo.findById(categoria.getIdCategoriaProducto()).orElse(null) : null;
+  @PostMapping("/productos/eliminar")
+  public String eliminarProducto(@RequestParam Integer idProducto, RedirectAttributes f) {
+    productoRepo.deleteById(idProducto);
+    return success(f, "productos", "PRODUCT_DELETED");
+  }
 
-            // 1. Manejo de la Imagen (Carpeta 'categorias_comidas' según tu WebConfig)
-            if (archivoLogo != null && !archivoLogo.isEmpty()) {
-                String nombreOriginal = archivoLogo.getOriginalFilename();
-                String extension = (nombreOriginal != null && nombreOriginal.contains(".")) ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) : "";
-                String nombreUnico = UUID.randomUUID().toString() + extension;
-                
-                // Usamos la carpeta dinámica especificada en tu WebConfig
-                Path directorio = Paths.get("RIDE_MEAL", "categorias_comidas");
-                if (!Files.exists(directorio)) {
-                    Files.createDirectories(directorio);
-                }
-                
-                Path rutaAbsoluta = directorio.resolve(nombreUnico);
-                Files.write(rutaAbsoluta, archivoLogo.getBytes());
-                
-                categoria.setLogo(nombreUnico); // Guardamos el nombre generado en la BD
-            } else if (existente != null) {
-                categoria.setLogo(existente.getLogo()); // Mantiene la foto anterior si no sube una nueva
-            }
+  @PostMapping("/promociones/guardar")
+  public String guardarPromocion(
+      @ModelAttribute("promo") Promocion p,
+      @RequestParam(required = false) List<String> dias,
+      @RequestParam(required = false) MultipartFile archivoBanner,
+      RedirectAttributes f)
+      throws java.io.IOException {
+    p.setTitulo(InputChecks.text(p.getTitulo(), 100));
+    InputChecks.optional(p.getDescripcion(), 255);
+    if (p.getFechaInicio() != null
+        && p.getFechaFin() != null
+        && p.getFechaFin().isBefore(p.getFechaInicio()))
+      throw BusinessException.invalid("Revisa el rango de fechas.");
+    if (dias != null && dias.stream().anyMatch(d -> !d.matches("[1-7]")))
+      throw BusinessException.invalid("Día no válido.");
+    p.setDiasActivos(dias == null ? "" : String.join(",", new LinkedHashSet<>(dias)));
+    if (p.getMostrarEnIndex() == null) p.setMostrarEnIndex(false);
+    if (p.getNegocio() == null || p.getNegocio().getIdNegocio() == null)
+      throw BusinessException.invalid("Selecciona un negocio.");
+    p.setNegocio(
+        negocioRepo
+            .findById(p.getNegocio().getIdNegocio())
+            .orElseThrow(BusinessException::missing));
+    var old =
+        p.getIdPromocion() == null
+            ? null
+            : promocionRepo.findById(p.getIdPromocion()).orElseThrow(BusinessException::missing);
+    try (var image = storage.storeImage(archivoBanner, "promociones")) {
+      p.setImagenBanner(
+          image.filename() != null ? image.filename() : old == null ? null : old.getImagenBanner());
+      promocionRepo.saveAndFlush(p);
+      image.commit();
+    }
+    return success(f, "promociones", "PROMOTION_SAVED");
+  }
 
-            // 2. Guardar en BD
-            categoriaRepo.save(categoria);
-            redirectAttributes.addFlashAttribute("mensajeExito", esEdicion ? "Categoría actualizada correctamente." : "Nueva categoría creada con éxito.");
-            
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al procesar el archivo o guardar la categoría.");
-        }
-        return "redirect:/panel?modulo=categorias";
-    }
+  @PostMapping("/promociones/eliminar")
+  public String eliminarPromocion(@RequestParam Integer idPromocion, RedirectAttributes f) {
+    promocionRepo.deleteById(idPromocion);
+    return success(f, "promociones", "PROMOTION_DELETED");
+  }
 
-    // ==========================================
-    // LÓGICA PARA ELIMINAR CATEGORÍA
-    // ==========================================
-    @PostMapping("/categorias/eliminar")
-    public String eliminarCategoria(@RequestParam("idCategoriaProducto") Integer idCategoriaProducto, RedirectAttributes redirectAttributes) {
-        try {
-            categoriaRepo.deleteById(idCategoriaProducto);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Categoría eliminada correctamente.");
-        } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar esta categoría porque ya tiene productos asignados.");
-        }
-        return "redirect:/panel?modulo=categorias";
-    }
- // ==========================================
-    // LÓGICA PARA CREAR Y EDITAR PRODUCTO
-    // ==========================================
-    @PostMapping("/productos/guardar")
-    public String guardarProducto(@ModelAttribute Producto producto, 
-                                  @RequestParam(value = "archivoImagen", required = false) MultipartFile archivoImagen, 
-                                  RedirectAttributes redirectAttributes) {
-        try {
-            boolean esEdicion = producto.getIdProducto() != null;
-            Producto existente = esEdicion ? productoRepo.findById(producto.getIdProducto()).orElse(null) : null;
+  @PostMapping("/tipos_negocio/ocultar")
+  public String ocultarTipoNegocio(@RequestParam Integer idTipoNegocio, RedirectAttributes f) {
+    var t = tipoNegocioRepo.findById(idTipoNegocio).orElseThrow(BusinessException::missing);
+    t.setEstado(false);
+    tipoNegocioRepo.saveAndFlush(t);
+    return success(f, "tipos_negocio", "BUSINESS_TYPE_HIDDEN");
+  }
 
-            // 1. Manejo de la Imagen (Carpeta 'productos' según tu WebConfig)
-            if (archivoImagen != null && !archivoImagen.isEmpty()) {
-                String nombreOriginal = archivoImagen.getOriginalFilename();
-                String extension = (nombreOriginal != null && nombreOriginal.contains(".")) ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) : "";
-                String nombreUnico = UUID.randomUUID().toString() + extension;
-                
-                Path directorio = Paths.get("RIDE_MEAL", "productos");
-                if (!Files.exists(directorio)) {
-                    Files.createDirectories(directorio);
-                }
-                
-                Path rutaAbsoluta = directorio.resolve(nombreUnico);
-                Files.write(rutaAbsoluta, archivoImagen.getBytes());
-                
-                producto.setImagen(nombreUnico);
-            } else if (existente != null) {
-                producto.setImagen(existente.getImagen()); // Mantiene la foto anterior
-            }
+  @PostMapping("/tipos_negocio/guardar")
+  public String guardarTipoNegocio(@ModelAttribute("tipo") TipoNegocio t, RedirectAttributes f) {
+    t.setNombre(InputChecks.text(t.getNombre(), 45));
+    InputChecks.optional(t.getIcono(), 200);
+    if (t.getIdTipoNegocio() != null && !tipoNegocioRepo.existsById(t.getIdTipoNegocio()))
+      throw BusinessException.missing();
+    if (t.getEstado() == null) t.setEstado(true);
+    tipoNegocioRepo.saveAndFlush(t);
+    return success(f, "tipos_negocio", "BUSINESS_TYPE_SAVED");
+  }
 
-            // 2. Guardar en BD
-            productoRepo.save(producto);
-            redirectAttributes.addFlashAttribute("mensajeExito", esEdicion ? "Producto actualizado correctamente." : "Nuevo producto creado con éxito.");
-            
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al procesar el archivo o guardar el producto.");
-        }
-        return "redirect:/panel?modulo=productos";
-    }
-
-    // ==========================================
-    // LÓGICA PARA ELIMINAR PRODUCTO
-    // ==========================================
-    @PostMapping("/productos/eliminar")
-    public String eliminarProducto(@RequestParam("idProducto") Integer idProducto, RedirectAttributes redirectAttributes) {
-        try {
-            productoRepo.deleteById(idProducto);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Producto eliminado correctamente.");
-        } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar el producto porque está incluido en pedidos, carritos o promociones.");
-        }
-        return "redirect:/panel?modulo=productos";
-    }
- // En los @PostMapping (Al final de la clase):
-    @PostMapping("/promociones/guardar")
-    public String guardarPromocion(@ModelAttribute Promocion promo, 
-                                   @RequestParam(value = "dias", required = false) List<String> dias,
-                                   @RequestParam(value = "archivoBanner", required = false) MultipartFile archivoBanner, 
-                                   RedirectAttributes redirectAttributes) {
-        try {
-            boolean esEdicion = promo.getIdPromocion() != null;
-            Promocion existente = esEdicion ? promocionRepo.findById(promo.getIdPromocion()).orElse(null) : null;
-
-            // Procesar los checkboxes de días hacia un String "1,2,3"
-            if (dias != null && !dias.isEmpty()) {
-                promo.setDiasActivos(String.join(",", dias));
-            } else {
-                promo.setDiasActivos("");
-            }
-
-            // Manejo de la Imagen (Carpeta dinámica 'banner')
-            if (archivoBanner != null && !archivoBanner.isEmpty()) {
-                String nombreOriginal = archivoBanner.getOriginalFilename();
-                String extension = (nombreOriginal != null && nombreOriginal.contains(".")) ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) : "";
-                String nombreUnico = UUID.randomUUID().toString() + extension;
-                
-                Path directorio = Paths.get("RIDE_MEAL", "promociones");
-                if (!Files.exists(directorio)) Files.createDirectories(directorio);
-                Files.write(directorio.resolve(nombreUnico), archivoBanner.getBytes());
-                
-                promo.setImagenBanner(nombreUnico);
-            } else if (existente != null) {
-                promo.setImagenBanner(existente.getImagenBanner());
-            }
-            
-         // INTERCEPCIÓN DEL CHECKBOX: Si viene nulo (desmarcado), lo forzamos a false
-            if (promo.getMostrarEnIndex() == null) {
-                promo.setMostrarEnIndex(false);
-            }
-            
-            promocionRepo.save(promo);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Promoción guardada correctamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Error al guardar la promoción.");
-        }
-        return "redirect:/panel?modulo=promociones";
-    }
-    
-    @PostMapping("/promociones/eliminar")
-    public String eliminarPromocion(@RequestParam("idPromocion") Integer idPromocion, RedirectAttributes redirectAttributes) {
-        promocionRepo.deleteById(idPromocion);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Promoción eliminada.");
-        return "redirect:/panel?modulo=promociones";
-    }
-    
-    @PostMapping("/tipos_negocio/ocultar")
-    public String ocultarTipoNegocio(@RequestParam("idTipoNegocio") Integer idTipoNegocio, RedirectAttributes redirectAttributes) {
-        TipoNegocio tipo = tipoNegocioRepo.findById(idTipoNegocio).orElse(null);
-        if (tipo != null) {
-            tipo.setEstado(false); // Lo marcamos como oculto
-            tipoNegocioRepo.save(tipo);
-            redirectAttributes.addFlashAttribute("mensajeExito", "El tipo de negocio ha sido ocultado del catálogo.");
-        }
-        return "redirect:/panel?modulo=tipos_negocio";
-    }
-
-    @PostMapping("/tipos_negocio/guardar")
-    public String guardarTipoNegocio(@ModelAttribute TipoNegocio tipo, RedirectAttributes redirectAttributes) {
-        try {
-            // Si es un tipo nuevo (ID nulo), por defecto lo hacemos visible
-            if (tipo.getIdTipoNegocio() == null && tipo.getEstado() == null) {
-                tipo.setEstado(true);
-            }
-            
-            tipoNegocioRepo.save(tipo);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Tipo de negocio guardado correctamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error al guardar el tipo de negocio.");
-        }
-        return "redirect:/panel?modulo=tipos_negocio";
-    }
- // ==========================================
-    // LÓGICA PARA CONFIGURACIÓN GLOBAL
-    // ==========================================
-    @PostMapping("/configuracion/guardar")
-    public String guardarConfiguracion(@ModelAttribute Configuracion config, RedirectAttributes redirectAttributes) {
-        config.setIdConfiguracion(1); // Siempre forzamos el ID 1 (Fila única)
-        configRepo.save(config);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Configuración global actualizada correctamente.");
-        return "redirect:/panel?modulo=configuracion";
-    }
+  @PostMapping("/configuracion/guardar")
+  public String guardarConfiguracion(
+      @ModelAttribute("config") Configuracion c, RedirectAttributes f) {
+    InputChecks.phone(c.getTelefonoSoporte());
+    InputChecks.httpsUrl(c.getLinkFacebook());
+    InputChecks.httpsUrl(c.getLinkInstagram());
+    InputChecks.httpsUrl(c.getLinkTiktok());
+    InputChecks.optional(c.getMensajeWspCabecera(), 500);
+    InputChecks.optional(c.getMensajeWspFooter(), 500);
+    if (c.getPrecioBaseDelivery() == null
+        || c.getPrecioKmAdicional() == null
+        || c.getDistanciaBaseMetros() == null
+        || c.getDistanciaBaseMetros() < 0
+        || c.getDistanciaBaseMetros() > 1000000)
+      throw BusinessException.invalid("Revisa las tarifas de delivery.");
+    InputChecks.money(c.getPrecioBaseDelivery());
+    InputChecks.money(c.getPrecioKmAdicional());
+    c.setIdConfiguracion(1);
+    configRepo.saveAndFlush(c);
+    return success(f, "configuracion", "CONFIG_CHANGED");
+  }
 }

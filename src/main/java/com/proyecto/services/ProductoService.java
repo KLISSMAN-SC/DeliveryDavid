@@ -1,45 +1,29 @@
 package com.proyecto.services;
 
+import com.proyecto.model.Producto;
+import com.proyecto.repository.ProductoRepository;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.proyecto.model.Producto;
-import com.proyecto.repository.NegocioRepository;
-import com.proyecto.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
 
-	@Autowired
-	private ProductoRepository productoRepository;
-	
-	
-    public List<Producto> listarProductosPorNegocio(Integer idNegocio) {
+  @Autowired private ProductoRepository productoRepository;
 
-        return productoRepository.findByNegocioIdNegocioAndDisponibleTrue(idNegocio);
+  public List<Producto> listarProductosPorNegocio(Integer idNegocio) {
 
+    return productoRepository.findByNegocioIdNegocioAndDisponibleTrue(idNegocio);
+  }
+
+  public List<Producto> buscarProductosPorNegocio(Integer idNegocio, String texto) {
+
+    // Si el buscador está vacío, mostrar todos
+    if (texto == null || texto.trim().isEmpty()) {
+
+      return productoRepository.findByNegocioIdNegocioAndDisponibleTrue(idNegocio);
     }
-    
-    public List<Producto> buscarProductosPorNegocio(
-            Integer idNegocio,
-            String texto) {
 
-        // Si el buscador está vacío, mostrar todos
-        if (texto == null || texto.trim().isEmpty()) {
-
-            return productoRepository
-                    .findByNegocioIdNegocioAndDisponibleTrue(
-                            idNegocio
-                    );
-        }
-
-
-        return productoRepository
-                .buscarProductosPorNegocio(
-                        idNegocio,
-                        texto.trim()
-                );
-    }
+    return productoRepository.buscarProductosPorNegocio(idNegocio, texto.trim());
+  }
 }

@@ -45,7 +45,7 @@ function buscarProductos(
     );
 
 
-    fetch(
+    secureFetch(
         `/api/productos/buscar` +
         `?idNegocio=${idNegocio}` +
         `&q=${encodeURIComponent(texto)}`

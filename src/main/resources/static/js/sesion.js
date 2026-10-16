@@ -36,7 +36,7 @@ function validarPassword() {
     const btnAccion = document.getElementById('btnRegistrar') || document.getElementById('btnRestablecer');
     
     // Reglas de seguridad
-    const tieneLongitud = password.length >= 8;
+    const tieneLongitud = password.length >= 12 && new TextEncoder().encode(password).length <= 72;
     const tieneMayus = /[A-Z]/.test(password);
     const tieneMinus = /[a-z]/.test(password);
     const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);

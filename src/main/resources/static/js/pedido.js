@@ -9,7 +9,7 @@ function abrirModalPedido(idNegocio) {
    
 
 
-    fetch(
+    secureFetch(
         `/api/pedido/resumen?` +
         `&idNegocio=${idNegocio}`
     )
@@ -94,6 +94,7 @@ function confirmarPedido(boton) {
 	    const idDireccion =direccionSeleccionada.value;
 	    const metodoPago =document.getElementById("metodoPagoPedido").value;
 	    const datos =new URLSearchParams();
+        if(boton.dataset.carrito)datos.append('idCarrito',boton.dataset.carrito);
 		
 	    datos.append(
 	        "idNegocio",
@@ -120,7 +121,7 @@ function confirmarPedido(boton) {
 	    // CREAR PEDIDO
 	    // ====================================
 
-	    fetch(
+	    secureFetch(
 	        "/api/pedido/confirmar",
 	        {
 
@@ -214,7 +215,7 @@ function cancelarPedido(
         "Cancelando...";
 
 
-    fetch(
+    secureFetch(
         `/api/pedido/${idPedido}/cancelar` +
 
         {
@@ -307,7 +308,7 @@ function mostrarPedidoConfirmado(
 	    }
 
 
-	    return fetch(
+	    return secureFetch(
 	        `/api/pedido/confirmacion/${idPedido}`
 	    )
 
@@ -555,7 +556,7 @@ function cancelarPedidoDesdeLista(
 	        "Cancelando...";
 
 
-	    fetch(
+	    secureFetch(
 	        `/api/pedido/${idPedido}/cancelar` +
 	        {
 	            method: "POST",
@@ -938,7 +939,7 @@ function cancelarPedidoDesdeLista(
 	        });
 
 
-	    fetch(
+	    secureFetch(
 	        `/api/pedido/calcular-envio?${parametros}`
 	    )
 
