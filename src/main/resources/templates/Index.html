@@ -96,9 +96,7 @@
         
      
          <a
-    	th:href="@{/pedido/mis-pedidos(
-        idUsuario=${usuarioAutenticado.idUsuario}
-    	)}"
+    	th:href="@{/pedido/mis-pedidos}"
     	class="menu-usuario-opcion">
 
     	<i class="fa-solid fa-bag-shopping"></i>
@@ -112,7 +110,7 @@
         
         
         <a
-    	th:href="@{/direcciones(idUsuario=${usuarioAutenticado.idUsuario})}"
+    	th:href="@{/direcciones}"
     	class="menu-usuario-opcion">
 
     	<i class="fa-solid fa-location-dot"></i>

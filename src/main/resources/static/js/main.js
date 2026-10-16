@@ -7,25 +7,6 @@ if ('scrollRestoration' in history) {
 window.addEventListener('beforeunload', () => {
     sessionStorage.setItem('posicionScroll', window.scrollY);
 });
-// ==========================================
-// FUNCIÓN GLOBAL PARA OBTENER EL USUARIO
-// ==========================================
-function obtenerIdUsuario() {
-    // 1. Intentar obtenerlo de la variable global de Thymeleaf
-    let idUsuario = Number(window.idUsuarioValidado);
-    
-    // 2. Si no existe (como en la vista de direcciones), intentar obtenerlo de la URL (?idUsuario=8)
-    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
-        const params = new URLSearchParams(window.location.search);
-        idUsuario = Number(params.get('idUsuario'));
-    }
-
-    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
-        throw new Error("No existe un usuario autenticado");
-    }
-    
-    return idUsuario;
-}
 
 document.addEventListener('DOMContentLoaded', () => {
 

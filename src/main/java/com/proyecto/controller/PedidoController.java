@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,9 +24,11 @@ import com.proyecto.model.Carrito;
 import com.proyecto.model.DetallePedido;
 import com.proyecto.model.DireccionUsuario;
 import com.proyecto.model.Pedido;
+import com.proyecto.model.Usuario;
 import com.proyecto.services.DeliveryService;
 import com.proyecto.services.DireccionUsuarioService;
 import com.proyecto.services.PedidoService;
+import com.proyecto.services.UsuarioService;
 
 
 
@@ -34,7 +37,8 @@ import com.proyecto.services.PedidoService;
 public class PedidoController {
 	@Autowired
     private PedidoService pedidoService;
-
+	@Autowired 
+	private UsuarioService usuarioService;
 
     @Autowired
     private DireccionUsuarioService
@@ -57,15 +61,16 @@ public class PedidoController {
     @GetMapping("/resumen")
     public String mostrarResumen(
 
-            @RequestParam Integer idUsuario,
+            
             @RequestParam Integer idNegocio,
+            Authentication authentication,
             Model model) {
 
-
+    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
         Carrito carrito =
                 pedidoService
                 .obtenerCarritoCheckout(
-                        idUsuario,
+                        usuario.getIdUsuario(),
                         idNegocio
                 );
 
@@ -73,14 +78,14 @@ public class PedidoController {
         List<DireccionUsuario> direcciones =
                 direccionUsuarioService
                 .listarPorUsuario(
-                        idUsuario
+                        usuario.getIdUsuario()
                 );
 
 
         DireccionUsuario direccionSeleccionada =
                 direccionUsuarioService
                 .obtenerPrincipalOPrimera(
-                        idUsuario
+                        usuario.getIdUsuario()
                 );
 
 
@@ -184,7 +189,7 @@ public class PedidoController {
     public ResponseEntity<Map<String, Object>>
     confirmarPedido(
 
-            @RequestParam Integer idUsuario,
+    		Authentication authentication,
             @RequestParam Integer idNegocio,
             @RequestParam Integer idDireccion,
             @RequestParam String metodoPago,
@@ -194,11 +199,11 @@ public class PedidoController {
             )
             BigDecimal propina) {
 
-
+    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
         Pedido pedido =
                 pedidoService
                 .confirmarPedido(
-                        idUsuario,
+                        usuario.getIdUsuario(),
                         idNegocio,
                         idDireccion,
                         metodoPago,
@@ -240,17 +245,17 @@ public class PedidoController {
     	@ResponseBody
     	public ResponseEntity<Map<String, Object>>
     	cancelarPedido(
-
+    			
     	        @PathVariable Integer idPedido,
-
-    	        @RequestParam Integer idUsuario) {
-
-
+    	        Authentication authentication
+    	        ) {
+    	
+    		Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
     	    Pedido pedido =
     	            pedidoService
     	            .cancelarPedido(
     	                    idPedido,
-    	                    idUsuario
+    	                    usuario.getIdUsuario()
     	            );
 
 
@@ -336,18 +341,20 @@ public class PedidoController {
         return
             "fragmentos/pedido-confirmado-modal :: modalPedidoConfirmado";
     }
+    
     @GetMapping("/mis-pedidos")
     public String mostrarMisPedidos(
 
-            @RequestParam Integer idUsuario,
+    		Authentication authentication,
 
             Model model) {
 
-
+    	Usuario usuario =usuarioService.obtenerUsuarioAutenticado(authentication);
+    	
         List<Pedido> pedidos =
                 pedidoService
                 .listarPedidosUsuario(
-                        idUsuario
+                        usuario.getIdUsuario()
                 );
 
 
@@ -356,15 +363,9 @@ public class PedidoController {
                 pedidos
         );
 
-
-        model.addAttribute(
-                "idUsuarioValidado",
-                idUsuario
-        );
-
-
         return "mis-pedidos";
     }
+    
     @GetMapping(
     	    value = "/calcular-envio",
     	    produces = MediaType.APPLICATION_JSON_VALUE
@@ -373,20 +374,20 @@ public class PedidoController {
     	public ResponseEntity<Map<String, Object>>
     	calcularEnvio(
 
-    	        @RequestParam Integer idUsuario,
-
+    	        	
+    			Authentication authentication,
     	        @RequestParam Integer idNegocio,
 
     	        @RequestParam Integer idDireccionUsuario) {
 
 
     	    try {
-
-
+    	    	
+    	    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
     	        Carrito carrito =
     	                pedidoService
     	                    .obtenerCarritoCheckout(
-    	                        idUsuario,
+    	                        usuario.getIdUsuario(),
     	                        idNegocio
     	                    );
 
@@ -395,7 +396,7 @@ public class PedidoController {
     	                direccionUsuarioService
     	                    .obtenerPorIdYUsuario(
     	                        idDireccionUsuario,
-    	                        idUsuario
+    	                        usuario.getIdUsuario()
     	                    );
 
 

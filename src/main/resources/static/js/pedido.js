@@ -6,12 +6,11 @@ function abrirModalPedido(idNegocio) {
 	
 	window.negocioPedidoActual =
 	        idNegocio;
-    const idUsuario = obtenerIdUsuario(); // TEMPORAL
+   
 
 
     fetch(
-        `/api/pedido/resumen` +
-        `?idUsuario=${idUsuario}` +
+        `/api/pedido/resumen?` +
         `&idNegocio=${idNegocio}`
     )
 
@@ -84,49 +83,18 @@ function cerrarModalPedido() {
 
 function confirmarPedido(boton) {
 
-	const idUsuario =
-	        obtenerIdUsuario();
-
-
-	    const idNegocio =
-	        boton.dataset.negocio;
-
-
-	    const direccionSeleccionada =
-	        document.querySelector(
-	            'input[name="direccionPedido"]:checked'
-	        );
-
+	    const idNegocio =boton.dataset.negocio;
+	    const direccionSeleccionada =document.querySelector('input[name="direccionPedido"]:checked');
 
 	    if (!direccionSeleccionada) {
 
-	        alert(
-	            "Selecciona una dirección de entrega."
-	        );
-
+	        alert("Selecciona una dirección de entrega.");
 	        return;
 	    }
-
-
-	    const idDireccion =
-	        direccionSeleccionada.value;
-
-
-	    const metodoPago =
-	        document.getElementById(
-	            "metodoPagoPedido"
-	        ).value;
-
-
-	    const datos =
-	        new URLSearchParams();
-
-
-	    datos.append(
-	        "idUsuario",
-	        idUsuario
-	    );
-
+	    const idDireccion =direccionSeleccionada.value;
+	    const metodoPago =document.getElementById("metodoPagoPedido").value;
+	    const datos =new URLSearchParams();
+		
 	    datos.append(
 	        "idNegocio",
 	        idNegocio
@@ -229,10 +197,6 @@ function cancelarPedido(
     boton
 ) {
 
-    const idUsuario =
-        obtenerIdUsuario();
-
-
     const confirmar =
         window.confirm(
             "¿Estás seguro de cancelar este pedido?"
@@ -252,7 +216,7 @@ function cancelarPedido(
 
     fetch(
         `/api/pedido/${idPedido}/cancelar` +
-        `?idUsuario=${idUsuario}`,
+
         {
             method: "POST",
 
@@ -568,13 +532,11 @@ function filtrarPedidos(boton) {
                 : "none";
     }
 	}
-	function cancelarPedidoDesdeLista(
+	
+function cancelarPedidoDesdeLista(
 	    idPedido,
 	    boton
 	) {
-
-	    const idUsuario =
-	        obtenerIdUsuario();
 
 
 	    if (
@@ -595,7 +557,6 @@ function filtrarPedidos(boton) {
 
 	    fetch(
 	        `/api/pedido/${idPedido}/cancelar` +
-	        `?idUsuario=${idUsuario}`,
 	        {
 	            method: "POST",
 
@@ -893,9 +854,7 @@ function filtrarPedidos(boton) {
 	    }
 
 
-	    const idUsuario =
-	        obtenerIdUsuario();
-
+	    
 
 	    const modal =
 	        document.getElementById(
@@ -969,8 +928,7 @@ function filtrarPedidos(boton) {
 	    const parametros =
 	        new URLSearchParams({
 
-	            idUsuario:
-	                idUsuario,
+	         
 
 	            idNegocio:
 	                idNegocio,

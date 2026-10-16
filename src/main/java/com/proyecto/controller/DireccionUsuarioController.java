@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.proyecto.model.DireccionUsuario;
+import com.proyecto.model.Usuario;
 import com.proyecto.services.DireccionUsuarioService;
+import com.proyecto.services.UsuarioService;
 
 @Controller
 @RequestMapping("/direcciones")
@@ -28,7 +31,8 @@ public class DireccionUsuarioController {
 	
 	@Autowired
     private DireccionUsuarioService direccionUsuarioService;
-
+	@Autowired
+	private UsuarioService usuarioService;
 	// ==========================================
     // MODULO DE MIS DIRECCIONES
     // ==========================================
@@ -38,14 +42,16 @@ public class DireccionUsuarioController {
 	
 	@GetMapping
 	public String paginaDirecciones(
-	        @RequestParam Integer idUsuario,
+			Authentication authentication,
 	        Model model) {
 
-
+		Usuario usuario =usuarioService.obtenerUsuarioAutenticado(authentication);
+	            
+		
 	    List<DireccionUsuario> direcciones =
 	            direccionUsuarioService
 	            .listarPorUsuario(
-	                    idUsuario
+	                   usuario.getIdUsuario()
 	            );
 
 
@@ -55,10 +61,7 @@ public class DireccionUsuarioController {
 	    );
 
 
-	    model.addAttribute(
-	            "idUsuarioValidado",
-	            idUsuario
-	    );
+	    
 	    model.addAttribute(
                 "googleMapsKey",
                 googleMapsApiKey
@@ -82,15 +85,14 @@ public class DireccionUsuarioController {
 
             @PathVariable
             Integer idDireccionUsuario,
-
-            @RequestParam
-            Integer idUsuario) {
-
+            Authentication authentication
+           ) {
+    	Usuario usuario =usuarioService.obtenerUsuarioAutenticado(authentication);
 
         direccionUsuarioService
                 .eliminarDireccion(
                         idDireccionUsuario,
-                        idUsuario
+                        usuario.getIdUsuario()
                 );
 
 
@@ -126,7 +128,7 @@ public class DireccionUsuarioController {
     public ResponseEntity<Map<String, Object>>
     agregarDireccion(
 
-            @RequestParam Integer idUsuario,
+    		Authentication authentication,
             @RequestParam String alias,
             @RequestParam String direccion,
 
@@ -136,11 +138,11 @@ public class DireccionUsuarioController {
             @RequestParam BigDecimal latitud,
             @RequestParam BigDecimal longitud) {
 
-
+    	Usuario usuario=usuarioService.obtenerUsuarioAutenticado(authentication);
         DireccionUsuario nueva =
                 direccionUsuarioService
                 .guardarDireccion(
-                        idUsuario,
+                        usuario.getIdUsuario(),
                         alias,
                         direccion,
                         referencia,

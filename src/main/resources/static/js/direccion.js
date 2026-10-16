@@ -5,310 +5,139 @@
 
 function inicializarDireccionesPedido() {
 
-	const radios =
-	        document.querySelectorAll(
-	            'input[name="direccionPedido"]'
-	        );
-
+	const radios =document.querySelectorAll('input[name="direccionPedido"]');
 
 	    radios.forEach(radio => {
+	        radio.addEventListener("change",function() {actualizarMapaDireccion(this);
+	                recalcularEnvioPedido(this);});});
 
-	        radio.addEventListener(
-	            "change",
-	            function() {
-
-	                actualizarMapaDireccion(
-	                    this
-	                );
-
-
-	                recalcularEnvioPedido(
-	                    this
-	                );
-	            }
-	        );
-
-	    });
-
-
-	    const seleccionada =
-	        document.querySelector(
-	            'input[name="direccionPedido"]:checked'
-	        );
-
+	    const seleccionada =document.querySelector('input[name="direccionPedido"]:checked');
 
 	    if (seleccionada) {
-
-	        actualizarMapaDireccion(
-	            seleccionada
-	        );
-	    }
+	        actualizarMapaDireccion(seleccionada);}
 }
-
-
 
 // ==========================================
 // CAMBIAR PUNTO DEL MAPA
 // ==========================================
 
 function actualizarMapaDireccion(radio) {
-	const modal =
-	        document.getElementById(
-	            "modalPedido"
-	        );
+		const modal =document.getElementById("modalPedido");
 
-
-	    const mapa =
-	        document.getElementById(
-	            "mapaPedido"
-	        );
-
+	    const mapa =document.getElementById("mapaPedido");
 
 	    if (!modal || !mapa || !radio) {
 	        return;
 	    }
 
 
-	    const apiKey =
-	        modal.dataset.googleKey;
+	    const apiKey =modal.dataset.googleKey;
 
+	    const latNegocio =modal.dataset.negocioLat;
 
-	    const latNegocio =
-	        modal.dataset.negocioLat;
+	    const lngNegocio =modal.dataset.negocioLng;
 
+	    const latCliente =radio.dataset.latitud;
 
-	    const lngNegocio =
-	        modal.dataset.negocioLng;
+	    const lngCliente =radio.dataset.longitud;
 
-
-	    const latCliente =
-	        radio.dataset.latitud;
-
-
-	    const lngCliente =
-	        radio.dataset.longitud;
-
-
-	    if (
-	        !apiKey ||
-	        !latNegocio ||
-	        !lngNegocio ||
-	        !latCliente ||
-	        !lngCliente
+	    if (!apiKey || !latNegocio || !lngNegocio || !latCliente || !lngCliente
 	    ) {
-
-	        console.error(
-	            "Faltan coordenadas para mostrar la ruta."
-	        );
-
+	        console.error("Faltan coordenadas para mostrar la ruta.");
 	        return;
 	    }
 
-
-	    mapa.src =
-	        "https://www.google.com/maps/embed/v1/directions" +
-	        "?key=" +
-	        encodeURIComponent(apiKey) +
-
-	        "&origin=" +
-	        encodeURIComponent(
-	            `${latNegocio},${lngNegocio}`
-	        ) +
-
-	        "&destination=" +
-	        encodeURIComponent(
-	            `${latCliente},${lngCliente}`
-	        ) +
-
-	        "&mode=driving" +
-
-	        "&units=metric";
-    
+	    mapa.src ="https://www.google.com/maps/embed/v1/directions" +"?key=" +encodeURIComponent(apiKey) +"&origin=" +encodeURIComponent(
+	            `${latNegocio},${lngNegocio}`) +"&destination=" +encodeURIComponent(`${latCliente},${lngCliente}`) +"&mode=driving" +"&units=metric";
+ 
 }
 
-function abrirModalAgregarDireccion(
-    origen = "general"
-) {
+function abrirModalAgregarDireccion(origen = "general") {
 
-    window.origenModalDireccion =
-        origen;
+    window.origenModalDireccion =origen;
 
-
-    const modal =
-        document.getElementById(
-            "modalDireccion"
-        );
-
+    const modal =document.getElementById("modalDireccion");
 
     if (!modal) {
         return;
     }
-
-
     volverElegirDireccion();
 
-
-    modal.classList.add(
-        "activo"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
+    modal.classList.add("activo");
+    document.body.style.overflow ="hidden";
 }
 
 
 function detectarUbicacionActual() {
 
 	if (!navigator.geolocation) {
-
-	        alert(
-	            "Tu navegador no permite obtener tu ubicación."
-	        );
-
+	        alert("Tu navegador no permite obtener tu ubicación.");
 	        return;
 	    }
-
 
 	    navigator.geolocation.getCurrentPosition(
 
 	        function(position) {
 
-	            const latitud =
-	                position.coords.latitude;
+	            const latitud =position.coords.latitude;
+	            const longitud =position.coords.longitude;
 
-	            const longitud =
-	                position.coords.longitude;
-
-
-	            mostrarUbicacionDetectada(
-	                latitud,
-	                longitud
-	            );
+	            mostrarUbicacionDetectada(latitud,longitud);
 	        },
 
-
-	        function(error) {
-
-	            console.error(
-	                "Error ubicación:",
-	                error
-	            );
-
+	        function(error) {console.error("Error ubicación:",error);
 
 	            if (error.code === 1) {
-
-	                alert(
-	                    "No permitiste acceder a tu ubicación."
-	                );
+	                alert("No permitiste acceder a tu ubicación.");
 
 	            } else if (error.code === 2) {
-
-	                alert(
-	                    "No pudimos determinar tu ubicación."
-	                );
+	                alert("No pudimos determinar tu ubicación.");
 
 	            } else if (error.code === 3) {
-
-	                alert(
-	                    "La solicitud de ubicación tardó demasiado."
-	                );
-
+	                alert("La solicitud de ubicación tardó demasiado.");
 	            } else {
-
-	                alert(
-	                    "No se pudo obtener tu ubicación."
-	                );
+	                alert("No se pudo obtener tu ubicación.");
 	            }
 	        },
 
-
-	        {
-	            enableHighAccuracy: true,
-	            timeout: 10000,
-	            maximumAge: 0
-	        }
+	        {enableHighAccuracy: true,timeout: 10000,maximumAge: 0}
 	    );
 }
-function mostrarUbicacionDetectada(
-    latitud,
-    longitud
-) {
-	const modalDireccion =
-	        document.getElementById(
-	            "modalDireccion"
-	        );
-
+function mostrarUbicacionDetectada(latitud,longitud) {
+	const modalDireccion =document.getElementById("modalDireccion");
 
 	    if (!modalDireccion) {
-
-	        console.error(
-	            "No existe #modalDireccion"
-	        );
-
+	        console.error("No existe #modalDireccion");
 	        return;
 	    }
 
-
-	    const googleKey =
-	        modalDireccion.dataset.googleKey;
-
+	    const googleKey =modalDireccion.dataset.googleKey;
 
 	    if (!googleKey) {
-
-	        console.error(
-	            "No se encontró la Google Maps API Key"
-	        );
-
+	        console.error("No se encontró la Google Maps API Key");
 	        return;
 	    }
 
-
-	    const coordenadas =
-	        `${latitud},${longitud}`;
-
+	    const coordenadas =`${latitud},${longitud}`;
 
 	    // Guardar coordenadas
+	    document.getElementById("nuevaLatitud").value = latitud;
 
-	    document.getElementById(
-	        "nuevaLatitud"
-	    ).value = latitud;
-
-
-	    document.getElementById(
-	        "nuevaLongitud"
-	    ).value = longitud;
-
-
+	    document.getElementById("nuevaLongitud").value = longitud;
 	    // Mostrar mapa
-
-	    const mapa =
-	        document.getElementById(
-	            "mapaNuevaDireccion"
-	        );
+	    const mapa =document.getElementById("mapaNuevaDireccion");
 
 
 	    mapa.src =
-	        `https://www.google.com/maps/embed/v1/place` +
+	    	 `https://www.google.com/maps/embed/v1/place` +
 	        `?key=${encodeURIComponent(googleKey)}` +
 	        `&q=${encodeURIComponent(coordenadas)}`;
 
-
 	    // Cambiar al paso de confirmación
 
-	    document.getElementById(
-	        "pasoElegirDireccion"
-	    ).classList.add(
-	        "oculto"
-	    );
+	    document.getElementById("pasoElegirDireccion").classList.add("oculto");
 
-
-	    document.getElementById(
-	        "pasoDireccionManual"
-	    ).classList.add(
-	        "oculto"
-	    );
-
+	    document.getElementById("pasoDireccionManual").classList.add("oculto");
 
 	    document.getElementById(
 	        "pasoConfirmarDireccion"
@@ -354,9 +183,6 @@ function cerrarModalDireccion() {
 	    }
 }
 function guardarNuevaDireccion() {
-
-    const idUsuario =
-        obtenerIdUsuario();
 
 
     const alias =
@@ -468,11 +294,6 @@ function guardarNuevaDireccion() {
     const datos =
         new URLSearchParams();
 
-
-    datos.append(
-        "idUsuario",
-        idUsuario
-    );
 
     datos.append(
         "alias",
@@ -623,17 +444,11 @@ function eliminarDireccionUsuario(
 
     const idDireccionUsuario =
         boton.dataset.direccion;
-
-
-    const idUsuario =
-        obtenerIdUsuario();
-
-
+		
     const confirmar =
         window.confirm(
             "¿Deseas eliminar esta dirección?"
         );
-
 
     if (!confirmar) {
         return;
@@ -644,8 +459,7 @@ function eliminarDireccionUsuario(
 
 
     fetch(
-        `/api/direcciones/${idDireccionUsuario}` +
-        `?idUsuario=${idUsuario}`,
+        `/api/direcciones/${idDireccionUsuario}`,
         {
             method: "DELETE",
 

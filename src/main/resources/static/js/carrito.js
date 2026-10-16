@@ -3,18 +3,15 @@ function abrirRestaurante(idNegocio) {
 
     fetch("/api/restaurante/" + idNegocio)
         .then(response => {
-
             // Spring Security redirigió la petición al login
             if (response.redirected && response.url.includes("/login")) {
                 window.location.href = response.url;
                 return null;
             }
-
             // Si ocurrió otro error
             if (!response.ok) {
                 throw new Error("No se pudo abrir el restaurante");
             }
-
             return response.text();
         })
         .then(html => {
@@ -25,9 +22,7 @@ function abrirRestaurante(idNegocio) {
             }
 
             document.getElementById("contenido-principal").innerHTML = html;
-
             window.scrollTo(0, 0);
-
             cargarCarrito(idNegocio);
         })
         .catch(error => {
@@ -37,12 +32,8 @@ function abrirRestaurante(idNegocio) {
 function agregarAlCarrito(boton) {
     const idProducto = boton.dataset.producto;
     const idNegocio = boton.dataset.negocio;
-    const idUsuario = obtenerIdUsuario();
-
-    fetch(
-        `/api/carrito/agregar?idUsuario=${idUsuario}&idNegocio=${idNegocio}&idProducto=${idProducto}`,
-        { method: "POST" }
-    )
+    
+    fetch(`/api/carrito/agregar?idNegocio=${idNegocio}&idProducto=${idProducto}`,{ method: "POST" })
     .then(response => {
         if (!response.ok) {
             throw new Error("No se pudo agregar el producto");
@@ -59,69 +50,37 @@ function agregarAlCarrito(boton) {
             mostrarCarrito(carrito);
         }
     })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+    .catch(error => {console.error("Error:", error);});
 }
 function cargarCarrito(idNegocio) {
 
-    const idUsuario = obtenerIdUsuario(); // temporal
-
     console.log("Consultando carrito del negocio:", idNegocio);
 
-    fetch(
-        `/api/carrito/actual` +
-        `?idUsuario=${idUsuario}` +
-        `&idNegocio=${idNegocio}`
-    )
-
+    fetch(`/api/carrito/actual?` +`&idNegocio=${idNegocio}`)
     .then(response => {
-
-        console.log(
-            "Respuesta GET carrito:",
-            response.status
-        );
-
+        console.log("Respuesta GET carrito:",response.status);
         if (!response.ok) {
             throw new Error(
                 "No se pudo obtener el carrito"
             );
         }
-
         // Si tu Controller devuelve null,
         // puede venir una respuesta vacía.
         return response.text();
     })
 
     .then(texto => {
-
         // No existe carrito todavía
         if (!texto) {
-
-            mostrarCarrito({
-                detalles: []
-            });
-
+            mostrarCarrito({detalles: []});
             return;
         }
-
         const carrito = JSON.parse(texto);
-
-        console.log(
-            "Carrito recuperado de BD:",
-            carrito
-        );
-
+        console.log("Carrito recuperado de BD:",carrito);
         mostrarCarrito(carrito);
     })
-
     .catch(error => {
-
-        console.error(
-            "Error cargando carrito:",
-            error
-        );
-
+        console.error("Error cargando carrito:",error);
     });
 }
 
@@ -142,7 +101,6 @@ function mostrarCarrito(carrito) {
         `;
         return;
     }
-
     let html = '<div class="carrito-items-lista">';
 
     // Generar la lista de productos
@@ -182,9 +140,7 @@ function mostrarCarrito(carrito) {
 
     // Calcular SOLO el subtotal de los productos (Se eliminó el envío)
     let totalProductos = 0;
-    carrito.detalles.forEach(detalle => {
-        totalProductos += Number(detalle.precioUnitario) * detalle.cantidad;
-    });
+    carrito.detalles.forEach(detalle => {totalProductos += Number(detalle.precioUnitario) * detalle.cantidad;});
 
     // Generar la zona de resumen limpia
     html += `
@@ -214,16 +170,10 @@ function mostrarCarrito(carrito) {
 }
 function aumentarProducto(idProducto, idNegocio) {
 
-    const idUsuario = obtenerIdUsuario(); // temporal
+    
 
-    fetch(
-        `/api/carrito/agregar` +
-        `?idUsuario=${idUsuario}` +
-        `&idNegocio=${idNegocio}` +
-        `&idProducto=${idProducto}`,
-        {
-            method: "POST"
-        }
+    fetch(`/api/carrito/agregar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+        {method: "POST"}
     )
     .then(response => {
 
@@ -236,17 +186,11 @@ function aumentarProducto(idProducto, idNegocio) {
         return response.json();
     })
     .then(carrito => {
-
-        mostrarCarrito(carrito);
-
+       mostrarCarrito(carrito);
     })
     .catch(error => {
 
-        console.error(
-            "Error aumentando producto:",
-            error
-        );
-
+        console.error("Error aumentando producto:",error);
     });
 }
 function disminuirProducto(
@@ -254,19 +198,10 @@ function disminuirProducto(
     idNegocio
 ) {
 
-    const idUsuario = obtenerIdUsuario(); // temporal
-
-    fetch(
-        `/api/carrito/disminuir` +
-        `?idUsuario=${idUsuario}` +
-        `&idNegocio=${idNegocio}` +
-        `&idProducto=${idProducto}`,
-        {
-            method: "POST"
-        }
+    fetch(`/api/carrito/disminuir?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+        {method: "POST"}
     )
     .then(response => {
-
         if (!response.ok) {
             throw new Error(
                 "No se pudo disminuir la cantidad"
@@ -275,34 +210,14 @@ function disminuirProducto(
 
         return response.json();
     })
-    .then(carrito => {
-
-        mostrarCarrito(carrito);
-
-    })
-    .catch(error => {
-
-        console.error(
-            "Error disminuyendo producto:",
-            error
-        );
-
-    });
+    .then(carrito => {mostrarCarrito(carrito);})
+    .catch(error => {console.error("Error disminuyendo producto:",error);});
 }
 function eliminarProducto(idProducto, idNegocio) {
 
-    const idUsuario = obtenerIdUsuario(); // temporal
-
-    fetch(
-        `/api/carrito/eliminar` +
-        `?idUsuario=${idUsuario}` +
-        `&idNegocio=${idNegocio}` +
-        `&idProducto=${idProducto}`,
-        {
-            method: "DELETE"
-        }
+    fetch(`/api/carrito/eliminar?` +`&idNegocio=${idNegocio}` +`&idProducto=${idProducto}`,
+        {method: "DELETE"}
     )
-
     .then(response => {
 
         if (!response.ok) {
@@ -314,22 +229,7 @@ function eliminarProducto(idProducto, idNegocio) {
         return response.json();
     })
 
-    .then(carrito => {
-
-        console.log(
-            "Producto eliminado:",
-            carrito
-        );
-
-        mostrarCarrito(carrito);
-    })
-
-    .catch(error => {
-
-        console.error(
-            "Error eliminando producto:",
-            error
-        );
-
-    });
+    .then(carrito => {console.log("Producto eliminado:",carrito);
+        mostrarCarrito(carrito);})
+    .catch(error => {console.error("Error eliminando producto:",error);});
 }
