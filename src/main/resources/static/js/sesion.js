@@ -24,53 +24,83 @@ function mostrarCarga() {
         if (icono) icono.style.display = 'inline-block';
     }
 }
+// ==========================================
+// 2. VALIDACIÓN DE CONTRASEÑA
+// REGISTRO Y RESET
+// ==========================================
 
-// ==========================================
-// 2. VALIDACIÓN DE CONTRASEÑA (REGISTRO Y RESET)
-// ==========================================
 function validarPassword() {
-    const inputPass = document.getElementById('inputPassword');
-    if (!inputPass) return; // Si no estamos en una vista con password, no hace nada
+    const inputPass =document.getElementById('inputPassword');
 
-    const password = inputPass.value;
-    const btnAccion = document.getElementById('btnRegistrar') || document.getElementById('btnRestablecer');
-    
-    // Reglas de seguridad
-    const tieneLongitud = password.length >= 12 && new TextEncoder().encode(password).length <= 72;
+    if (!inputPass) {return;}
+
+    const password =inputPass.value;
+
+    // ==========================================
+    // REGLAS DE CONTRASEÑA
+    // ==========================================
+
+    const tieneLongitud =password.length >= 8 && new TextEncoder().encode(password).length <= 72;
     const tieneMayus = /[A-Z]/.test(password);
-    const tieneMinus = /[a-z]/.test(password);
-    const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const tieneMinus =/[a-z]/.test(password);
+    const tieneEspecial =/[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    actualizarRequisito('req-long', tieneLongitud);
-    actualizarRequisito('req-mayus', tieneMayus);
-    actualizarRequisito('req-minus', tieneMinus);
-    actualizarRequisito('req-especial', tieneEspecial);
-
-    const cumpleRequisitos = tieneLongitud && tieneMayus && tieneMinus && tieneEspecial;
-
-    // Validación adicional si existe confirmación de contraseña (en reset-password)
-    const inputConfirm = document.getElementById('inputConfirmPassword');
+    actualizarRequisito('req-long',tieneLongitud);
+    actualizarRequisito('req-mayus',tieneMayus);
+    actualizarRequisito('req-minus',tieneMinus);
+    actualizarRequisito('req-especial',tieneEspecial);
+    const cumpleRequisitos =tieneLongitud &&tieneMayus &&tieneMinus &&tieneEspecial;
+    // ==========================================
+    // CONFIRMACIÓN DE PASSWORD
+    // SOLO SI EXISTE
+    // ==========================================
+    const inputConfirm =document.getElementById('inputConfirmPassword');
     let coinciden = true;
     if (inputConfirm) {
-        const confirmPassword = inputConfirm.value;
-        const mensajeCoincidencia = document.getElementById('mensajeCoincidencia');
-        coinciden = password === confirmPassword && confirmPassword.length > 0;
-
+        const confirmPassword =inputConfirm.value;
+        const mensajeCoincidencia =document.getElementById('mensajeCoincidencia');
+        coinciden =password === confirmPassword && confirmPassword.length > 0;
         if (confirmPassword.length > 0 && !coinciden) {
-            if (mensajeCoincidencia) mensajeCoincidencia.style.display = 'block';
+
+            if (mensajeCoincidencia) {
+                mensajeCoincidencia.style.display = 'block';
+            }
         } else {
-            if (mensajeCoincidencia) mensajeCoincidencia.style.display = 'none';
+            if (mensajeCoincidencia) {
+                mensajeCoincidencia.style.display = 'none';
+            }
         }
     }
 
-    // Activar o desactivar el botón principal
-    if (btnAccion) {
-        if (cumpleRequisitos && coinciden) {
-            btnAccion.disabled = false;
-            btnAccion.classList.remove('btn-deshabilitado');
+    // ==========================================
+    // BOTÓN REGISTRAR
+    // ==========================================
+
+    const btnRegistrar =document.getElementById('btnRegistrar');
+    if (btnRegistrar) {
+        const checkboxLegales =document.getElementById('aceptaLegales');
+        const legalesAceptados =checkboxLegales? checkboxLegales.checked: false;
+        const registroValido =cumpleRequisitos &&legalesAceptados;
+        
+		btnRegistrar.disabled =!registroValido;
+        if (registroValido) {
+            btnRegistrar.classList.remove('btn-deshabilitado');
         } else {
-            btnAccion.disabled = true;
-            btnAccion.classList.add('btn-deshabilitado');
+            btnRegistrar.classList.add('btn-deshabilitado');
+        }
+    }
+    // ==========================================
+    // BOTÓN RESTABLECER PASSWORD
+    // ==========================================
+    const btnRestablecer =document.getElementById('btnRestablecer');
+
+    if (btnRestablecer) {
+        const resetValido =cumpleRequisitos &&coinciden;
+        btnRestablecer.disabled =!resetValido;
+        if (resetValido) {
+			btnRestablecer.classList.remove('btn-deshabilitado');
+        } else {btnRestablecer.classList.add('btn-deshabilitado'
+            );
         }
     }
 }
@@ -106,8 +136,34 @@ function toggleVisibilidad(inputId = 'inputPassword', iconId = 'togglePassword')
         }
     }
 }
-
 // Inicialización al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    validarPassword();
-});
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        // Estado inicial
+        validarPassword();
+        // ======================================
+        // CHECKBOX LEGALES
+        // ======================================
+        const checkboxLegales =document.getElementById('aceptaLegales');
+        if (checkboxLegales) {
+            checkboxLegales.addEventListener('change',validarPassword);
+        }
+        // ======================================
+        // PASSWORD
+        // ======================================
+
+        const inputPassword =document.getElementById('inputPassword');
+        if (inputPassword) {
+            inputPassword.addEventListener('input',validarPassword);
+        }
+        // ======================================
+        // CONFIRMACIÓN PASSWORD
+        // RESET
+        // ======================================
+        const inputConfirm =document.getElementById('inputConfirmPassword');
+        if (inputConfirm) {
+            inputConfirm.addEventListener('input',validarPassword);
+        }
+    }
+);

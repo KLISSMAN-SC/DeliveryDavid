@@ -25,7 +25,11 @@
 <a class="menu-item" th:classappend="${modulo == 'tipos_negocio'} ? 'activo' : ''" th:href="@{/panel?modulo=tipos_negocio}"><i class="fa-solid fa-tags"></i> Tipos de Negocio</a>
 <a class="menu-item" th:classappend="${modulo == 'negocios'} ? 'activo' : ''" th:href="@{/panel?modulo=negocios}"><i class="fa-solid fa-store"></i> Negocios</a>
 <a class="menu-item" th:classappend="${modulo == 'categorias'} ? 'activo' : ''" th:href="@{/panel?modulo=categorias}"><i class="fa-solid fa-list"></i> Categorías de Prod.</a>
-<a class="menu-item" th:classappend="${modulo == 'productos'} ? 'activo' : ''" th:href="@{/panel?modulo=productos}"><i class="fa-solid fa-box-open"></i> Productos</a>
+<!-- DESACTIVAMOS MODULO DE PRODUCTOS -->
+<!--  
+<a class="menu-item" th:classappend="${modulo == 'productos'} ? 'activo' : ''" 
+th:href="@{/panel?modulo=productos}"><i class="fa-solid fa-box-open"></i> Productos</a>
+-->
 <a class="menu-item" th:classappend="${modulo == 'promociones'} ? 'activo' : ''" th:href="@{/panel?modulo=promociones}"><i class="fa-solid fa-star"></i> Promociones</a>
 <a class="menu-item" th:classappend="${modulo == 'configuracion'} ? 'activo' : ''" th:href="@{/panel?modulo=configuracion}"><i class="fa-solid fa-gear"></i> Configuración Global</a>
 </div>
@@ -254,6 +258,12 @@
 <button class="btn-icon editar" data-argc="13" data-click="abrirModalNegocio" data-kind0="number" data-kind12="boolean" data-kind7="number" data-kind8="number" data-kind9="number" th:data-arg0="${negocio.idNegocio}" th:data-arg1="${negocio.nombre}" th:data-arg10="${negocio.horaInicio}" th:data-arg11="${negocio.horaFin}" th:data-arg12="${negocio.modoWhatsapp}" th:data-arg2="${negocio.direccion}" th:data-arg3="${negocio.latitud}" th:data-arg4="${negocio.longitud}" th:data-arg5="${negocio.telefono}" th:data-arg6="${negocio.estado}" th:data-arg7="${negocio.tipoNegocio?.idTipoNegocio}" th:data-arg8="${negocio.zona?.idZona}" th:data-arg9="${negocio.centroComercial?.idCentroComercial}" title="Modificar">
 <i class="fa-solid fa-pen-to-square"></i>
 </button>
+ <!-- PRODUCTOS -->
+    <a class="btn-icon" th:href="@{/panel/negocios/{id}/productos(id=${negocio.idNegocio})}"
+        title="Gestionar productos"
+        style="text-decoration: none;display: inline-flex;align-items: center;justify-content: center;">
+        <i class="fa-solid fa-box-open"></i>
+    </a>
 <form data-confirm="¿Eliminar este negocio?" method="POST" style="display:inline;" th:action="@{/panel/negocios/eliminar}">
 <input name="idNegocio" th:value="${negocio.idNegocio}" type="hidden"/>
 <button class="btn-icon eliminar" title="Eliminar" type="submit"><i class="fa-solid fa-trash"></i></button>
@@ -459,19 +469,31 @@
 <!-- ==========================================
              7. CRUD DE PRODUCTOS 
              ========================================== -->
-<div th:if="${modulo == 'productos'}">
+<div th:if="${modulo == 'productos_negocio'}">
 <header class="panel-header">
-<h2>Gestión de Productos</h2>
-<div class="panel-acciones-top">
-<div class="search-container">
-<i class="fa-solid fa-magnifying-glass"></i>
-<input autocomplete="off" class="search-input" id="buscadorProductos" placeholder="Buscar por producto o negocio..." type="text"/>
-</div>
-<button class="btn-aceptar" data-argc="0" data-click="abrirModalProducto" style="width: auto; padding: 10px 20px;">
-<i class="fa-solid fa-plus"></i> Nuevo Producto
-                    </button>
-</div>
+
+<div>
+        <a th:href="@{/panel?modulo=negocios}" class="btn-text"style="display: inline-flex; align-items: center; gap: 7px; margin-bottom: 10px; text-decoration: none;">
+            <i class="fa-solid fa-arrow-left"></i>
+            Volver a negocios
+        </a>
+        <h2>
+            Productos de
+            <span style="color: var(--naranja-marca);" th:text="${negocioSeleccionado.nombre}">
+                Negocio
+            </span>
+        </h2>
+    </div>
+    <div class="panel-acciones-top">
+        <!-- BUSCADOR -->
+        <!-- NUEVO PRODUCTO -->
+        <button class="btn-aceptar" data-argc="0"data-click="abrirModalProducto"type="button">
+            <i class="fa-solid fa-plus"></i>
+            Nuevo Producto
+        </button>
+    </div>
 </header>
+
 <!-- Alertas -->
 <div class="alerta-mensaje" style="background: rgba(255, 85, 85, 0.1); color: #ff5555; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff5555; transition: opacity 0.5s ease;" th:if="${mensajeError}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${mensajeError}"></span></div>
 <div class="alerta-mensaje" style="background: rgba(0, 255, 0, 0.1); color: #00ff00; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #00ff00; transition: opacity 0.5s ease;" th:if="${mensajeExito}"><i class="fa-solid fa-circle-check"></i> <span th:text="${mensajeExito}"></span></div>
@@ -479,7 +501,7 @@
 <div class="tabla-contenedor">
 <table class="tabla-oscura">
 <thead>
-<tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Negocio</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr>
+<tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr>
 </thead>
 <tbody id="tablaProductosBody">
 <tr th:each="producto : ${listaProductos}">
@@ -495,7 +517,6 @@
 </div>
 </td>
 <td th:text="|S/ ${producto.precio != null ? producto.precio : '0.00'}|"></td>
-<td th:text="${producto.negocio?.nombre}"></td>
 <td th:text="${producto.categoriaProducto?.nombre}"></td>
 <td>
 <span class="badge" th:style="${producto.disponible != null and producto.disponible} ? 'background: rgba(0, 255, 0, 0.1); color: #00ff00;' : 'background: rgba(255, 85, 85, 0.1); color: #ff5555;'" th:text="${producto.disponible != null and producto.disponible} ? 'Disponible' : 'Agotado'"></span>
@@ -512,6 +533,24 @@
 </tr>
 </tbody>
 </table>
+<div
+    class="paginacion"th:if="${paginaProductos.totalPages > 1}">
+    <a th:if="${paginaProductos.hasPrevious()}" th:href="@{/panel/negocios/{id}/productos( id=${negocioSeleccionado.idNegocio}, pagina=${paginaProductos.number - 1}, q=${q} )}"><i class="fa-solid fa-chevron-left"></i>
+        Anterior
+    </a>
+    <span>
+        Página
+        <strong  th:text="${paginaProductos.number + 1}">  1
+        </strong>
+        de
+        <strong th:text="${paginaProductos.totalPages}"> 1
+        </strong>
+    </span>
+    <a th:if="${paginaProductos.hasNext()}" th:href="@{/panel/negocios/{id}/productos(id=${negocioSeleccionado.idNegocio},pagina=${paginaProductos.number + 1}, q=${q})}">
+        Siguiente
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+</div>
 </div>
 </section>
 <!-- MODAL HTML PRODUCTOS -->
@@ -530,10 +569,17 @@
 </div>
 <textarea class="search-input" id="inputDescripcionProducto" name="descripcion" placeholder="Descripción corta..." style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; resize: none; height: 60px;"></textarea>
 <div style="display: flex; gap: 10px;">
-<select class="search-input" id="inputNegocioProducto" name="negocio.idNegocio" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
-<option disabled="" selected="" value="">Negocio...</option>
-<option th:each="n : ${listaNegocios}" th:text="${n.nombre}" th:value="${n.idNegocio}"></option>
-</select>
+
+
+<input type="hidden"id="inputNegocioProducto" name="negocio.idNegocio" th:value="${negocioSeleccionado.idNegocio}">
+<div class="search-input">
+    <i class="fa-solid fa-store"></i>
+    <span
+        th:text="${negocioSeleccionado.nombre}">
+        Negocio
+    </span>
+</div>
+
 <select class="search-input" id="inputCategoriaProducto" name="categoriaProducto.idCategoriaProducto" required="" style="border: 1px solid var(--borde-sutil); padding: 10px; border-radius: 8px; width: 100%; background: var(--fondo-principal);">
 <option disabled="" selected="" value="">Categoría...</option>
 <option th:each="c : ${listaCategorias}" th:text="${c.nombre}" th:value="${c.idCategoriaProducto}"></option>

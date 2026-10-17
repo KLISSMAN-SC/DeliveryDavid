@@ -1,12 +1,17 @@
 package com.proyecto.services;
 
 import com.proyecto.dto.*;
+import com.proyecto.model.ConsentimientoLegal;
 import com.proyecto.model.Usuario;
 import com.proyecto.repository.*;
 import com.proyecto.security.*;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +25,7 @@ public class UserAccountService {
   private final PasswordPolicy policy;
   private final EmailService email;
   private final SecurityAudit audit;
-
+  @Autowired private ConsentimientoLegalRepository consentimientoLegalRepository;
   public UserAccountService(
       UsuarioRepository users,
       RolRepository roles,
@@ -42,7 +47,10 @@ public class UserAccountService {
 
   @Transactional
   public Usuario createClient(
-      String nombres, String apellidos, String telefono, String correo, String hash) {
+      String nombres, String apellidos, String telefono, String correo, String hash,
+      String versionTerminos,
+      String versionPrivacidad,
+      Instant fechaAceptacionLegal) {
     if (users.findByCorreoElectronico(correo).isPresent()
         || users.findByTelefono(telefono).isPresent())
       throw BusinessException.invalid("No se pudo completar el registro con esos datos.");
@@ -60,6 +68,40 @@ public class UserAccountService {
     u.setIntentosFallidos(0);
     users.saveAndFlush(u);
     audit.event("ACCOUNT_CREATED", u.getIdUsuario());
+ // ==========================================
+    // REGISTRAR CONSENTIMIENTO
+    // ==========================================
+
+    ConsentimientoLegal consentimiento =
+        new ConsentimientoLegal();
+
+
+    consentimiento.setUsuario(
+       u
+    );
+
+
+    consentimiento.setVersionTerminos(
+        versionTerminos
+    );
+
+
+    consentimiento.setVersionPrivacidad(
+        versionPrivacidad
+    );
+
+
+    consentimiento.setFechaAceptacion(
+    		LocalDateTime.ofInstant(
+    		        fechaAceptacionLegal,
+    		        ZoneId.of("America/Lima")
+    		    )
+    );
+
+
+    consentimientoLegalRepository.save(
+        consentimiento
+    );
     return u;
   }
 

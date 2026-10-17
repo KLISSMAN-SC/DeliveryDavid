@@ -616,32 +616,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-// ==========================================
-// MODAL CRUD PRODUCTOS
-// ==========================================
-function abrirModalProducto(id, nombre, descripcion, precio, disponible, idNegocio, idCategoria, seccionMenu) {
-    document.getElementById("inputSeccionMenu").value = seccionMenu || "PRINCIPAL";
+function abrirModalProducto(id,nombre,descripcion,precio,disponible,idNegocio,idCategoria,seccionMenu
+) {
+    const inputNegocio =document.getElementById("inputNegocioProducto");
     if (id) {
-        document.getElementById('tituloModalProducto').innerText = 'Editar Producto';
-        document.getElementById('inputIdProducto').value = id;
-        document.getElementById('inputNombreProducto').value = nombre || '';
-        document.getElementById('inputDescripcionProducto').value = descripcion || '';
-        document.getElementById('inputPrecioProducto').value = precio || '';
-        // Convertimos el booleano en texto para el selector
-        document.getElementById('inputDisponibleProducto').value = (disponible !== false) ? 'true' : 'false';
-        document.getElementById('inputNegocioProducto').value = idNegocio || '';
-        document.getElementById('inputCategoriaProducto').value = idCategoria || '';
+        document.getElementById("tituloModalProducto").innerText ="Editar Producto";
+        document.getElementById("inputIdProducto").value =id;
+        document.getElementById("inputNombreProducto").value =nombre || "";
+        document.getElementById("inputDescripcionProducto").value =descripcion || "";
+        document.getElementById("inputPrecioProducto").value =precio ?? "";
+        document.getElementById("inputDisponibleProducto").value =String(disponible);
+        document.getElementById("inputCategoriaProducto").value =idCategoria || "";
+        document.getElementById("inputSeccionMenu").value =seccionMenu || "";
+        // NO es necesario cambiar
+        // el negocio desde JS.
     } else {
-        document.getElementById('tituloModalProducto').innerText = 'Nuevo Producto';
-        document.getElementById('inputIdProducto').value = '';
-        document.getElementById('inputNombreProducto').value = '';
-        document.getElementById('inputDescripcionProducto').value = '';
-        document.getElementById('inputPrecioProducto').value = '';
-        document.getElementById('inputDisponibleProducto').value = 'true';
-        document.getElementById('inputNegocioProducto').value = '';
-        document.getElementById('inputCategoriaProducto').value = '';
+        document.getElementById("tituloModalProducto").innerText ="Nuevo Producto";
+        document.getElementById("inputIdProducto").value ="";
+        document.getElementById("inputNombreProducto").value ="";
+        document.getElementById("inputDescripcionProducto").value ="";
+        document.getElementById("inputPrecioProducto").value ="";
+        document.getElementById("inputDisponibleProducto").value ="true";
+        document.getElementById("inputCategoriaProducto").value ="";
+        document.getElementById("inputSeccionMenu").value ="";
+
+        /*
+         * IMPORTANTE:
+         *
+         * NO:
+         *
+         * inputNegocio.value = "";
+         *
+         * porque Thymeleaf ya dejó aquí
+         * el id del negocio actual.
+         */
     }
-    document.getElementById('modalProducto').style.display = 'flex';
+    document.getElementById("modalProducto").style.display ="flex";
 }
 
 // ==========================================

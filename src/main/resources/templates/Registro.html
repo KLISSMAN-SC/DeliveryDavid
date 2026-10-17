@@ -37,14 +37,28 @@
 </div>
 <div class="input-group-login" style="margin-bottom: 5px;">
 <i class="fa-solid fa-lock"></i>
-<input autocomplete="new-password" data-argc="0" data-input="validarPassword" id="inputPassword" minlength="12" name="password" placeholder="Crea una contraseña" required="" type="password"/>
+<input autocomplete="new-password" data-argc="0" data-input="validarPassword" id="inputPassword" minlength="8" name="password" placeholder="Crea una contraseña" required="" type="password"/>
 <!-- Opcional: Ojito para ver la contraseña -->
 <i class="fa-solid fa-eye-slash" data-argc="0" data-click="toggleVisibilidad" id="togglePassword" style="cursor: pointer; position: absolute; right: 15px; color: var(--texto-secundario);"></i>
 </div>
+<div class="aceptacion-legal">
+    <label class="checkbox-legal">
+        <input type="checkbox" id="aceptaLegales" name="aceptaLegales" value="true">
+        <span>
+            Acepto los
+            <a th:href="@{/terminos-condiciones}" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a>
+            y la
+            <a th:href="@{/politica-privacidad}"target="_blank"rel="noopener noreferrer"> Política de Privacidad</a>
+        </span>
+    </label>
+</div>
+
+
+
 <!-- Contenedor de validación visual -->
 <div class="password-requisitos" id="passwordRequisitos">
 <div class="req-item" id="req-long">
-<i class="fa-solid fa-circle-xmark"></i> Mínimo 12 caracteres
+<i class="fa-solid fa-circle-xmark"></i> Mínimo 8 caracteres
                     </div>
 <div class="req-item" id="req-mayus">
 <i class="fa-solid fa-circle-xmark"></i> Una mayúscula

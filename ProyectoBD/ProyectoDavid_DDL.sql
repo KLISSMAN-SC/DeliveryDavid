@@ -46,6 +46,18 @@ CREATE TABLE IF NOT EXISTS `proyecto_david`.`USUARIO` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `proyecto_david`.`CONSENTIMIENTO_LEGAL`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `proyecto_david`.`CONSENTIMIENTO_LEGAL` (
+    idConsentimiento INT AUTO_INCREMENT PRIMARY KEY,
+    versionTerminos VARCHAR(30) NOT NULL,
+    versionPrivacidad VARCHAR(30) NOT NULL,
+    fechaAceptacion DATETIME NOT NULL,
+    idUsuario INT NOT NULL,
+    CONSTRAINT fk_consentimiento_usuario FOREIGN KEY (idUsuario) REFERENCES USUARIO(idUsuario)
+);
 
 -- -----------------------------------------------------
 -- Table `proyecto_david`.`TIPO_NEGOCIO`

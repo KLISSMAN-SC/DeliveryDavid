@@ -3,12 +3,12 @@ INSERT INTO `centro_comercial` VALUES
 (2,'Open Plaza Pucallpa','Av. Centenario 2086, Yarinacocha',-8.38720000,-74.56880000);
 
 INSERT INTO `tipo_negocio` VALUES 
-(1,'Restaurantes','restaurantes.png'),
-(2,'Súper','super.png'),
-(3,'Farmacias','farmacias.png'),
-(4,'Tiendas','tiendas.png'),
-(5,'Bebidas','bebidas.png'),
-(6,'Mascotas','mascotas.png');
+(1,'Restaurantes','restaurantes.png',1),
+(2,'Súper','super.png',1),
+(3,'Farmacias','farmacias.png',1),
+(4,'Tiendas','tiendas.png',1),
+(5,'Bebidas','bebidas.png',1),
+(6,'Mascotas','mascotas.png',1);
 
 INSERT INTO `zona` VALUES 
 (1,'SAPORI',3.00),

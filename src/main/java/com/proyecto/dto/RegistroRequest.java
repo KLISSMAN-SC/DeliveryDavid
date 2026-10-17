@@ -7,4 +7,10 @@ public record RegistroRequest(
     @NotBlank @Size(max = 45) String apellidos,
     @NotBlank @Pattern(regexp = "[0-9]{9,15}") String telefono,
     @NotBlank @Email @Size(max = 45) String correoElectronico,
-    @NotBlank String password) {}
+    @NotBlank String password,
+    @AssertTrue(
+    	    message =
+    	        "Debes aceptar los Términos y Condiciones y la Política de Privacidad."
+    	)
+    	Boolean aceptaLegales
+		) {}

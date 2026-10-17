@@ -2315,3 +2315,55 @@ footer {
 @keyframes girarLoader {
     to { transform: rotate(360deg); }
 }
+.aceptacion-legal {
+
+    margin-top: 18px;
+    margin-bottom: 25px;
+}
+
+
+.checkbox-legal {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    color: #bdbdbd;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    cursor: pointer;
+}
+
+
+.checkbox-legal input {
+
+    width: 18px;
+    height: 18px;
+
+    margin-top: 2px;
+
+    accent-color: #ff6500;
+
+    cursor: pointer;
+}
+
+
+.checkbox-legal a {
+
+    color: #ff6500;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.checkbox-legal a:hover {
+
+    text-decoration: underline;
+}

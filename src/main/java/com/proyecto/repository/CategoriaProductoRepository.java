@@ -12,4 +12,9 @@ public interface CategoriaProductoRepository extends JpaRepository<CategoriaProd
   // Extrae solo los nombres de categoría eliminando los repetidos
   @Query("SELECT DISTINCT c.nombre FROM CategoriaProducto c")
   List<String> findNombresUnicos();
+  
+  List<CategoriaProducto>
+  findByNegocio_IdNegocioOrderByNombreAsc(
+      Integer idNegocio
+  );
 }

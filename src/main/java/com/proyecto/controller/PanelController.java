@@ -7,6 +7,7 @@ import com.proyecto.services.*;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +37,11 @@ public class PanelController {
   @Autowired private PasswordPolicy passwords;
   @Autowired private FileStorageService storage;
   @Autowired private SecurityAudit audit;
+  
+  //SERVICE
+  @Autowired private CategoriaProductoService categoriaProductoService;
+  @Autowired private NegocioService negocioService;
+  @Autowired private ProductoService productoService;
 
   @Value("${google.maps.api-key:}")
   private String googleMapsApiKey;
@@ -168,7 +174,7 @@ public class PanelController {
         model.addAttribute("listaPromociones", promocionRepo.findAll());
         model.addAttribute("listaNegocios", negocioRepo.findAll());
       }
-      case "pedidos" -> {
+      /*case "pedidos" -> {
         var u =
             usuarioRepo
                 .findByCorreoElectronico(auth.getName())
@@ -178,7 +184,7 @@ public class PanelController {
             admin
                 ? pedidoRepo.findAll()
                 : pedidoRepo.findByRepartidorIdUsuarioOrderByIdPedidoDesc(u.getIdUsuario()));
-      }
+      }*/
       case "configuracion" ->
           model.addAttribute("configApp", configRepo.findById(1).orElse(new Configuracion()));
       default -> throw BusinessException.missing();
@@ -371,6 +377,13 @@ public class PanelController {
             .orElseThrow(BusinessException::missing));
     if (!p.getCategoriaProducto().getNegocio().getIdNegocio().equals(p.getNegocio().getIdNegocio()))
       throw BusinessException.invalid("La categoría no pertenece al negocio.");
+ // ==========================================
+    // GUARDAMOS EL ID DEL NEGOCIO
+    // PARA REGRESAR AL MISMO
+    // ==========================================
+
+    Integer idNegocio =p.getNegocio().getIdNegocio();
+    
     var old =
         p.getIdProducto() == null
             ? null
@@ -381,13 +394,33 @@ public class PanelController {
       productoRepo.saveAndFlush(p);
       image.commit();
     }
-    return success(f, "productos", "PRODUCT_SAVED");
+ // ==========================================
+    // MENSAJE
+    // ==========================================
+
+    f.addFlashAttribute("mensajeExito",old == null? "Producto creado correctamente." : "Producto actualizado correctamente." );
+    return "redirect:/panel/negocios/"+ idNegocio+ "/productos";
+    
   }
 
   @PostMapping("/productos/eliminar")
-  public String eliminarProducto(@RequestParam Integer idProducto, RedirectAttributes f) {
-    productoRepo.deleteById(idProducto);
-    return success(f, "productos", "PRODUCT_DELETED");
+  public String eliminarProducto(
+      @RequestParam Integer idProducto,
+      RedirectAttributes f) {
+      Producto producto =productoRepo.findById(idProducto).orElseThrow(BusinessException::missing );
+
+      Integer idNegocio =producto.getNegocio().getIdNegocio();
+      try {
+          productoRepo.delete( producto );
+          productoRepo.flush();
+          f.addFlashAttribute("mensajeExito",  "Producto eliminado correctamente.");
+      } catch (
+          org.springframework.dao.DataIntegrityViolationException e
+      ) {
+          f.addFlashAttribute("mensajeError","No se puede eliminar el producto porque tiene información relacionada.");
+      }
+      return
+          "redirect:/panel/negocios/"+ idNegocio+ "/productos";
   }
 
   @PostMapping("/promociones/guardar")
@@ -471,5 +504,81 @@ public class PanelController {
     c.setIdConfiguracion(1);
     configRepo.saveAndFlush(c);
     return success(f, "configuracion", "CONFIG_CHANGED");
+  }
+  @GetMapping("/negocios/{idNegocio}/productos")
+  public String productosDelNegocio(
+
+          @PathVariable
+          Integer idNegocio,
+
+          @RequestParam(
+              name = "q",
+              required = false,
+              defaultValue = ""
+          )
+          String q,
+
+          @RequestParam(
+              name = "pagina",
+              defaultValue = "0"
+          )
+          int pagina,
+
+          Model model) {
+
+
+      // ==========================================
+      // NEGOCIO
+      // ==========================================
+
+      Negocio negocio =
+          negocioService.obtenerporId(
+              idNegocio
+          );
+
+
+      if (negocio == null) {
+
+          return "redirect:/panel?modulo=negocios";
+      }
+
+
+      // ==========================================
+      // PRODUCTOS SOLO DEL NEGOCIO
+      // ==========================================
+
+      Page<Producto> paginaProductos =
+          productoService.listarAdminPorNegocio(
+              idNegocio,
+              q,
+              pagina,
+              20
+          );
+
+
+      // ==========================================
+      // CATEGORÍAS SOLO DEL NEGOCIO
+      // ==========================================
+
+      List<CategoriaProducto> categorias =
+          categoriaProductoService
+              .listarPorNegocio(
+                  idNegocio
+              );
+
+
+      // ==========================================
+      // MODEL
+      // ==========================================
+
+      model.addAttribute("modulo","productos_negocio");
+      model.addAttribute("negocioSeleccionado",negocio);
+      model.addAttribute("listaProductos",paginaProductos.getContent());
+      model.addAttribute("paginaProductos", paginaProductos);
+      model.addAttribute( "listaCategorias", categorias);
+      model.addAttribute( "q",q);
+
+
+      return "Panel";
   }
 }

@@ -21,7 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class RegistroController {
-  private record Pending(
+  
+	private record Pending(
       String nombres,
       String apellidos,
       String telefono,
@@ -29,7 +30,10 @@ public class RegistroController {
       String passwordHash,
       String codeHash,
       Instant expires,
-      int attempts)
+      int attempts,
+      String versionTerminos,
+      String versionPrivacidad,
+      Instant fechaAceptacionLegal)
       implements java.io.Serializable {}
 
   private final PasswordEncoder encoder;
@@ -81,6 +85,8 @@ public class RegistroController {
       limits.check("register-account", correo, 3, Duration.ofMinutes(15));
       policy.validate(form.password());
       String code = TokenTools.code();
+      //Ahorita
+      Instant ahora =Instant.now();
       Pending pending =
           new Pending(
               form.nombres(),
@@ -90,7 +96,10 @@ public class RegistroController {
               encoder.encode(form.password()),
               TokenTools.hash(code),
               Instant.now().plus(Duration.ofMinutes(10)),
-              0);
+              0,
+              LegalVersions.TERMINOS,
+              LegalVersions.PRIVACIDAD,
+              ahora);
       email.enviarCorreoVerificacion(correo, code, form.nombres() + " " + form.apellidos());
       req.getSession().setAttribute("pendingRegistration", pending);
       return "redirect:/verificar";
@@ -134,7 +143,11 @@ public class RegistroController {
               p.passwordHash(),
               p.codeHash(),
               p.expires(),
-              p.attempts() + 1));
+              p.attempts() + 1,
+              p.versionTerminos(),
+              p.versionPrivacidad(),
+              p.fechaAceptacionLegal())
+          );
       if (!codigoIngresado.matches("[0-9]{6}")
           || !TokenTools.matches(codigoIngresado, p.codeHash())) {
         model.addAttribute("error", "Código incorrecto.");
@@ -142,7 +155,10 @@ public class RegistroController {
       }
       try {
         accounts.createClient(
-            p.nombres(), p.apellidos(), p.telefono(), p.correo(), p.passwordHash());
+            p.nombres(), p.apellidos(), p.telefono(), p.correo(), p.passwordHash(),
+            p.versionTerminos(),
+            p.versionPrivacidad(),
+            p.fechaAceptacionLegal());
       } catch (BusinessException | org.springframework.dao.DataIntegrityViolationException e) {
         session.removeAttribute("pendingRegistration");
         model.addAttribute("error", "No se pudo completar el registro con esos datos.");
